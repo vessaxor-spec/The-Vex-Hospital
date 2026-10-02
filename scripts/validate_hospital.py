@@ -81,6 +81,56 @@ def validate_protocol():
     return protocol
 
 
+def collect_condition_facts(expression):
+    facts = set()
+
+    if "fact" in expression:
+        facts.add(expression["fact"])
+    elif "not" in expression:
+        facts.update(collect_condition_facts(expression["not"]))
+    else:
+        for key in ("all", "any"):
+            for item in expression.get(key, []):
+                facts.update(collect_condition_facts(item))
+
+    return facts
+
+
+def validate_transition_conditions(protocol):
+    registry_path = ROOT / "protocol" / "conditions.json"
+    schema_path = ROOT / "protocol" / "conditions.schema.json"
+    validate_json_schema(registry_path, schema_path)
+
+    registry = load_json(registry_path)
+
+    predicates = {
+        transition["when"]
+        for transitions in protocol["transitions"].values()
+        for transition in transitions
+    }
+    predicates.update(
+        transition["when"] for transition in protocol["global_transitions"]
+    )
+
+    registered = set(registry["conditions"])
+    require(
+        registered == predicates,
+        "Transition condition registry must exactly match protocol predicates. "
+        f"Missing={sorted(predicates - registered)} Extra={sorted(registered - predicates)}",
+    )
+
+    referenced_facts = set()
+    for expression in registry["conditions"].values():
+        referenced_facts.update(collect_condition_facts(expression))
+
+    declared_facts = set(registry["facts"])
+    require(
+        referenced_facts == declared_facts,
+        "Transition fact registry must exactly match referenced facts. "
+        f"Missing={sorted(referenced_facts - declared_facts)} Extra={sorted(declared_facts - referenced_facts)}",
+    )
+
+
 def validate_specialists():
     registry_path = ROOT / "specialists" / "registry.yaml"
     schema_path = ROOT / "specialists" / "registry.schema.json"
@@ -234,6 +284,9 @@ def main():
     try:
         protocol = validate_protocol()
         checks.append("protocol")
+
+        validate_transition_conditions(protocol)
+        checks.append("transition-policy")
 
         specialists = validate_specialists()
         checks.append("specialists")
