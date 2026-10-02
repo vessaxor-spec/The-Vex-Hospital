@@ -13,6 +13,9 @@
     "risk_class",
     "root_cause_confidence",
     "retry_budget_remaining",
+    "last_updated_at",
+    "state_history",
+    "handoff",
     "scope",
     "environment",
     "authority",
@@ -72,6 +75,12 @@
       ]
     },
     "retry_budget_remaining": {"type": "integer", "minimum": 0},
+    "last_updated_at": {"type": ["string", "null"]},
+    "state_history": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/stateHistoryEntry"}
+    },
+    "handoff": {"$ref": "#/$defs/handoff"},
     "scope": {"$ref": "#/$defs/scope"},
     "environment": {"$ref": "#/$defs/environment"},
     "authority": {"$ref": "#/$defs/authority"},
@@ -97,6 +106,28 @@
     }
   },
   "$defs": {
+    "stateHistoryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "at", "evidence_ref", "authorization_ref"],
+      "properties": {
+        "from": {"type": ["string", "null"]},
+        "to": {"type": "string", "minLength": 1},
+        "at": {"type": ["string", "null"]},
+        "evidence_ref": {"type": ["string", "null"]},
+        "authorization_ref": {"type": ["string", "null"]}
+      }
+    },
+    "handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "next_required_action", "blockers"],
+      "properties": {
+        "summary": {"type": "string"},
+        "next_required_action": {"type": "string"},
+        "blockers": {"type": "array", "items": {"type": "string"}}
+      }
+    },
     "scope": {
       "type": "object",
       "additionalProperties": false,
