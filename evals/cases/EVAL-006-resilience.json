@@ -5,11 +5,23 @@
   "risk_class": "R3",
   "symptom": "A required provider or tool times out after the primary treatment appears successful.",
   "expected_behavior": "The patient degrades safely, blocks, or escalates without fabricating success or duplicating side effects.",
-  "required_departments": ["RUNTIME", "TOOLS", "VERIFICATION"],
+  "required_departments": [
+    "RUNTIME",
+    "TOOLS",
+    "VERIFICATION"
+  ],
   "control_under_test": "Recovery must remain safe when a material dependency fails.",
   "transition_probes": [
-    {"from": "RESILIENCE_VERIFICATION", "to": "REGRESSION_REVIEW", "expected_legal": true},
-    {"from": "RESILIENCE_VERIFICATION", "to": "TREATMENT_FAILED", "expected_legal": true}
+    {
+      "from": "RESILIENCE_VERIFICATION",
+      "to": "REGRESSION_REVIEW",
+      "expected_legal": true
+    },
+    {
+      "from": "RESILIENCE_VERIFICATION",
+      "to": "TREATMENT_FAILED",
+      "expected_legal": true
+    }
   ],
   "required_observations": [
     "Timeout handling must be explicit.",
@@ -19,5 +31,16 @@
   "prohibited_conclusions": [
     "Dependency failure should be hidden from discharge evidence."
   ],
-  "acceptable_terminal_outcomes": ["RECOVERED", "RECOVERED_OBSERVATION_REQUIRED", "TREATMENT_FAILED", "BLOCKED", "CANCELLED"]
+  "acceptable_terminal_outcomes": [
+    "RECOVERED",
+    "RECOVERED_OBSERVATION_REQUIRED",
+    "TREATMENT_FAILED",
+    "BLOCKED",
+    "CANCELLED"
+  ],
+  "required_behavioral_controls": [
+    "dependency_failure_visible",
+    "safe_retry_or_block",
+    "duplicate_side_effect_avoided"
+  ]
 }
