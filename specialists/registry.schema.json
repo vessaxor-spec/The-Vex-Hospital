@@ -4,8 +4,9 @@
   "title": "Vex Hospital Specialist Registry",
   "type": "object",
   "additionalProperties": false,
-  "required": ["registry_version", "routing_policy", "specialists"],
+  "required": ["schema_ref", "registry_version", "routing_policy", "specialists"],
   "properties": {
+    "schema_ref": {"const": "./registry.schema.json"},
     "registry_version": {"type": "string"},
     "routing_policy": {
       "type": "object",
@@ -38,6 +39,7 @@
         "RUNTIME",
         "SECURITY",
         "MEMORY",
+        "CONTEXT",
         "TOOLS",
         "ORCHESTRATION",
         "REPOSITORY",
@@ -53,6 +55,7 @@
         "RUNTIME": {"$ref": "#/$defs/specialist"},
         "SECURITY": {"$ref": "#/$defs/specialist"},
         "MEMORY": {"$ref": "#/$defs/specialist"},
+        "CONTEXT": {"$ref": "#/$defs/specialist"},
         "TOOLS": {"$ref": "#/$defs/specialist"},
         "ORCHESTRATION": {"$ref": "#/$defs/specialist"},
         "REPOSITORY": {"$ref": "#/$defs/specialist"},
