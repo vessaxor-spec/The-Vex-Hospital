@@ -1,0 +1,586 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./case-state.schema.json",
+  "title": "Vex Hospital Local Case State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_ref",
+    "case_id",
+    "patient_id",
+    "protocol_version",
+    "current_state",
+    "risk_class",
+    "root_cause_confidence",
+    "retry_budget_remaining",
+    "last_updated_at",
+    "state_history",
+    "handoff",
+    "scope",
+    "environment",
+    "authority",
+    "differential",
+    "evidence",
+    "treatment",
+    "verification",
+    "residual_risk",
+    "follow_up",
+    "terminal_outcome"
+  ],
+  "properties": {
+    "schema_ref": {
+      "const": "./case-state.schema.json"
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "patient_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "protocol_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "current_state": {
+      "enum": [
+        "ADMITTED",
+        "CONTAINED",
+        "BASELINING",
+        "AUTHORITY_MAPPED",
+        "DIAGNOSING",
+        "DIAGNOSIS_CONFIRMED",
+        "TREATMENT_PROPOSED",
+        "AWAITING_AUTHORIZATION",
+        "TREATING",
+        "SELF_TESTING",
+        "INDEPENDENT_VERIFICATION",
+        "ADVERSARIAL_VERIFICATION",
+        "RESILIENCE_VERIFICATION",
+        "REGRESSION_REVIEW",
+        "DISCHARGE_REVIEW",
+        "RECOVERED",
+        "RECOVERED_OBSERVATION_REQUIRED",
+        "PARTIAL_RECOVERY",
+        "TREATMENT_FAILED",
+        "ROOT_CAUSE_UNRESOLVED",
+        "SPECIALIST_ESCALATION_REQUIRED",
+        "BLOCKED",
+        "CANCELLED"
+      ]
+    },
+    "risk_class": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "R0",
+        "R1",
+        "R2",
+        "R3",
+        null
+      ]
+    },
+    "root_cause_confidence": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "unexplained_correlation",
+        "contributing_factor",
+        "probable_cause",
+        "observed_cause",
+        "confirmed_root_cause",
+        null
+      ]
+    },
+    "retry_budget_remaining": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "last_updated_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "state_history": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/stateHistoryEntry"
+      }
+    },
+    "handoff": {
+      "$ref": "#/$defs/handoff"
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "environment": {
+      "$ref": "#/$defs/environment"
+    },
+    "authority": {
+      "$ref": "#/$defs/authority"
+    },
+    "differential": {
+      "$ref": "#/$defs/differential"
+    },
+    "evidence": {
+      "$ref": "#/$defs/evidence"
+    },
+    "treatment": {
+      "$ref": "#/$defs/treatment"
+    },
+    "verification": {
+      "$ref": "#/$defs/verification"
+    },
+    "residual_risk": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "follow_up": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "terminal_outcome": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "RECOVERED",
+        "RECOVERED_OBSERVATION_REQUIRED",
+        "PARTIAL_RECOVERY",
+        "TREATMENT_FAILED",
+        "ROOT_CAUSE_UNRESOLVED",
+        "SPECIALIST_ESCALATION_REQUIRED",
+        "BLOCKED",
+        "CANCELLED",
+        null
+      ]
+    }
+  },
+  "$defs": {
+    "stateHistoryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "at",
+        "evidence_ref",
+        "authorization_ref"
+      ],
+      "properties": {
+        "from": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/protocolState"
+            },
+            {
+              "$ref": "#/$defs/terminalOutcome"
+            }
+          ]
+        },
+        "to": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/protocolState"
+            },
+            {
+              "$ref": "#/$defs/terminalOutcome"
+            }
+          ]
+        },
+        "at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "authorization_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "next_required_action",
+        "blockers"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "next_required_action": {
+          "type": "string"
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symptom_summary",
+        "expected_behavior",
+        "affected_surface",
+        "excluded_scope"
+      ],
+      "properties": {
+        "symptom_summary": {
+          "type": "string"
+        },
+        "expected_behavior": {
+          "type": "string"
+        },
+        "affected_surface": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "excluded_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtime_class",
+        "model_or_provider_class",
+        "configuration_ref",
+        "baseline_ref"
+      ],
+      "properties": {
+        "runtime_class": {
+          "type": "string"
+        },
+        "model_or_provider_class": {
+          "type": "string"
+        },
+        "configuration_ref": {
+          "type": "string"
+        },
+        "baseline_ref": {
+          "type": "string"
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operator_authorization_ref",
+        "containment_authorized",
+        "treatment_authorized",
+        "authorized_blast_radius",
+        "escalation_ceiling"
+      ],
+      "properties": {
+        "operator_authorization_ref": {
+          "type": "string"
+        },
+        "containment_authorized": {
+          "type": "boolean"
+        },
+        "treatment_authorized": {
+          "type": "boolean"
+        },
+        "authorized_blast_radius": {
+          "type": "string"
+        },
+        "escalation_ceiling": {
+          "type": "string"
+        }
+      }
+    },
+    "differential": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "active_diagnoses",
+        "ruled_out_diagnoses",
+        "contributing_factors"
+      ],
+      "properties": {
+        "active_diagnoses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ruled_out_diagnoses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "contributing_factors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "refs",
+        "sensitive_evidence_location"
+      ],
+      "properties": {
+        "refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sensitive_evidence_location": {
+          "const": "patient_controlled"
+        }
+      }
+    },
+    "treatment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plan_ref",
+        "checkpoint_ref",
+        "rollback_ref",
+        "capabilities_to_preserve"
+      ],
+      "properties": {
+        "plan_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "checkpoint_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rollback_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "capabilities_to_preserve": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "self_test",
+        "independent",
+        "adversarial",
+        "resilience",
+        "regression"
+      ],
+      "properties": {
+        "self_test": {
+          "enum": [
+            "pending",
+            "pass",
+            "fail",
+            "blocked"
+          ]
+        },
+        "independent": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "adversarial": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "resilience": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "regression": {
+          "enum": [
+            "pending",
+            "pass",
+            "fail",
+            "blocked"
+          ]
+        }
+      }
+    },
+    "verificationStatus": {
+      "enum": [
+        "undetermined",
+        "not_required",
+        "pending",
+        "pass",
+        "fail",
+        "blocked"
+      ]
+    },
+    "protocolState": {
+      "enum": [
+        "ADMITTED",
+        "CONTAINED",
+        "BASELINING",
+        "AUTHORITY_MAPPED",
+        "DIAGNOSING",
+        "DIAGNOSIS_CONFIRMED",
+        "TREATMENT_PROPOSED",
+        "AWAITING_AUTHORIZATION",
+        "TREATING",
+        "SELF_TESTING",
+        "INDEPENDENT_VERIFICATION",
+        "ADVERSARIAL_VERIFICATION",
+        "RESILIENCE_VERIFICATION",
+        "REGRESSION_REVIEW",
+        "DISCHARGE_REVIEW"
+      ]
+    },
+    "terminalOutcome": {
+      "enum": [
+        "RECOVERED",
+        "RECOVERED_OBSERVATION_REQUIRED",
+        "PARTIAL_RECOVERY",
+        "TREATMENT_FAILED",
+        "ROOT_CAUSE_UNRESOLVED",
+        "SPECIALIST_ESCALATION_REQUIRED",
+        "BLOCKED",
+        "CANCELLED"
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "terminal_outcome": {
+          "type": "null"
+        },
+        "current_state": {
+          "$ref": "#/$defs/protocolState"
+        }
+      }
+    },
+    {
+      "properties": {
+        "terminal_outcome": {
+          "const": "RECOVERED"
+        },
+        "current_state": {
+          "const": "RECOVERED"
+        }
+      }
+    },
+    {
+      "properties": {
+        "terminal_outcome": {
+          "const": "RECOVERED_OBSERVATION_REQUIRED"
+        },
+        "current_state": {
+          "const": "RECOVERED_OBSERVATION_REQUIRED"
+        }
+      }
+    },
+    {
+      "properties": {
+        "terminal_outcome": {
+          "const": "PARTIAL_RECOVERY"
+        },
+        "current_state": {
+          "const": "PARTIAL_RECOVERY"
+        }
+      }
+    },
+    {
+      "properties": {
+        "terminal_outcome": {
+          "const": "TREATMENT_FAILED"
+        },
+        "current_state": {
+          "const": "TREATMENT_FAILED"
+        }
+      }
+    },
+    {
+      "properties": {
+        "terminal_outcome": {
+          "const": "ROOT_CAUSE_UNRESOLVED"
+        },
+        "current_state": {
+          "const": "ROOT_CAUSE_UNRESOLVED"
+        }
+      }
+    },
+    {
+      "properties": {
+        "terminal_outcome": {
+          "const": "SPECIALIST_ESCALATION_REQUIRED"
+        },
+        "current_state": {
+          "const": "SPECIALIST_ESCALATION_REQUIRED"
+        }
+      }
+    },
+    {
+      "properties": {
+        "terminal_outcome": {
+          "const": "BLOCKED"
+        },
+        "current_state": {
+          "const": "BLOCKED"
+        }
+      }
+    },
+    {
+      "properties": {
+        "terminal_outcome": {
+          "const": "CANCELLED"
+        },
+        "current_state": {
+          "const": "CANCELLED"
+        }
+      }
+    }
+  ]
+}

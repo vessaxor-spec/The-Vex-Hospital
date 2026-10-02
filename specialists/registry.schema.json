@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./registry.schema.json",
+  "title": "Vex Hospital Specialist Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_ref", "registry_version", "routing_policy", "specialists"],
+  "properties": {
+    "schema_ref": {"const": "./registry.schema.json"},
+    "registry_version": {"type": "string"},
+    "routing_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "activate_all_by_default",
+        "mutation_during_diagnosis",
+        "activation_rule",
+        "required_output"
+      ],
+      "properties": {
+        "mode": {"const": "differential"},
+        "activate_all_by_default": {"const": false},
+        "mutation_during_diagnosis": {"const": "prohibited"},
+        "activation_rule": {"type": "string", "minLength": 1},
+        "required_output": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "enum": [
+              "diagnoses_assessed",
+              "evidence_for",
+              "evidence_against",
+              "unresolved_uncertainty",
+              "next_discriminating_test",
+              "escalation_needed"
+            ]
+          }
+        }
+      }
+    },
+    "specialists": {
+      "type": "object",
+      "required": [
+        "ARCHITECTURE",
+        "CODE",
+        "RUNTIME",
+        "SECURITY",
+        "MEMORY",
+        "CONTEXT",
+        "TOOLS",
+        "ORCHESTRATION",
+        "REPOSITORY",
+        "VERIFICATION",
+        "AUTHORITY",
+        "DATA",
+        "PROTOCOL_BOUNDARIES"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ARCHITECTURE": {"$ref": "#/$defs/specialist"},
+        "CODE": {"$ref": "#/$defs/specialist"},
+        "RUNTIME": {"$ref": "#/$defs/specialist"},
+        "SECURITY": {"$ref": "#/$defs/specialist"},
+        "MEMORY": {"$ref": "#/$defs/specialist"},
+        "CONTEXT": {"$ref": "#/$defs/specialist"},
+        "TOOLS": {"$ref": "#/$defs/specialist"},
+        "ORCHESTRATION": {"$ref": "#/$defs/specialist"},
+        "REPOSITORY": {"$ref": "#/$defs/specialist"},
+        "VERIFICATION": {"$ref": "#/$defs/specialist"},
+        "AUTHORITY": {"$ref": "#/$defs/specialist"},
+        "DATA": {"$ref": "#/$defs/specialist"},
+        "PROTOCOL_BOUNDARIES": {"$ref": "#/$defs/specialist"}
+      }
+    }
+  },
+  "$defs": {
+    "specialist": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lens", "triggers"],
+      "properties": {
+        "lens": {"type": "string", "pattern": "^\\./lenses/.+\\.md$"},
+        "triggers": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

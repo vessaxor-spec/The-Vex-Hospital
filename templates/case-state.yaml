@@ -1,0 +1,62 @@
+schema_ref: "./case-state.schema.json"
+case_id: "CASE-XXX"
+patient_id: "PATIENT-XXX"
+protocol_version: "1.0-draft"
+
+current_state: ADMITTED
+risk_class: null
+root_cause_confidence: null
+retry_budget_remaining: 0
+last_updated_at: null
+
+state_history: []
+
+handoff:
+  summary: ""
+  next_required_action: ""
+  blockers: []
+
+scope:
+  symptom_summary: ""
+  expected_behavior: ""
+  affected_surface: []
+  excluded_scope: []
+
+environment:
+  runtime_class: "<RUNTIME>"
+  model_or_provider_class: "<PROVIDER>"
+  configuration_ref: "<CONFIG_REF>"
+  baseline_ref: "<BASELINE_REVISION>"
+
+authority:
+  operator_authorization_ref: "<AUTH_REF>"
+  containment_authorized: false
+  treatment_authorized: false
+  authorized_blast_radius: ""
+  escalation_ceiling: ""
+
+differential:
+  active_diagnoses: []
+  ruled_out_diagnoses: []
+  contributing_factors: []
+
+evidence:
+  refs: []
+  sensitive_evidence_location: "patient_controlled"
+
+treatment:
+  plan_ref: null
+  checkpoint_ref: null
+  rollback_ref: null
+  capabilities_to_preserve: []
+
+verification:
+  self_test: pending
+  independent: undetermined
+  adversarial: undetermined
+  resilience: undetermined
+  regression: pending
+
+residual_risk: []
+follow_up: []
+terminal_outcome: null

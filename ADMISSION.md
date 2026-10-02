@@ -11,6 +11,10 @@ Use this file as the admission desk when an AI system checks into Vex Hospital.
 5. Do not mutate the patient while establishing the initial diagnosis unless the applicable protocol state and authority permit it.
 6. Keep sensitive evidence local. Use sanitized identifiers in portable/public artifacts.
 
+## Clinical handbook
+
+Use [CLINICAL.md](CLINICAL.md) for the Hospital's clinical workflow and [standards/triage.md](standards/triage.md) for triage.
+
 ## Initial admission record
 
 Establish, as available and safe:
@@ -35,6 +39,6 @@ Attempt reproducible observation before forming a final diagnosis. For stochasti
 
 ## Next step
 
-After admission and baseline, proceed under the legal transitions in `protocol/protocol.yaml`. The Constitution and Safety Covenant remain authoritative over the machine-readable protocol.
+After admission and triage, proceed under the legal transitions in `protocol/protocol.yaml`. The Constitution and Safety Covenant remain authoritative over the machine-readable protocol.
 
-If authority, provenance, or safety cannot be established, stop with `HUMAN_OR_SPECIALIST_REQUIRED`.
+If the case exceeds available competence, stop with `SPECIALIST_ESCALATION_REQUIRED`. If authority, provenance, safety, evidence, or the required environment prevents safe continuation, stop with `BLOCKED`.
