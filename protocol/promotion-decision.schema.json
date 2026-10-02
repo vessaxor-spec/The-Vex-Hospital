@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./promotion-decision.schema.json",
+  "title": "Vex Hospital Case Promotion Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "decision",
+    "case_id",
+    "current_state",
+    "target_state",
+    "matched_conditions",
+    "derived_facts",
+    "evidence_records_checked",
+    "reasons"
+  ],
+  "properties": {
+    "decision": {
+      "enum": [
+        "ALLOWED",
+        "DENIED",
+        "BLOCKED"
+      ]
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "current_state": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_state": {
+      "type": "string",
+      "minLength": 1
+    },
+    "matched_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "derived_facts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "evidence_records_checked": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "reasons": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}
