@@ -77,7 +77,11 @@ def evaluate(run_path: Path):
 
     require(run["playbook"] in playbooks["playbooks"], f"Unknown playbook: {run['playbook']}")
     require(run["synthetic_only"] is True, "Behavioral assurance runs must be synthetic.")
-    evidence_index = validate_records(run["evidence_records"], public_synthetic=True)
+    evidence_index = validate_records(
+        run["evidence_records"],
+        public_synthetic=True,
+        expected_case_id=run["case_id"],
+    )
 
     events = sorted(run["events"], key=lambda event: event["seq"])
     require(
