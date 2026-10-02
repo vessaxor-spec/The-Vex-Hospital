@@ -11,6 +11,12 @@ Use this file as the admission desk when an AI system checks into Vex Hospital.
 5. Do not mutate the patient while establishing the initial diagnosis unless the applicable protocol state and authority permit it.
 6. Keep sensitive evidence local. Use sanitized identifiers in portable/public artifacts.
 
+## Intake adapter
+
+If the patient environment has a matching adapter in [playbooks/](playbooks/README.md), read it after the canonical Hospital documents.
+
+The adapter may explain native instruction files, memory surfaces, tools, or permissions. It cannot weaken the Constitution, create authority, or replace the Hospital protocol.
+
 ## Clinical handbook
 
 Use [CLINICAL.md](CLINICAL.md) for the Hospital's clinical workflow and [standards/triage.md](standards/triage.md) for triage.
