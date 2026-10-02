@@ -46,6 +46,8 @@ Begin with [ADMISSION.md](ADMISSION.md).
 
 The patient should then follow [HOSPITAL.md](HOSPITAL.md) as the governing Constitution and the machine-readable Hospital protocol for legal state transitions.
 
+Once admitted, [CLINICAL.md](CLINICAL.md) is the Hospital's Clinical Handbook. It explains triage, specialist examinations, diagnosis, treatment planning, recovery testing, discharge, and follow-up.
+
 Core safety boundaries are defined in [SAFETY.md](SAFETY.md). Security researchers should use [SECURITY.md](SECURITY.md).
 
 ## Hospital doctrine
@@ -72,6 +74,6 @@ Sensitive patient evidence should remain in the patient-controlled environment a
 
 ## Hospital status
 
-Vex Hospital v1 is under construction. The constitutional foundation and machine-readable protocol engine are established. Clinical specialist standards, patient charts, agent-specific intake playbooks, and the assurance suite are being added in reviewed tranches.
+Vex Hospital v1 is under construction. The constitutional foundation, machine-readable protocol engine, and clinical system are established in the current v1 work. Agent-specific intake playbooks and the assurance suite remain the next major reviewed tranches.
 
 See [DISCLAIMER.md](DISCLAIMER.md) before relying on results.
