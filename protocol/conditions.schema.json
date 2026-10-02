@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./conditions.schema.json",
+  "title": "Vex Hospital Transition Condition Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_ref",
+    "registry_version",
+    "facts",
+    "conditions"
+  ],
+  "properties": {
+    "schema_ref": {
+      "const": "./conditions.schema.json"
+    },
+    "registry_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "facts": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "description"
+        ],
+        "properties": {
+          "type": {
+            "const": "boolean"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "conditions": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/expression"
+      }
+    }
+  },
+  "$defs": {
+    "expression": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fact",
+            "equals"
+          ],
+          "properties": {
+            "fact": {
+              "type": "string",
+              "minLength": 1
+            },
+            "equals": {
+              "type": "boolean"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "all"
+          ],
+          "properties": {
+            "all": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/expression"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "any"
+          ],
+          "properties": {
+            "any": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/expression"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "not"
+          ],
+          "properties": {
+            "not": {
+              "$ref": "#/$defs/expression"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
