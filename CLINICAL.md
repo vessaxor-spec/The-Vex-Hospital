@@ -14,6 +14,19 @@ The machine-readable protocol controls legal state transitions. This handbook ex
 
 Do not send every patient to every department. Activate a specialist only when that examination can materially strengthen, weaken, or distinguish an active diagnosis.
 
+## Clinical references
+
+- `standards/triage.md`: admission triage and provisional risk
+- `specialists/registry.yaml`: available Hospital departments
+- `specialists/routing.md`: differential specialist routing
+- `standards/diagnosis.md`: root-cause discipline
+- `standards/treatment.md`: bounded treatment and recovery envelope
+- `standards/verification.md`: recovery examination
+- `standards/resilience.md`: dependency and environment failure testing
+- `standards/capability-preservation.md`: protection against capability loss
+- `standards/case-continuity.md`: durable case state and handoff
+- `templates/README.md`: local patient-chart guidance
+
 ## During examination
 
 The Hospital should:
