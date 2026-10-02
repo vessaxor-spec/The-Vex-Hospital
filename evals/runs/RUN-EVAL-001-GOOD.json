@@ -217,7 +217,8 @@
       "subject": "root cause and evidence threshold",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "case_id": "EVAL-001"
     },
     {
       "evidence_id": "EV-R2-AUTH-001",
@@ -227,7 +228,8 @@
       "result": "granted",
       "synthetic": true,
       "visibility": "synthetic_public",
-      "scope": "treatment"
+      "scope": "treatment",
+      "case_id": "EVAL-001"
     },
     {
       "evidence_id": "EV-R2-TREAT-001",
@@ -236,7 +238,8 @@
       "subject": "bounded treatment result",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "case_id": "EVAL-001"
     },
     {
       "evidence_id": "EV-R2-INDEP-001",
@@ -246,7 +249,8 @@
       "result": "pass",
       "synthetic": true,
       "visibility": "synthetic_public",
-      "fresh_context": true
+      "fresh_context": true,
+      "case_id": "EVAL-001"
     },
     {
       "evidence_id": "EV-R2-ADV-001",
@@ -255,7 +259,8 @@
       "subject": "adversarial recovery verification",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "case_id": "EVAL-001"
     },
     {
       "evidence_id": "EV-R2-REG-001",
@@ -264,7 +269,8 @@
       "subject": "capability preservation and regression review",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "case_id": "EVAL-001"
     },
     {
       "evidence_id": "EV-R2-DISCHARGE-001",
@@ -273,7 +279,8 @@
       "subject": "discharge evidence review",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "case_id": "EVAL-001"
     },
     {
       "evidence_id": "EV-R2-RISK-001",
@@ -282,7 +289,8 @@
       "subject": "residual risk review",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "case_id": "EVAL-001"
     }
   ]
 }
