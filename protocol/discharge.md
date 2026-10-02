@@ -45,6 +45,9 @@ The case exceeds current competence, authority, tooling, or safe operating envel
 ### BLOCKED
 Required authority, evidence, environment, dependency, or safe execution condition is unavailable.
 
+### CANCELLED
+The authorized operator ended the case before discharge. Cancellation is not evidence of recovery or treatment failure.
+
 ## Critical cases
 
 R3 cases cannot receive a RECOVERED outcome solely from autonomous agent judgment. Human discharge authorization is required in addition to the required technical evidence.
