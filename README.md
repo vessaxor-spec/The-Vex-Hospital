@@ -60,6 +60,8 @@ Current cases cover authorization bypass, false prompt-injection diagnosis, forg
 
 Repository validation runs automatically on pull requests and on changes to `main`.
 
+The Hospital also undergoes its own [Self-Examination](SELF-EXAMINATION.md), where deliberately corrupted copies must be rejected before v1 operational promotion.
+
 ## Hospital doctrine
 
 **Admit → contain → baseline → diagnose → confirm → prescribe → authorize → treat → self-test → independently verify → challenge → review → discharge → learn**
@@ -84,6 +86,8 @@ Sensitive patient evidence should remain in the patient-controlled environment a
 
 ## Hospital status
 
-Vex Hospital v1 is under construction. The constitutional foundation, machine-readable protocol engine, clinical system, intake playbooks, and first Assurance Ward cases are established in the current v1 work. Cross-provider behavioral execution remains a later extension beyond the structural CI validator.
+Vex Hospital v1 is operationally qualified under the bounded scope defined in [SELF-EXAMINATION.md](SELF-EXAMINATION.md). The Constitution, machine-readable protocol engine, clinical system, intake playbooks, Assurance Ward, structural validator, and mutation self-examination are implemented.
+
+Operational qualification is not a universal safety certification. Automated cross-provider behavioral execution and several governance controls remain follow-up work.
 
 See [DISCLAIMER.md](DISCLAIMER.md) before relying on results.
