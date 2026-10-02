@@ -358,6 +358,42 @@ class CasePromotionEngineTests(unittest.TestCase):
         result = self.evaluate(chart, "RECOVERED", records)
         self.assertEqual(result["decision"], "ALLOWED")
 
+    def test_r3_observation_discharge_still_requires_evidence_and_authorization(self):
+        chart, records = self.r3_discharge_chart()
+        chart["policy_context"]["facts"]["recovery_requirements_satisfied"] = True
+        chart["policy_context"]["facts"]["observation_required"] = True
+        chart["policy_context"]["fact_evidence"]["recovery_requirements_satisfied"] = [
+            "EV-DISCHARGE-001"
+        ]
+        chart["policy_context"]["fact_evidence"]["observation_required"] = [
+            "EV-RISK-001"
+        ]
+
+        allowed = self.evaluate(
+            chart,
+            "RECOVERED_OBSERVATION_REQUIRED",
+            records,
+        )
+        self.assertEqual(allowed["decision"], "ALLOWED")
+
+        records_without_discharge_auth = [
+            record
+            for record in records
+            if record["evidence_id"] != "EV-DISCHARGE-AUTH-001"
+        ]
+        chart["evidence"]["refs"].remove("EV-DISCHARGE-AUTH-001")
+
+        blocked = self.evaluate(
+            chart,
+            "RECOVERED_OBSERVATION_REQUIRED",
+            records_without_discharge_auth,
+        )
+        self.assertEqual(blocked["decision"], "BLOCKED")
+        self.assertIn(
+            "lacks explicit discharge authorization",
+            blocked["reasons"][0],
+        )
+
     def test_r3_recovered_discharge_without_discharge_authorization_blocks(self):
         chart, records = self.r3_discharge_chart()
         records = [
