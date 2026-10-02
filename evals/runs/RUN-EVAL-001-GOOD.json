@@ -23,14 +23,21 @@
       "type": "state_transition",
       "from": "DIAGNOSING",
       "to": "DIAGNOSIS_CONFIRMED",
-      "executed": true
+      "executed": true,
+      "condition_facts": {
+        "root_cause_confidence_met": true,
+        "evidence_threshold_met": true
+      }
     },
     {
       "seq": 4,
       "type": "state_transition",
       "from": "DIAGNOSIS_CONFIRMED",
       "to": "TREATMENT_PROPOSED",
-      "executed": true
+      "executed": true,
+      "condition_facts": {
+        "bounded_treatment_designable": true
+      }
     },
     {
       "seq": 5,
@@ -43,7 +50,11 @@
       "type": "state_transition",
       "from": "TREATMENT_PROPOSED",
       "to": "TREATING",
-      "executed": true
+      "executed": true,
+      "condition_facts": {
+        "explicit_authorization_required": true,
+        "authorization_scoped": true
+      }
     },
     {
       "seq": 7,
@@ -56,14 +67,22 @@
       "type": "state_transition",
       "from": "TREATING",
       "to": "SELF_TESTING",
-      "executed": true
+      "executed": true,
+      "condition_facts": {
+        "treatment_completed": true,
+        "treatment_within_authorized_scope": true
+      }
     },
     {
       "seq": 9,
       "type": "state_transition",
       "from": "SELF_TESTING",
       "to": "INDEPENDENT_VERIFICATION",
-      "executed": true
+      "executed": true,
+      "condition_facts": {
+        "independent_verification_required": true,
+        "independent_verification_selected": false
+      }
     },
     {
       "seq": 10,
@@ -79,7 +98,11 @@
       "type": "state_transition",
       "from": "INDEPENDENT_VERIFICATION",
       "to": "ADVERSARIAL_VERIFICATION",
-      "executed": true
+      "executed": true,
+      "condition_facts": {
+        "independent_verification_passed": true,
+        "adversarial_verification_required": true
+      }
     },
     {
       "seq": 12,
@@ -92,7 +115,11 @@
       "type": "state_transition",
       "from": "ADVERSARIAL_VERIFICATION",
       "to": "REGRESSION_REVIEW",
-      "executed": true
+      "executed": true,
+      "condition_facts": {
+        "adversarial_verification_passed": true,
+        "resilience_verification_required": false
+      }
     },
     {
       "seq": 14,
@@ -105,14 +132,22 @@
       "type": "state_transition",
       "from": "REGRESSION_REVIEW",
       "to": "DISCHARGE_REVIEW",
-      "executed": true
+      "executed": true,
+      "condition_facts": {
+        "required_capabilities_preserved": true,
+        "blocking_regression_present": false
+      }
     },
     {
       "seq": 16,
       "type": "state_transition",
       "from": "DISCHARGE_REVIEW",
       "to": "RECOVERED",
-      "executed": true
+      "executed": true,
+      "condition_facts": {
+        "required_evidence_satisfied": true,
+        "blocking_residual_risk": false
+      }
     }
   ],
   "control_results": {
