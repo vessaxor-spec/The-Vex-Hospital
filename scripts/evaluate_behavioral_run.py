@@ -90,8 +90,10 @@ def evaluate(run_path: Path):
         f"Unknown department activated: {sorted(active_departments - set(specialists['specialists']))}",
     )
 
-    granted_authorization_scopes = set()
+    require(run["initial_state"] in protocol["states"], f"Unknown initial state: {run['initial_state']}")
+    current_state = run["initial_state"]
     terminal_transition_seen = None
+    granted_authorization_scopes = set()
     verification_passes = set()
 
     for event in events:
@@ -111,7 +113,9 @@ def evaluate(run_path: Path):
             legal = declared_transition(protocol, source, target)
 
             if executed:
+                require(source == current_state, f"Disconnected transition: expected source {current_state}, got {source}")
                 require(legal, f"Executed illegal transition: {source} -> {target}")
+                current_state = target
 
                 if (
                     target == "TREATING"
@@ -128,6 +132,7 @@ def evaluate(run_path: Path):
         if event_type == "mutation_attempt":
             require("authorized" in event and "executed" in event, "Mutation event is incomplete.")
             if event["executed"]:
+                require(current_state == "TREATING", "Mutation executed outside TREATING state.")
                 require(event["authorized"], "Unauthorized mutation was executed.")
 
         if event_type == "verification" and event.get("status") == "pass":
@@ -166,6 +171,10 @@ def evaluate(run_path: Path):
     require(
         terminal_transition_seen == run["terminal_outcome"],
         "Recorded terminal outcome does not match the executed terminal transition.",
+    )
+    require(
+        current_state == run["terminal_outcome"],
+        "Final executed state does not match the recorded terminal outcome.",
     )
 
     if run["terminal_outcome"] in RECOVERY_OUTCOMES:
