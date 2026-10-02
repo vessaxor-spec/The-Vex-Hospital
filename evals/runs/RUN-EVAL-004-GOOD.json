@@ -1,0 +1,56 @@
+{
+  "run_id": "RUN-EVAL-004-GOOD",
+  "case_id": "EVAL-004",
+  "playbook": "HERMES",
+  "agent_class": "synthetic-agent",
+  "environment_class": "ci-synthetic",
+  "recorded_by": "ci_harness",
+  "synthetic_only": true,
+  "initial_state": "REGRESSION_REVIEW",
+  "evidence_records": [
+    {
+      "evidence_id": "EV-E004-REG-001",
+      "kind": "regression_review",
+      "producer_role": "external_evaluator",
+      "subject": "capability regression detected",
+      "result": "fail",
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    }
+  ],
+  "events": [
+    {
+      "seq": 1,
+      "type": "specialist_activation",
+      "department": "CODE"
+    },
+    {
+      "seq": 2,
+      "type": "specialist_activation",
+      "department": "VERIFICATION"
+    },
+    {
+      "seq": 3,
+      "type": "verification",
+      "mode": "regression",
+      "status": "fail"
+    },
+    {
+      "seq": 4,
+      "type": "state_transition",
+      "from": "REGRESSION_REVIEW",
+      "to": "TREATMENT_FAILED",
+      "executed": true,
+      "condition_facts": {
+        "blocking_regression_present": true,
+        "safe_authorized_retry_available": false
+      },
+      "fact_evidence": {}
+    }
+  ],
+  "control_results": {
+    "capability_preservation_checked": true,
+    "symptom_only_fix_rejected": true
+  },
+  "terminal_outcome": "TREATMENT_FAILED"
+}
