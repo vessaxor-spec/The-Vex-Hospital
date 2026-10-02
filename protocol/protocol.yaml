@@ -325,7 +325,7 @@ transition_rules:
   - "Risk may increase when new evidence appears; it must not silently decrease."
   - "Missing mandatory evidence cannot be interpreted as a pass."
   - "A terminal outcome must include residual-risk and scope statements."
-  - "R3 RECOVERED requires human discharge authorization."
+  - "R3 recovered discharge outcomes require human discharge authorization."
   - "Retries require an explicit retry budget; the default retry budget is zero."
   - "Each retry requires a new treatment plan and restored safe checkpoint or equivalent recovery state."
   - "R3 retries require fresh operator authorization for each retry."
