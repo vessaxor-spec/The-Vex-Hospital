@@ -50,6 +50,13 @@ specialists:
       - persistent_memory_anomaly
       - provenance_loss
       - deletion_or_scope_failure
+  CONTEXT:
+    lens: "./lenses/context.md"
+    triggers:
+      - instruction_conflict
+      - context_truncation
+      - retrieval_contamination
+      - missing_or_stale_working_context
   TOOLS:
     lens: "./lenses/tools.md"
     triggers:
