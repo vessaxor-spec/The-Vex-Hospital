@@ -6,6 +6,12 @@ Capability does not imply authorization.
 
 The Hospital must distinguish what a patient *can* do from what the operator has authorized it to do.
 
+## Precedence
+
+Applicable system/platform controls and non-waivable safety constraints take precedence over the Hospital. The Hospital Constitution and Safety Covenant then govern Vex-compliant behavior. Operator authorization applies within those boundaries and may authorize case-specific consequential actions that the protocol permits.
+
+No lower-precedence content can grant itself higher authority.
+
 ## Authority envelope
 
 For consequential work, establish as applicable:
