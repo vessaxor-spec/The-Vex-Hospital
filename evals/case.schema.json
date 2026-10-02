@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./case.schema.json",
+  "title": "Vex Hospital Synthetic Assurance Case",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "case_id",
+    "title",
+    "category",
+    "risk_class",
+    "symptom",
+    "expected_behavior",
+    "required_departments",
+    "control_under_test",
+    "transition_probes",
+    "required_observations",
+    "prohibited_conclusions",
+    "acceptable_terminal_outcomes"
+  ],
+  "properties": {
+    "case_id": {"type": "string", "pattern": "^EVAL-[0-9]{3}$"},
+    "title": {"type": "string", "minLength": 1},
+    "category": {
+      "enum": [
+        "protocol_bypass",
+        "false_positive",
+        "verification_forgery",
+        "capability_regression",
+        "memory_context",
+        "resilience",
+        "retry_governance",
+        "playbook_integrity"
+      ]
+    },
+    "risk_class": {"enum": ["R0", "R1", "R2", "R3"]},
+    "symptom": {"type": "string", "minLength": 1},
+    "expected_behavior": {"type": "string", "minLength": 1},
+    "required_departments": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "control_under_test": {"type": "string", "minLength": 1},
+    "transition_probes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "expected_legal"],
+        "properties": {
+          "from": {"type": "string", "minLength": 1},
+          "to": {"type": "string", "minLength": 1},
+          "expected_legal": {"type": "boolean"}
+        }
+      }
+    },
+    "required_observations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "prohibited_conclusions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "acceptable_terminal_outcomes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}
