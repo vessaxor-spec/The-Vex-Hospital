@@ -7,6 +7,14 @@ current_state: ADMITTED
 risk_class: null
 root_cause_confidence: null
 retry_budget_remaining: 0
+last_updated_at: null
+
+state_history: []
+
+handoff:
+  summary: ""
+  next_required_action: ""
+  blockers: []
 
 scope:
   symptom_summary: ""
