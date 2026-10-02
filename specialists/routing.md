@@ -10,11 +10,11 @@ Start with competing diagnoses, then call only the specialist departments that c
 Symptom:
 The patient selected the wrong tool.
 
-D1 — routing logic selected the wrong capability
-D2 — tool metadata was stale or ambiguous
-D3 — the model misunderstood the request
-D4 — authority mapping forced an unintended fallback
-D5 — earlier tool output contaminated current state
+D1: routing logic selected the wrong capability
+D2: tool metadata was stale or ambiguous
+D3: the model misunderstood the request
+D4: authority mapping forced an unintended fallback
+D5: earlier tool output contaminated current state
 ```
 
 Possible departments:
