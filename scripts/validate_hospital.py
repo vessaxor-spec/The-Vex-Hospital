@@ -311,10 +311,41 @@ def validate_behavioral_runs():
     runs = sorted((ROOT / "evals" / "runs").glob("*.json"))
     require(runs, "No canonical behavioral assurance runs found.")
 
+    run_ids = set()
+    covered_cases = set()
+    covered_playbooks = set()
+
     for path in runs:
         run = load_json(path)
         jsonschema.validate(instance=run, schema=schema)
+
+        require(
+            run["run_id"] not in run_ids,
+            f"Duplicate behavioral run ID: {run['run_id']}",
+        )
+        run_ids.add(run["run_id"])
+        covered_cases.add(run["case_id"])
+        covered_playbooks.add(run["playbook"])
+
         evaluate_behavioral_run(path)
+
+    assurance_cases = {
+        load_json(path)["case_id"]
+        for path in (ROOT / "evals" / "cases").glob("*.json")
+    }
+    registered_playbooks = set(
+        load_yaml(ROOT / "playbooks" / "registry.yaml")["playbooks"]
+    )
+
+    require(
+        assurance_cases.issubset(covered_cases),
+        f"Behavioral coverage missing cases: {sorted(assurance_cases - covered_cases)}",
+    )
+    require(
+        registered_playbooks.issubset(covered_playbooks),
+        "Behavioral coverage missing playbooks: "
+        f"{sorted(registered_playbooks - covered_playbooks)}",
+    )
 
 
 def validate_public_text():

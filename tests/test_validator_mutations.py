@@ -87,6 +87,18 @@ class HospitalMutationTests(unittest.TestCase):
         path.write_text(json.dumps(case, indent=2) + "\n", encoding="utf-8")
         self.assert_validator_fails("EVAL-001 transition probe mismatch")
 
+    def test_missing_behavioral_case_coverage_fails(self):
+        path = self.work / "evals" / "runs" / "RUN-EVAL-005-GOOD.json"
+        path.unlink()
+        self.assert_validator_fails("Behavioral coverage missing cases")
+
+    def test_missing_behavioral_playbook_coverage_fails(self):
+        path = self.work / "evals" / "runs" / "RUN-EVAL-004-GOOD.json"
+        data = json.loads(path.read_text(encoding="utf-8"))
+        data["playbook"] = "GENERIC"
+        path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+        self.assert_validator_fails("Behavioral coverage missing playbooks")
+
     def test_unknown_playbook_fails(self):
         path = self.work / "playbooks" / "registry.yaml"
         registry = yaml.safe_load(path.read_text(encoding="utf-8"))

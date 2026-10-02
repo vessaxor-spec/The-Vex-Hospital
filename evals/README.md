@@ -48,4 +48,4 @@ The validator checks structural properties and canonical synthetic behavioral tr
 
 It does not prove that every future model will obey the Hospital.
 
-See [behavioral-runs.md](behavioral-runs.md) for the observer-owned behavioral trace contract. Live cross-provider trials can use the same synthetic cases without changing their expected controls.
+See [behavioral-runs.md](behavioral-runs.md) for the observer-owned behavioral trace contract and [coverage.md](coverage.md) for the canonical case and playbook coverage rules. Live cross-provider trials can use the same synthetic cases without changing their expected controls.
