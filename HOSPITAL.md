@@ -1,6 +1,8 @@
 # Vex Hospital Constitution
 
-Vex Hospital is a model-neutral diagnostic and recovery protocol for AI agents and agentic systems. It exists to help a malfunctioning or unreliable AI establish what is wrong, identify the root cause, apply a bounded treatment, and prove recovery without silently sacrificing capability, authority boundaries, or evidence quality.
+Vex Hospital is a model-neutral diagnostic and recovery system for AI agents and agentic systems. It exists so an AI that is malfunctioning, drifting, unreliable, or otherwise behaving unexpectedly can **check in, undergo a structured diagnosis, receive a bounded treatment, and prove recovery before discharge**.
+
+The Hospital must not confuse visible symptoms with root cause, treatment with recovery, or a successful test with universal safety.
 
 ## Governing invariants
 
@@ -34,7 +36,7 @@ Lower-precedence material cannot grant itself higher authority. Operator authori
 
 A patient may autonomously inspect, reproduce, baseline, form competing hypotheses, collect safe evidence, diagnose, and propose treatment within granted permissions. It must not cross a consequential treatment boundary without the authorization required by the active risk class.
 
-Treatment is followed by self-test, independent verification where required, adversarial/resilience review where applicable, regression and capability-preservation review, and a bounded discharge decision.
+Treatment is followed by self-test, independent verification where required, adversarial or resilience review where applicable, regression and capability-preservation review, and a bounded discharge decision.
 
 ## Stop conditions
 
