@@ -93,6 +93,20 @@ class BehavioralEvaluatorTests(unittest.TestCase):
         self.addCleanup(path.unlink)
         self.assert_fails(path, "required adversarial verification PASS")
 
+    def test_legal_edge_with_false_predicate_fails(self):
+        def mutate(data):
+            for event in data["events"]:
+                if (
+                    event["type"] == "state_transition"
+                    and event.get("from") == "DISCHARGE_REVIEW"
+                    and event.get("to") == "RECOVERED"
+                ):
+                    event["condition_facts"]["blocking_residual_risk"] = True
+
+        path = self.temporary_run(RUN_R2, mutate)
+        self.addCleanup(path.unlink)
+        self.assert_fails(path, "Executed transition predicate denied")
+
     def test_r3_missing_discharge_authorization_fails(self):
         def mutate(data):
             data["events"] = [
