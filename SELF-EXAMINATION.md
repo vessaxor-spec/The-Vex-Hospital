@@ -53,6 +53,20 @@ This qualification does not prove:
 
 Cross-provider behavioral runs remain a separate assurance dimension.
 
+## Known residual risks
+
+Operational qualification does not remove these known limitations:
+
+- cross-provider behavioral runs are not yet automated in CI;
+- the mutation suite covers selected control failures, not every possible protocol defect;
+- transition conditions are represented as protocol predicates and are not yet executed by a full policy engine;
+- privacy scanning is pattern based and is not a replacement for dedicated secret scanning;
+- supported agent environments may change their native instruction, tool, memory, or permission conventions;
+- repository branch protection and ruleset enforcement remain separate governance controls;
+- the project license remains a separate legal and distribution decision.
+
+These items do not invalidate the structural qualification, but they define its scope and follow-up needs.
+
 ## Operational outcome
 
 The Hospital may be labeled **v1 operational** only when the clean validator and all required self-examination mutation tests pass on the exact candidate revision.
