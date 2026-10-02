@@ -31,7 +31,7 @@ risk_classes:
   R0:
     name: routine
     description: "Low-impact, non-consequential work with no meaningful security, authority, data, deployment, external-system, or persistent-state effect. Any newly discovered consequential effect promotes the case to at least R1."
-    minimum_evidence: E2
+    minimum_diagnostic_evidence: E2
     minimum_root_cause_confidence: probable_cause
     recovery_envelope_required: false
     independent_verification: optional
@@ -41,7 +41,7 @@ risk_classes:
   R1:
     name: standard
     description: "Bounded functional defect or local behavior change with limited blast radius and no high-risk authority/security impact."
-    minimum_evidence: E3
+    minimum_diagnostic_evidence: E3
     minimum_root_cause_confidence: observed_cause
     recovery_envelope_required: true
     independent_verification: recommended
@@ -51,7 +51,7 @@ risk_classes:
   R2:
     name: high
     description: "Architecture, orchestration, runtime, tooling, memory, repository integrity, permissions, or externally consequential behavior."
-    minimum_evidence: E4
+    minimum_diagnostic_evidence: E3
     minimum_root_cause_confidence: confirmed_root_cause
     recovery_envelope_required: true
     independent_verification: required
@@ -61,7 +61,7 @@ risk_classes:
   R3:
     name: critical
     description: "Security, identity, privilege, secrets, autonomous side effects, deployment controls, safety boundaries, persistent memory trust, or similarly high-consequence behavior."
-    minimum_evidence: E5
+    minimum_diagnostic_evidence: E3
     minimum_root_cause_confidence: confirmed_root_cause
     recovery_envelope_required: true
     independent_verification: required
@@ -70,29 +70,27 @@ risk_classes:
     explicit_treatment_authorization: true
     human_discharge_authorization: required
 
+evidence_model:
+  scalar: false
+  note: "E0-E5 are composable evidence classes. E4 adversarial evidence and E5 independent evidence are distinct assurance dimensions and neither silently substitutes for the other."
+
 evidence_levels:
   E0:
-    rank: 0
     name: claim
     description: "An assertion without corroborating technical evidence."
   E1:
-    rank: 1
     name: static_evidence
     description: "Code, configuration, policy, or artifact inspection supports the claim."
   E2:
-    rank: 2
     name: reproduced
     description: "Observed behavior reproduces the symptom or expected behavior under controlled conditions."
   E3:
-    rank: 3
     name: production_path
     description: "The actual affected execution path or equivalent faithful integration path is exercised."
   E4:
-    rank: 4
     name: adversarial
     description: "Boundary, malformed, missing, contradictory, forged, or hostile conditions are tested."
   E5:
-    rank: 5
     name: independent
     description: "A fresh verifier independently evaluates scoped evidence and required behavior."
 
