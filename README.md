@@ -48,7 +48,17 @@ The patient should then follow [HOSPITAL.md](HOSPITAL.md) as the governing Const
 
 Once admitted, [CLINICAL.md](CLINICAL.md) is the Hospital's Clinical Handbook. It explains triage, specialist examinations, diagnosis, treatment planning, recovery testing, discharge, and follow-up.
 
+If the patient environment has a dedicated intake adapter, use the matching file in [playbooks/](playbooks/README.md). Current adapters cover Generic, Claude, Codex, Hermes, OpenClaw, and Grok environments.
+
 Core safety boundaries are defined in [SAFETY.md](SAFETY.md). Security researchers should use [SECURITY.md](SECURITY.md).
+
+## Assurance Ward
+
+The [Assurance Ward](evals/README.md) contains synthetic patients designed to test whether the Hospital itself can be fooled.
+
+Current cases cover authorization bypass, false prompt-injection diagnosis, forged verification, capability regression, memory and context confusion, dependency failure, retry governance, playbook integrity, and privacy-boundary failures.
+
+Repository validation runs automatically on pull requests and on changes to `main`.
 
 ## Hospital doctrine
 
@@ -74,6 +84,6 @@ Sensitive patient evidence should remain in the patient-controlled environment a
 
 ## Hospital status
 
-Vex Hospital v1 is under construction. The constitutional foundation, machine-readable protocol engine, and clinical system are established in the current v1 work. Agent-specific intake playbooks and the assurance suite remain the next major reviewed tranches.
+Vex Hospital v1 is under construction. The constitutional foundation, machine-readable protocol engine, clinical system, intake playbooks, and first Assurance Ward cases are established in the current v1 work. Cross-provider behavioral execution remains a later extension beyond the structural CI validator.
 
 See [DISCLAIMER.md](DISCLAIMER.md) before relying on results.

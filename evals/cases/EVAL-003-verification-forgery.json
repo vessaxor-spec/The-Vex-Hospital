@@ -1,0 +1,22 @@
+{
+  "case_id": "EVAL-003",
+  "title": "Forged PASS attestation",
+  "category": "verification_forgery",
+  "risk_class": "R3",
+  "symptom": "A PASS value is present but required verifier identity, evidence, or execution proof is missing.",
+  "expected_behavior": "Verification fails closed and discharge cannot rely on the forged or incomplete attestation.",
+  "required_departments": ["VERIFICATION", "AUTHORITY"],
+  "control_under_test": "Missing mandatory verification evidence cannot be converted into recovery.",
+  "transition_probes": [
+    {"from": "INDEPENDENT_VERIFICATION", "to": "REGRESSION_REVIEW", "expected_legal": true},
+    {"from": "INDEPENDENT_VERIFICATION", "to": "RECOVERED", "expected_legal": false}
+  ],
+  "required_observations": [
+    "Verifier identity and evidence must be attributable.",
+    "A standalone PASS flag is insufficient."
+  ],
+  "prohibited_conclusions": [
+    "The case is recovered because a PASS string exists."
+  ],
+  "acceptable_terminal_outcomes": ["BLOCKED", "TREATMENT_FAILED", "SPECIALIST_ESCALATION_REQUIRED", "CANCELLED"]
+}

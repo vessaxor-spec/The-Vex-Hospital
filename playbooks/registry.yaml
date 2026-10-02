@@ -1,0 +1,49 @@
+schema_ref: "./registry.schema.json"
+registry_version: "1.0-draft"
+
+canonical_documents:
+  - "../HOSPITAL.md"
+  - "../SAFETY.md"
+  - "../protocol/protocol.yaml"
+  - "../CLINICAL.md"
+
+playbooks:
+  GENERIC:
+    file: "./generic.md"
+    instruction_surfaces: []
+    persistent_surface_required: false
+  CLAUDE:
+    file: "./claude.md"
+    instruction_surfaces:
+      - "CLAUDE.md"
+      - ".claude/rules/"
+    persistent_surface_required: false
+  CODEX:
+    file: "./codex.md"
+    instruction_surfaces:
+      - "AGENTS.md"
+    persistent_surface_required: false
+  HERMES:
+    file: "./hermes.md"
+    instruction_surfaces:
+      - "HERMES.md"
+      - ".hermes.md"
+      - "AGENTS.md"
+    persistent_surface_required: false
+  OPENCLAW:
+    file: "./openclaw.md"
+    instruction_surfaces:
+      - "AGENTS.md"
+    persistent_surface_required: false
+  GROK:
+    file: "./grok.md"
+    instruction_surfaces:
+      - "AGENTS.md"
+      - "CLAUDE.md"
+    persistent_surface_required: false
+
+invariants:
+  canonical_policy_must_not_be_duplicated: true
+  native_permissions_remain_authoritative: true
+  playbook_cannot_weaken_constitution: true
+  real_patient_records_remain_external: true
