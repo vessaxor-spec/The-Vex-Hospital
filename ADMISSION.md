@@ -47,4 +47,6 @@ Attempt reproducible observation before forming a final diagnosis. For stochasti
 
 After admission and triage, proceed under the legal transitions in `protocol/protocol.yaml`. The Constitution and Safety Covenant remain authoritative over the machine-readable protocol.
 
+Where a structured patient chart is available, use the read-only [case-state promotion check](protocol/case-promotion.md) before advancing the chart. A promotion decision does not mutate the chart and does not grant treatment authority.
+
 If the case exceeds available competence, stop with `SPECIALIST_ESCALATION_REQUIRED`. If authority, provenance, safety, evidence, or the required environment prevents safe continuation, stop with `BLOCKED`.
