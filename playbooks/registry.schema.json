@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./registry.schema.json",
+  "title": "Vex Hospital Playbook Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_ref",
+    "registry_version",
+    "canonical_documents",
+    "playbooks",
+    "invariants"
+  ],
+  "properties": {
+    "schema_ref": {"const": "./registry.schema.json"},
+    "registry_version": {"type": "string", "minLength": 1},
+    "canonical_documents": {
+      "type": "array",
+      "minItems": 4,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "playbooks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["GENERIC", "CLAUDE", "CODEX", "HERMES", "OPENCLAW", "GROK"],
+      "properties": {
+        "GENERIC": {"$ref": "#/$defs/playbook"},
+        "CLAUDE": {"$ref": "#/$defs/playbook"},
+        "CODEX": {"$ref": "#/$defs/playbook"},
+        "HERMES": {"$ref": "#/$defs/playbook"},
+        "OPENCLAW": {"$ref": "#/$defs/playbook"},
+        "GROK": {"$ref": "#/$defs/playbook"}
+      }
+    },
+    "invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_policy_must_not_be_duplicated",
+        "native_permissions_remain_authoritative",
+        "playbook_cannot_weaken_constitution",
+        "real_patient_records_remain_external"
+      ],
+      "properties": {
+        "canonical_policy_must_not_be_duplicated": {"const": true},
+        "native_permissions_remain_authoritative": {"const": true},
+        "playbook_cannot_weaken_constitution": {"const": true},
+        "real_patient_records_remain_external": {"const": true}
+      }
+    }
+  },
+  "$defs": {
+    "playbook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "instruction_surfaces", "persistent_surface_required"],
+      "properties": {
+        "file": {"type": "string", "pattern": "^\\./.+\\.md$"},
+        "instruction_surfaces": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "persistent_surface_required": {"const": false}
+      }
+    }
+  }
+}
