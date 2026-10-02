@@ -27,9 +27,11 @@ def evidence(
     *,
     scope=None,
     fresh_context=None,
+    case_id="CASE-TEST",
 ):
     item = {
         "evidence_id": evidence_id,
+        "case_id": case_id,
         "kind": kind,
         "producer_role": role,
         "subject": "synthetic local promotion test",
@@ -66,7 +68,7 @@ class CasePromotionEngineTests(unittest.TestCase):
         self.addCleanup(path.unlink)
         return path
 
-    def write_bundle(self, records):
+    def write_bundle(self, records, case_id="CASE-TEST"):
         handle = tempfile.NamedTemporaryFile(
             mode="w",
             suffix=".json",
@@ -76,6 +78,7 @@ class CasePromotionEngineTests(unittest.TestCase):
         json.dump(
             {
                 "schema_ref": "./evidence-bundle.schema.json",
+                "case_id": case_id,
                 "records": records,
             },
             handle,
@@ -89,7 +92,11 @@ class CasePromotionEngineTests(unittest.TestCase):
 
     def evaluate(self, chart, target, records=None):
         chart_path = self.write_chart(chart)
-        bundle_path = self.write_bundle(records) if records is not None else None
+        bundle_path = (
+            self.write_bundle(records, chart["case_id"])
+            if records is not None
+            else None
+        )
         return evaluate_case_promotion(chart_path, target, bundle_path)
 
     def test_early_declared_transition_allowed(self):
@@ -470,6 +477,24 @@ class CasePromotionEngineTests(unittest.TestCase):
 
         self.assertEqual(result["decision"], "ALLOWED")
         self.assertEqual(before, after)
+
+    def test_cross_case_evidence_bundle_blocks(self):
+        chart = self.base_chart()
+        chart["current_state"] = "ADMITTED"
+        chart["policy_context"]["facts"] = {
+            "containment_required": False,
+        }
+
+        chart_path = self.write_chart(chart)
+        bundle_path = self.write_bundle([], case_id="CASE-OTHER")
+        result = evaluate_case_promotion(
+            chart_path,
+            "BASELINING",
+            bundle_path,
+        )
+
+        self.assertEqual(result["decision"], "BLOCKED")
+        self.assertIn("Evidence bundle case_id does not match", result["reasons"][0])
 
     def test_evidence_wrong_producer_role_blocks(self):
         chart, records = self.r3_discharge_chart()
