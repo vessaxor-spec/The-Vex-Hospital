@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./evidence-bundle.schema.json",
+  "title": "Vex Hospital Patient-Controlled Evidence Bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_ref",
+    "records"
+  ],
+  "properties": {
+    "schema_ref": {
+      "const": "./evidence-bundle.schema.json"
+    },
+    "records": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "object"
+      }
+    }
+  }
+}
