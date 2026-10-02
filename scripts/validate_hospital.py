@@ -233,6 +233,22 @@ def validate_case_template(protocol):
         "Patient chart outcome vocabulary does not match protocol outcomes.",
     )
 
+    condition_registry = load_json(ROOT / "protocol" / "conditions.json")
+    chart_facts = set(
+        schema["$defs"]["policyContext"]["properties"]["facts"]["propertyNames"]["enum"]
+    )
+    condition_facts = set(condition_registry["facts"])
+    require(
+        chart_facts == condition_facts,
+        "Patient chart policy facts do not match the transition fact registry.",
+    )
+
+    provenance_policy = load_json(ROOT / "evidence" / "fact-provenance.json")
+    require(
+        set(provenance_policy["fact_rules"]).issubset(chart_facts),
+        "Patient chart is missing one or more governed provenance facts.",
+    )
+
 
 def declared_transition(protocol, source: str, target: str) -> bool:
     if source not in protocol["states"]:
