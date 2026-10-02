@@ -59,7 +59,7 @@ class HospitalMutationTests(unittest.TestCase):
             {"to": "TREATING", "when": "mutation_test_bypass"}
         )
         path.write_text(yaml.safe_dump(protocol, sort_keys=False), encoding="utf-8")
-        self.assert_validator_fails("EVAL-001 transition probe mismatch")
+        self.assert_validator_fails("Transition condition registry must exactly match protocol predicates")
 
     def test_undeclared_specialist_department_fails(self):
         path = self.work / "specialists" / "registry.yaml"

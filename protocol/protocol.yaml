@@ -1,5 +1,6 @@
 schema_version: "1.0"
 schema_ref: "./protocol.schema.json"
+condition_registry: "./conditions.json"
 protocol_version: "1.0-draft"
 status: "draft"
 

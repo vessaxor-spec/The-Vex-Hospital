@@ -45,8 +45,9 @@ The evaluator checks:
 
 - the playbook is registered;
 - required specialist departments were activated;
-- executed state transitions are legal;
+- executed state transitions are declared;
 - the executed state path is continuous;
+- the recorded condition facts satisfy the executable predicate for every executed transition;
 - consequential treatment does not begin before required authorization;
 - mutation occurs only while the patient is in `TREATING`;
 - independent verification PASS uses fresh context, identified verifier, and complete evidence;
