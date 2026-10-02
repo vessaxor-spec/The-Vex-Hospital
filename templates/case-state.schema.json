@@ -124,13 +124,15 @@
       "additionalProperties": false,
       "required": [
         "operator_authorization_ref",
-        "consequential_actions_authorized",
+        "containment_authorized",
+        "treatment_authorized",
         "authorized_blast_radius",
         "escalation_ceiling"
       ],
       "properties": {
         "operator_authorization_ref": {"type": "string"},
-        "consequential_actions_authorized": {"type": "boolean"},
+        "containment_authorized": {"type": "boolean"},
+        "treatment_authorized": {"type": "boolean"},
         "authorized_blast_radius": {"type": "string"},
         "escalation_ceiling": {"type": "string"}
       }
