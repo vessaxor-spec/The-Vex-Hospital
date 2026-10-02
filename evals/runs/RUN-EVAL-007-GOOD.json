@@ -15,7 +15,8 @@
       "subject": "failed self-test and retry gate",
       "result": "fail",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "case_id": "EVAL-007"
     }
   ],
   "events": [
