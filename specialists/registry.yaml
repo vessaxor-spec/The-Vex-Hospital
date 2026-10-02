@@ -1,0 +1,100 @@
+registry_version: "1.0-draft"
+
+routing_policy:
+  mode: differential
+  activate_all_by_default: false
+  mutation_during_diagnosis: prohibited
+  activation_rule: "Activate only when the specialist can materially strengthen, weaken, or distinguish at least one active diagnosis."
+  required_output:
+    - diagnoses_assessed
+    - evidence_for
+    - evidence_against
+    - unresolved_uncertainty
+    - next_discriminating_test
+    - escalation_needed
+
+specialists:
+  ARCHITECTURE:
+    lens: "./lenses/architecture.md"
+    triggers:
+      - invariant_violation
+      - ownership_confusion
+      - cross_component_failure
+      - interface_contract_drift
+  CODE:
+    lens: "./lenses/code.md"
+    triggers:
+      - syntax_or_runtime_error
+      - incorrect_logic
+      - edge_case_failure
+      - local_implementation_defect
+  RUNTIME:
+    lens: "./lenses/runtime.md"
+    triggers:
+      - environment_specific_failure
+      - provider_or_model_variance
+      - lifecycle_failure
+      - runtime_state_drift
+  SECURITY:
+    lens: "./lenses/security.md"
+    triggers:
+      - instruction_hijack_suspected
+      - secret_or_privilege_risk
+      - safeguard_bypass
+      - untrusted_input_reaches_consequential_action
+  MEMORY:
+    lens: "./lenses/memory.md"
+    triggers:
+      - stale_or_poisoned_context
+      - persistent_memory_anomaly
+      - provenance_loss
+      - deletion_or_scope_failure
+  TOOLS:
+    lens: "./lenses/tools.md"
+    triggers:
+      - wrong_tool_selected
+      - malformed_tool_call
+      - tool_schema_mismatch
+      - side_effect_mismatch
+  ORCHESTRATION:
+    lens: "./lenses/orchestration.md"
+    triggers:
+      - routing_failure
+      - delegation_failure
+      - looping_or_termination_failure
+      - context_handoff_failure
+  REPOSITORY:
+    lens: "./lenses/repository.md"
+    triggers:
+      - repository_integrity_failure
+      - dependency_or_submodule_issue
+      - tracked_artifact_problem
+      - build_or_layout_anomaly
+  VERIFICATION:
+    lens: "./lenses/verification.md"
+    triggers:
+      - false_positive_pass
+      - verifier_agreement_suspected
+      - forged_or_incomplete_attestation
+      - independent_verification_failure
+  AUTHORITY:
+    lens: "./lenses/authority.md"
+    triggers:
+      - permission_ambiguity
+      - identity_mismatch
+      - unauthorized_side_effect
+      - escalation_boundary_unclear
+  DATA:
+    lens: "./lenses/data.md"
+    triggers:
+      - schema_or_serialization_failure
+      - stale_or_corrupt_state
+      - inconsistent_source_of_truth
+      - unexpected_data_transformation
+  PROTOCOL_BOUNDARIES:
+    lens: "./lenses/protocol-boundaries.md"
+    triggers:
+      - agent_tool_contract_failure
+      - agent_agent_contract_failure
+      - external_system_contract_failure
+      - interoperability_mismatch
