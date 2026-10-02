@@ -8,6 +8,7 @@ Low-impact, non-consequential work with no meaningful effect on security, author
 
 Typical minimum:
 - evidence through E2;
+- at least probable-cause confidence;
 - self-test;
 - regression check proportional to the change.
 
@@ -19,6 +20,8 @@ A bounded functional defect or local behavior change with a limited blast radius
 
 Typical minimum:
 - evidence through E3;
+- at least observed-cause confidence;
+- treatment/recovery envelope;
 - explicit treatment authorization for consequential mutation;
 - self-test;
 - regression review;
@@ -30,6 +33,8 @@ Architecture, orchestration, runtime, tooling, memory, repository integrity, per
 
 Required:
 - evidence through E4;
+- confirmed-root-cause confidence;
+- treatment/recovery envelope;
 - explicit treatment authorization;
 - independent verification;
 - adversarial verification;
@@ -42,6 +47,8 @@ Security, identity, privilege, secrets, autonomous side effects, deployment cont
 
 Required:
 - evidence through E5;
+- confirmed-root-cause confidence;
+- treatment/recovery envelope;
 - explicit treatment authorization;
 - independent verification;
 - adversarial verification;
