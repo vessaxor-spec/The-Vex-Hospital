@@ -17,11 +17,13 @@ A case may use:
 
 The machine-readable `case-state.yaml` should remain the canonical summary of current case status.
 
+Its `policy_context` stores the currently asserted transition facts and the opaque evidence IDs supporting governed high-impact facts. Fact names must come from the Hospital transition registry.
+
 ## Privacy
 
 Keep real patient evidence, private repository details, credentials, raw logs, sensitive prompts, memory contents, and proprietary implementation material inside the patient-controlled environment unless the operator explicitly authorizes disclosure.
 
-Portable or public reports should use sanitized identifiers and evidence references.
+Portable or public reports should use sanitized identifiers and opaque evidence references. Do not replace a private artifact reference with the raw artifact merely to make a case easier to inspect.
 
 ## Continuity
 
