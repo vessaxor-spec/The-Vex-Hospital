@@ -60,7 +60,9 @@ Current cases cover authorization bypass, false prompt-injection diagnosis, forg
 
 Repository validation runs automatically on pull requests and on changes to `main`.
 
-The Hospital also undergoes its own [Self-Examination](SELF-EXAMINATION.md), where deliberately corrupted copies must be rejected before v1 operational promotion.
+The Assurance Ward also includes canonical observer-owned behavioral traces. These traces test continuous clinical trajectories, treatment authorization, risk-scaled verification, R3 discharge approval, and synthetic-evidence boundaries.
+
+The Hospital also undergoes its own [Self-Examination](SELF-EXAMINATION.md), where deliberately corrupted copies must be rejected before operational promotion.
 
 ## Hospital doctrine
 
@@ -86,8 +88,8 @@ Sensitive patient evidence should remain in the patient-controlled environment a
 
 ## Hospital status
 
-Vex Hospital v1 is operationally qualified under the bounded scope defined in [SELF-EXAMINATION.md](SELF-EXAMINATION.md). The Constitution, machine-readable protocol engine, clinical system, intake playbooks, Assurance Ward, structural validator, and mutation self-examination are implemented.
+Vex Hospital v1 is operationally qualified under the bounded scope defined in [SELF-EXAMINATION.md](SELF-EXAMINATION.md). The Constitution, machine-readable protocol engine, clinical system, intake playbooks, Assurance Ward, structural validator, mutation self-examination, and canonical synthetic behavioral evaluation are implemented.
 
-Operational qualification is not a universal safety certification. Automated cross-provider behavioral execution and several governance controls remain follow-up work.
+Operational qualification is not a universal safety certification. Live cross-provider behavioral execution and several governance controls remain follow-up work.
 
 See [DISCLAIMER.md](DISCLAIMER.md) before relying on results.
