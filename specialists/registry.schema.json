@@ -27,7 +27,17 @@
           "type": "array",
           "uniqueItems": true,
           "minItems": 6,
-          "items": {"type": "string", "minLength": 1}
+          "maxItems": 6,
+          "items": {
+            "enum": [
+              "diagnoses_assessed",
+              "evidence_for",
+              "evidence_against",
+              "unresolved_uncertainty",
+              "next_discriminating_test",
+              "escalation_needed"
+            ]
+          }
         }
       }
     },
@@ -48,7 +58,7 @@
         "DATA",
         "PROTOCOL_BOUNDARIES"
       ],
-      "additionalProperties": {"$ref": "#/$defs/specialist"},
+      "additionalProperties": false,
       "properties": {
         "ARCHITECTURE": {"$ref": "#/$defs/specialist"},
         "CODE": {"$ref": "#/$defs/specialist"},
