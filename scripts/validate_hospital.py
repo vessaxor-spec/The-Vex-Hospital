@@ -184,6 +184,24 @@ def validate_privacy_registry():
     return registry
 
 
+def validate_case_promotion_contracts():
+    bundle_schema = load_json(ROOT / "evidence" / "evidence-bundle.schema.json")
+    decision_schema = load_json(ROOT / "protocol" / "promotion-decision.schema.json")
+
+    jsonschema.Draft202012Validator.check_schema(bundle_schema)
+    jsonschema.Draft202012Validator.check_schema(decision_schema)
+
+    require(
+        bundle_schema["properties"]["records"]["type"] == "array",
+        "Evidence bundle records must remain an array.",
+    )
+    require(
+        set(decision_schema["properties"]["decision"]["enum"])
+        == {"ALLOWED", "DENIED", "BLOCKED"},
+        "Promotion decision vocabulary has drifted.",
+    )
+
+
 def validate_specialists():
     registry_path = ROOT / "specialists" / "registry.yaml"
     schema_path = ROOT / "specialists" / "registry.schema.json"
@@ -430,6 +448,9 @@ def main():
 
         validate_privacy_registry()
         checks.append("privacy-policy")
+
+        validate_case_promotion_contracts()
+        checks.append("case-promotion")
 
         specialists = validate_specialists()
         checks.append("specialists")
