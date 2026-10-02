@@ -45,5 +45,8 @@ A terminal outcome is a scoped case result, not a universal safety judgment.
 - Evidence can raise risk at any time.
 - Risk must not silently decrease merely to satisfy a gate.
 - If new evidence invalidates an earlier assumption, return to the earliest affected state.
+- A failed treatment or verification step may return to treatment planning only when the diagnosis remains valid, a safe checkpoint or recovery state has been restored, and an explicit retry budget remains.
+- The default retry budget is zero. Each retry requires a new treatment plan.
+- R3 retries require fresh operator authorization for every retry.
 - Do not repeatedly patch a failing treatment without revisiting diagnosis when the evidence has changed.
 - A required verification stage cannot be bypassed because the treating agent is confident.
