@@ -24,7 +24,11 @@ def require(condition: bool, message: str):
         raise ProvenanceFailure(message)
 
 
-def validate_records(records: list[dict], public_synthetic: bool = False):
+def validate_records(
+    records: list[dict],
+    public_synthetic: bool = False,
+    expected_case_id: str | None = None,
+):
     schema = load_json(ROOT / "evidence" / "evidence-record.schema.json")
     jsonschema.Draft202012Validator.check_schema(schema)
 
@@ -33,6 +37,12 @@ def validate_records(records: list[dict], public_synthetic: bool = False):
         jsonschema.validate(instance=record, schema=schema)
         evidence_id = record["evidence_id"]
         require(evidence_id not in index, f"Duplicate evidence ID: {evidence_id}")
+
+        if expected_case_id is not None:
+            require(
+                record["case_id"] == expected_case_id,
+                f"Evidence record case_id mismatch: {evidence_id}",
+            )
 
         if public_synthetic:
             require(record["synthetic"] is True, f"Public assurance evidence is not synthetic: {evidence_id}")
