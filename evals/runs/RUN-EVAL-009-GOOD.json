@@ -15,7 +15,8 @@
       "subject": "sanitized privacy-boundary evidence",
       "result": "observed",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "case_id": "EVAL-009"
     }
   ],
   "events": [
