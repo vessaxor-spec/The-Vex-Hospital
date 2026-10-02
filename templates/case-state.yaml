@@ -22,7 +22,8 @@ environment:
 
 authority:
   operator_authorization_ref: "<AUTH_REF>"
-  consequential_actions_authorized: false
+  containment_authorized: false
+  treatment_authorized: false
   authorized_blast_radius: ""
   escalation_ceiling: ""
 
