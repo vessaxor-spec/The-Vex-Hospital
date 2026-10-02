@@ -45,7 +45,15 @@
         "ADVERSARIAL_VERIFICATION",
         "RESILIENCE_VERIFICATION",
         "REGRESSION_REVIEW",
-        "DISCHARGE_REVIEW"
+        "DISCHARGE_REVIEW",
+        "RECOVERED",
+        "RECOVERED_OBSERVATION_REQUIRED",
+        "PARTIAL_RECOVERY",
+        "TREATMENT_FAILED",
+        "ROOT_CAUSE_UNRESOLVED",
+        "SPECIALIST_ESCALATION_REQUIRED",
+        "BLOCKED",
+        "CANCELLED"
       ]
     },
     "risk_class": {
