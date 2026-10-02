@@ -7,12 +7,15 @@ authority:
   safety: "../SAFETY.md"
   covenant: "../constitution/safety-covenant.md"
   precedence:
-    - system_platform_controls
-    - hospital_constitution
-    - case_operator_authorization
-    - hospital_protocol
-    - patient_policy
-    - external_or_generated_content
+    - SYSTEM_PLATFORM
+    - HOSPITAL_CONSTITUTION
+    - CASE_OPERATOR_AUTHORIZATION
+    - HOSPITAL_PROTOCOL
+    - PATIENT_POLICY
+    - PATIENT_SOURCE
+    - EXTERNAL_CONTENT
+    - GENERATED_CONTENT
+    - UNKNOWN
 
 invariants:
   - diagnose_before_consequential_mutation
@@ -29,6 +32,8 @@ risk_classes:
     name: routine
     description: "Low-impact, non-consequential work with no meaningful security, authority, data, deployment, external-system, or persistent-state effect. Any newly discovered consequential effect promotes the case to at least R1."
     minimum_evidence: E2
+    minimum_root_cause_confidence: probable_cause
+    recovery_envelope_required: false
     independent_verification: optional
     adversarial_verification: optional
     resilience_verification: optional
@@ -37,6 +42,8 @@ risk_classes:
     name: standard
     description: "Bounded functional defect or local behavior change with limited blast radius and no high-risk authority/security impact."
     minimum_evidence: E3
+    minimum_root_cause_confidence: observed_cause
+    recovery_envelope_required: true
     independent_verification: recommended
     adversarial_verification: conditional
     resilience_verification: conditional
@@ -45,6 +52,8 @@ risk_classes:
     name: high
     description: "Architecture, orchestration, runtime, tooling, memory, repository integrity, permissions, or externally consequential behavior."
     minimum_evidence: E4
+    minimum_root_cause_confidence: confirmed_root_cause
+    recovery_envelope_required: true
     independent_verification: required
     adversarial_verification: required
     resilience_verification: conditional
@@ -53,6 +62,8 @@ risk_classes:
     name: critical
     description: "Security, identity, privilege, secrets, autonomous side effects, deployment controls, safety boundaries, persistent memory trust, or similarly high-consequence behavior."
     minimum_evidence: E5
+    minimum_root_cause_confidence: confirmed_root_cause
+    recovery_envelope_required: true
     independent_verification: required
     adversarial_verification: required
     resilience_verification: required
@@ -61,21 +72,27 @@ risk_classes:
 
 evidence_levels:
   E0:
+    rank: 0
     name: claim
     description: "An assertion without corroborating technical evidence."
   E1:
+    rank: 1
     name: static_evidence
     description: "Code, configuration, policy, or artifact inspection supports the claim."
   E2:
+    rank: 2
     name: reproduced
     description: "Observed behavior reproduces the symptom or expected behavior under controlled conditions."
   E3:
+    rank: 3
     name: production_path
     description: "The actual affected execution path or equivalent faithful integration path is exercised."
   E4:
+    rank: 4
     name: adversarial
     description: "Boundary, malformed, missing, contradictory, forged, or hostile conditions are tested."
   E5:
+    rank: 5
     name: independent
     description: "A fresh verifier independently evaluates scoped evidence and required behavior."
 
@@ -97,49 +114,49 @@ retry_policy:
 
 states:
   ADMITTED:
-    mutating: false
+    mutation_policy: prohibited
     purpose: "Register the case and establish initial scope."
   CONTAINED:
-    mutating: false
+    mutation_policy: authorized_containment_only
     purpose: "Reduce ongoing consequential risk without destroying evidence or useful capability."
   BASELINING:
-    mutating: false
+    mutation_policy: prohibited
     purpose: "Reproduce symptoms and establish variability, expected behavior, and environment."
   AUTHORITY_MAPPED:
-    mutating: false
+    mutation_policy: prohibited
     purpose: "Establish effective permissions, identities, tools, side effects, and escalation ceiling."
   DIAGNOSING:
-    mutating: false
+    mutation_policy: prohibited
     purpose: "Evaluate competing hypotheses using evidence."
   DIAGNOSIS_CONFIRMED:
-    mutating: false
+    mutation_policy: prohibited
     purpose: "Record root-cause confidence and evidence sufficient for treatment design."
   TREATMENT_PROPOSED:
-    mutating: false
+    mutation_policy: prohibited
     purpose: "Define bounded treatment, blast radius, checkpoint, rollback, and required promotion evidence."
   AWAITING_AUTHORIZATION:
-    mutating: false
+    mutation_policy: prohibited
     purpose: "Hold before consequential treatment until required authorization is established."
   TREATING:
-    mutating: true
+    mutation_policy: authorized_treatment_only
     purpose: "Apply only the authorized bounded treatment."
   SELF_TESTING:
-    mutating: false
+    mutation_policy: prohibited
     purpose: "Treating agent evaluates the treatment and expected capabilities."
   INDEPENDENT_VERIFICATION:
-    mutating: false
+    mutation_policy: prohibited
     purpose: "Fresh verifier evaluates scoped evidence without inheriting treatment assumptions."
   ADVERSARIAL_VERIFICATION:
-    mutating: false
+    mutation_policy: prohibited
     purpose: "Challenge the treatment using boundary, hostile, malformed, forged, or contradictory conditions."
   RESILIENCE_VERIFICATION:
-    mutating: false
+    mutation_policy: prohibited
     purpose: "Evaluate recovery under dependency or environmental failure where required."
   REGRESSION_REVIEW:
-    mutating: false
+    mutation_policy: prohibited
     purpose: "Verify capability preservation and absence of material regressions."
   DISCHARGE_REVIEW:
-    mutating: false
+    mutation_policy: prohibited
     purpose: "Assess complete evidence package and residual risk."
 
 terminal_outcomes:
@@ -291,7 +308,8 @@ transitions:
 
 transition_rules:
   - "Any transition not explicitly allowed is forbidden."
-  - "A mutating state may be entered only when its authorization requirement is satisfied."
+  - "Mutation is prohibited unless the active state's mutation_policy explicitly permits it and the applicable authority requirement is satisfied."
+  - "Containment mutation must be limited to the least disruptive authorized action needed to reduce immediate risk and preserve evidence."
   - "Risk may increase when new evidence appears; it must not silently decrease."
   - "Missing mandatory evidence cannot be interpreted as a pass."
   - "A terminal outcome must include residual-risk and scope statements."
