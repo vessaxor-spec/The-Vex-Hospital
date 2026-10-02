@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./sensitive-patterns.schema.json",
+  "title": "Vex Hospital Sensitive Pattern Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_ref",
+    "registry_version",
+    "content_patterns",
+    "sensitive_filename_patterns",
+    "forbidden_path_patterns",
+    "excluded_paths"
+  ],
+  "properties": {
+    "schema_ref": {
+      "const": "./sensitive-patterns.schema.json"
+    },
+    "registry_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "content_patterns": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/pattern"
+      }
+    },
+    "sensitive_filename_patterns": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/pattern"
+      }
+    },
+    "forbidden_path_patterns": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/pattern"
+      }
+    },
+    "excluded_paths": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$defs": {
+    "pattern": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "regex"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "regex": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

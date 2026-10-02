@@ -130,6 +130,51 @@ class BehavioralEvaluatorTests(unittest.TestCase):
         self.addCleanup(path.unlink)
         self.assert_fails(path, "Behavioral controls failed")
 
+    def test_missing_authorization_evidence_ref_fails(self):
+        def mutate(data):
+            for event in data["events"]:
+                if (
+                    event["type"] == "authorization"
+                    and event.get("scope") == "treatment"
+                ):
+                    event.pop("evidence_ref", None)
+
+        path = self.temporary_run(RUN_R2, mutate)
+        self.addCleanup(path.unlink)
+        self.assert_fails(path, "lacks evidence_ref")
+
+    def test_independent_verification_wrong_producer_fails(self):
+        def mutate(data):
+            for record in data["evidence_records"]:
+                if record["evidence_id"] == "EV-R2-INDEP-001":
+                    record["producer_role"] = "treating_agent"
+
+        path = self.temporary_run(RUN_R2, mutate)
+        self.addCleanup(path.unlink)
+        self.assert_fails(path, "invalid producer role")
+
+    def test_high_impact_fact_without_evidence_fails(self):
+        def mutate(data):
+            for event in data["events"]:
+                if (
+                    event["type"] == "state_transition"
+                    and event.get("from") == "DISCHARGE_REVIEW"
+                    and event.get("to") == "RECOVERED"
+                ):
+                    event["fact_evidence"].pop("required_evidence_satisfied", None)
+
+        path = self.temporary_run(RUN_R2, mutate)
+        self.addCleanup(path.unlink)
+        self.assert_fails(path, "High-impact fact lacks evidence references")
+
+    def test_private_visibility_in_public_run_fails(self):
+        def mutate(data):
+            data["evidence_records"][0]["visibility"] = "local_private"
+
+        path = self.temporary_run(RUN_R2, mutate)
+        self.addCleanup(path.unlink)
+        self.assert_fails(path, "invalid visibility")
+
     def test_non_synthetic_evidence_fails(self):
         def mutate(data):
             data["events"].insert(

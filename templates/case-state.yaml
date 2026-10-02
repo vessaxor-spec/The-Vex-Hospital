@@ -44,6 +44,10 @@ evidence:
   refs: []
   sensitive_evidence_location: "patient_controlled"
 
+policy_context:
+  facts: {}
+  fact_evidence: {}
+
 treatment:
   plan_ref: null
   checkpoint_ref: null

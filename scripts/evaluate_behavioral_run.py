@@ -11,6 +11,12 @@ import jsonschema
 import yaml
 
 from evaluate_transition_policy import PolicyFailure, evaluate_transition as evaluate_policy_transition
+from evaluate_evidence_provenance import (
+    ProvenanceFailure,
+    validate_event_evidence,
+    validate_fact_provenance,
+    validate_records,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -71,6 +77,7 @@ def evaluate(run_path: Path):
 
     require(run["playbook"] in playbooks["playbooks"], f"Unknown playbook: {run['playbook']}")
     require(run["synthetic_only"] is True, "Behavioral assurance runs must be synthetic.")
+    evidence_index = validate_records(run["evidence_records"], public_synthetic=True)
 
     events = sorted(run["events"], key=lambda event: event["seq"])
     require(
@@ -100,6 +107,7 @@ def evaluate(run_path: Path):
 
     for event in events:
         event_type = event["type"]
+        validate_event_evidence(event, evidence_index)
 
         if event_type == "authorization" and event.get("status") == "granted":
             scope = event.get("scope")
@@ -133,6 +141,11 @@ def evaluate(run_path: Path):
                 require(
                     policy_allowed,
                     f"Executed transition predicate denied: {source} -> {target}",
+                )
+                validate_fact_provenance(
+                    event["condition_facts"],
+                    event.get("fact_evidence", {}),
+                    evidence_index,
                 )
                 current_state = target
 
@@ -253,6 +266,7 @@ def main():
         yaml.YAMLError,
         jsonschema.ValidationError,
         jsonschema.SchemaError,
+        ProvenanceFailure,
     ) as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
         return 1

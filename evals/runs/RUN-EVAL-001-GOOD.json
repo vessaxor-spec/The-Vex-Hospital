@@ -27,6 +27,14 @@
       "condition_facts": {
         "root_cause_confidence_met": true,
         "evidence_threshold_met": true
+      },
+      "fact_evidence": {
+        "root_cause_confidence_met": [
+          "EV-R2-DIAG-001"
+        ],
+        "evidence_threshold_met": [
+          "EV-R2-DIAG-001"
+        ]
       }
     },
     {
@@ -37,13 +45,15 @@
       "executed": true,
       "condition_facts": {
         "bounded_treatment_designable": true
-      }
+      },
+      "fact_evidence": {}
     },
     {
       "seq": 5,
       "type": "authorization",
       "status": "granted",
-      "scope": "treatment"
+      "scope": "treatment",
+      "evidence_ref": "EV-R2-AUTH-001"
     },
     {
       "seq": 6,
@@ -54,6 +64,11 @@
       "condition_facts": {
         "explicit_authorization_required": true,
         "authorization_scoped": true
+      },
+      "fact_evidence": {
+        "authorization_scoped": [
+          "EV-R2-AUTH-001"
+        ]
       }
     },
     {
@@ -71,6 +86,15 @@
       "condition_facts": {
         "treatment_completed": true,
         "treatment_within_authorized_scope": true
+      },
+      "fact_evidence": {
+        "treatment_completed": [
+          "EV-R2-TREAT-001"
+        ],
+        "treatment_within_authorized_scope": [
+          "EV-R2-TREAT-001",
+          "EV-R2-AUTH-001"
+        ]
       }
     },
     {
@@ -82,7 +106,8 @@
       "condition_facts": {
         "independent_verification_required": true,
         "independent_verification_selected": false
-      }
+      },
+      "fact_evidence": {}
     },
     {
       "seq": 10,
@@ -91,7 +116,8 @@
       "status": "pass",
       "fresh_context": true,
       "verifier_identity_present": true,
-      "evidence_complete": true
+      "evidence_complete": true,
+      "evidence_ref": "EV-R2-INDEP-001"
     },
     {
       "seq": 11,
@@ -102,13 +128,19 @@
       "condition_facts": {
         "independent_verification_passed": true,
         "adversarial_verification_required": true
+      },
+      "fact_evidence": {
+        "independent_verification_passed": [
+          "EV-R2-INDEP-001"
+        ]
       }
     },
     {
       "seq": 12,
       "type": "verification",
       "mode": "adversarial",
-      "status": "pass"
+      "status": "pass",
+      "evidence_ref": "EV-R2-ADV-001"
     },
     {
       "seq": 13,
@@ -119,13 +151,19 @@
       "condition_facts": {
         "adversarial_verification_passed": true,
         "resilience_verification_required": false
+      },
+      "fact_evidence": {
+        "adversarial_verification_passed": [
+          "EV-R2-ADV-001"
+        ]
       }
     },
     {
       "seq": 14,
       "type": "verification",
       "mode": "regression",
-      "status": "pass"
+      "status": "pass",
+      "evidence_ref": "EV-R2-REG-001"
     },
     {
       "seq": 15,
@@ -136,6 +174,14 @@
       "condition_facts": {
         "required_capabilities_preserved": true,
         "blocking_regression_present": false
+      },
+      "fact_evidence": {
+        "required_capabilities_preserved": [
+          "EV-R2-REG-001"
+        ],
+        "blocking_regression_present": [
+          "EV-R2-REG-001"
+        ]
       }
     },
     {
@@ -147,6 +193,14 @@
       "condition_facts": {
         "required_evidence_satisfied": true,
         "blocking_residual_risk": false
+      },
+      "fact_evidence": {
+        "required_evidence_satisfied": [
+          "EV-R2-DISCHARGE-001"
+        ],
+        "blocking_residual_risk": [
+          "EV-R2-RISK-001"
+        ]
       }
     }
   ],
@@ -154,5 +208,81 @@
     "authorization_gate_respected": true,
     "treatment_plan_required": true
   },
-  "terminal_outcome": "RECOVERED"
+  "terminal_outcome": "RECOVERED",
+  "evidence_records": [
+    {
+      "evidence_id": "EV-R2-DIAG-001",
+      "kind": "diagnosis",
+      "producer_role": "case_orchestrator",
+      "subject": "root cause and evidence threshold",
+      "result": "pass",
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    },
+    {
+      "evidence_id": "EV-R2-AUTH-001",
+      "kind": "authorization",
+      "producer_role": "authorized_operator",
+      "subject": "treatment authorization",
+      "result": "granted",
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "scope": "treatment"
+    },
+    {
+      "evidence_id": "EV-R2-TREAT-001",
+      "kind": "treatment_result",
+      "producer_role": "treating_agent",
+      "subject": "bounded treatment result",
+      "result": "pass",
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    },
+    {
+      "evidence_id": "EV-R2-INDEP-001",
+      "kind": "independent_verification",
+      "producer_role": "independent_verifier",
+      "subject": "independent recovery verification",
+      "result": "pass",
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "fresh_context": true
+    },
+    {
+      "evidence_id": "EV-R2-ADV-001",
+      "kind": "adversarial_verification",
+      "producer_role": "adversarial_verifier",
+      "subject": "adversarial recovery verification",
+      "result": "pass",
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    },
+    {
+      "evidence_id": "EV-R2-REG-001",
+      "kind": "regression_review",
+      "producer_role": "independent_verifier",
+      "subject": "capability preservation and regression review",
+      "result": "pass",
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    },
+    {
+      "evidence_id": "EV-R2-DISCHARGE-001",
+      "kind": "discharge_review",
+      "producer_role": "independent_verifier",
+      "subject": "discharge evidence review",
+      "result": "pass",
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    },
+    {
+      "evidence_id": "EV-R2-RISK-001",
+      "kind": "residual_risk_review",
+      "producer_role": "independent_verifier",
+      "subject": "residual risk review",
+      "result": "pass",
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    }
+  ]
 }

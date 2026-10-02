@@ -15,7 +15,7 @@ This is an operational qualification, not a universal safety certification.
 V1 operational qualification requires:
 
 1. the clean Hospital validator passes;
-2. protocol, specialist, playbook, patient-chart, assurance-case, privacy, and style checks pass in CI;
+2. protocol, transition-policy, evidence-provenance, specialist, playbook, patient-chart, assurance-case, privacy-policy, behavioral-run, and style checks pass in CI;
 3. deliberate mutation of a protected treatment gate is detected;
 4. an undeclared specialist department is rejected;
 5. patient-chart and protocol-state drift is detected;
@@ -59,8 +59,8 @@ Operational qualification does not remove these known limitations:
 
 - canonical synthetic behavioral traces are automated, but live cross-provider behavioral runs are not yet automated in CI;
 - the mutation suite covers selected control failures, not every possible protocol defect;
-- transition predicates are executable in the reference policy engine, but fact derivation and evidence provenance still require trustworthy inputs;
-- privacy scanning is pattern based and is not a replacement for dedicated secret scanning;
+- high-impact facts are bound to typed evidence metadata, but evidence authenticity and runtime identity still depend on trustworthy underlying artifacts and producers;
+- privacy scanning is stronger and registry driven, but it remains pattern based and is not a guarantee that every secret or private artifact will be detected;
 - supported agent environments may change their native instruction, tool, memory, or permission conventions;
 - repository branch protection and ruleset enforcement remain separate governance controls;
 - the project license remains a separate legal and distribution decision.

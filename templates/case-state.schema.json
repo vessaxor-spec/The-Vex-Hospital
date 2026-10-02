@@ -21,6 +21,7 @@
     "authority",
     "differential",
     "evidence",
+    "policy_context",
     "treatment",
     "verification",
     "residual_risk",
@@ -165,6 +166,9 @@
         "CANCELLED",
         null
       ]
+    },
+    "policy_context": {
+      "$ref": "#/$defs/policyContext"
     }
   },
   "$defs": {
@@ -367,7 +371,8 @@
         "refs": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^EV-[A-Z0-9-]+$"
           }
         },
         "sensitive_evidence_location": {
@@ -489,6 +494,174 @@
         "BLOCKED",
         "CANCELLED"
       ]
+    },
+    "policyContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "facts",
+        "fact_evidence"
+      ],
+      "properties": {
+        "facts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          },
+          "propertyNames": {
+            "enum": [
+              "adversarial_verification_failed",
+              "adversarial_verification_passed",
+              "adversarial_verification_required",
+              "authority_envelope_established",
+              "authority_facts_available",
+              "authorization_denied_or_unavailable",
+              "authorization_scoped",
+              "authorized_retry_remains",
+              "baseline_sufficient",
+              "blast_radius_exceeded",
+              "blocking_regression_present",
+              "blocking_residual_risk",
+              "bounded_treatment_designable",
+              "checkpoint_available",
+              "consequential_treatment",
+              "containment_required",
+              "current_competence_sufficient",
+              "diagnosis_invalidated",
+              "diagnosis_valid",
+              "evidence_threshold_met",
+              "explicit_authorization_required",
+              "hypotheses_exhausted",
+              "independent_verification_available",
+              "independent_verification_failed",
+              "independent_verification_passed",
+              "independent_verification_required",
+              "independent_verification_selected",
+              "material_recovery",
+              "nonwaivable_blocker",
+              "objective_in_scope",
+              "objective_safe",
+              "observation_required",
+              "operator_cancelled",
+              "other_sufficient_evidence",
+              "recovery_requirements_satisfied",
+              "regression_found",
+              "reproduction_failed",
+              "required_capabilities_preserved",
+              "required_capability_loss",
+              "required_evidence_satisfied",
+              "required_recovery_conditions_unmet",
+              "residual_risk_exceeds_authority",
+              "residual_risk_exceeds_competence",
+              "resilience_verification_failed",
+              "resilience_verification_passed",
+              "resilience_verification_required",
+              "retry_budget_available",
+              "rollback_available",
+              "root_cause_confidence_invalidated",
+              "root_cause_confidence_met",
+              "safe_authorized_retry_available",
+              "safe_baseline_possible",
+              "safe_checkpoint_restored",
+              "safe_recovery_possible",
+              "safe_retry_available",
+              "safe_to_observe",
+              "safe_treatment_designable",
+              "safety_boundary_exceeded",
+              "self_test_failed",
+              "sufficient_hypothesis_support",
+              "treatment_cannot_be_completed",
+              "treatment_completed",
+              "treatment_evidence_invalidates_diagnosis",
+              "treatment_incomplete",
+              "treatment_within_authorized_scope",
+              "unresolved_noncritical_conditions"
+            ]
+          }
+        },
+        "fact_evidence": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^EV-[A-Z0-9-]+$"
+            }
+          },
+          "propertyNames": {
+            "enum": [
+              "adversarial_verification_failed",
+              "adversarial_verification_passed",
+              "adversarial_verification_required",
+              "authority_envelope_established",
+              "authority_facts_available",
+              "authorization_denied_or_unavailable",
+              "authorization_scoped",
+              "authorized_retry_remains",
+              "baseline_sufficient",
+              "blast_radius_exceeded",
+              "blocking_regression_present",
+              "blocking_residual_risk",
+              "bounded_treatment_designable",
+              "checkpoint_available",
+              "consequential_treatment",
+              "containment_required",
+              "current_competence_sufficient",
+              "diagnosis_invalidated",
+              "diagnosis_valid",
+              "evidence_threshold_met",
+              "explicit_authorization_required",
+              "hypotheses_exhausted",
+              "independent_verification_available",
+              "independent_verification_failed",
+              "independent_verification_passed",
+              "independent_verification_required",
+              "independent_verification_selected",
+              "material_recovery",
+              "nonwaivable_blocker",
+              "objective_in_scope",
+              "objective_safe",
+              "observation_required",
+              "operator_cancelled",
+              "other_sufficient_evidence",
+              "recovery_requirements_satisfied",
+              "regression_found",
+              "reproduction_failed",
+              "required_capabilities_preserved",
+              "required_capability_loss",
+              "required_evidence_satisfied",
+              "required_recovery_conditions_unmet",
+              "residual_risk_exceeds_authority",
+              "residual_risk_exceeds_competence",
+              "resilience_verification_failed",
+              "resilience_verification_passed",
+              "resilience_verification_required",
+              "retry_budget_available",
+              "rollback_available",
+              "root_cause_confidence_invalidated",
+              "root_cause_confidence_met",
+              "safe_authorized_retry_available",
+              "safe_baseline_possible",
+              "safe_checkpoint_restored",
+              "safe_recovery_possible",
+              "safe_retry_available",
+              "safe_to_observe",
+              "safe_treatment_designable",
+              "safety_boundary_exceeded",
+              "self_test_failed",
+              "sufficient_hypothesis_support",
+              "treatment_cannot_be_completed",
+              "treatment_completed",
+              "treatment_evidence_invalidates_diagnosis",
+              "treatment_incomplete",
+              "treatment_within_authorized_scope",
+              "unresolved_noncritical_conditions"
+            ]
+          }
+        }
+      }
     }
   },
   "oneOf": [

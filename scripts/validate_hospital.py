@@ -11,19 +11,12 @@ import jsonschema
 import yaml
 
 from evaluate_behavioral_run import BehavioralFailure, evaluate as evaluate_behavioral_run
+from evaluate_evidence_provenance import ProvenanceFailure
 
 ROOT = Path(__file__).resolve().parents[1]
 
 TEXT_SUFFIXES = {".md", ".yaml", ".yml", ".json", ".py", ".txt"}
 EM_DASH = "\u2014"
-
-PRIVATE_PATTERNS = [
-    re.compile(r"/Users/[^/<>{}]+/"),
-    re.compile(r"[A-Za-z]:\\\\Users\\\\[^\\\\<>{}]+\\\\"),
-    re.compile(r"\bsk-[A-Za-z0-9_-]{16,}\b"),
-    re.compile(r"\bxai-[A-Za-z0-9_-]{16,}\b"),
-]
-
 
 class ValidationFailure(Exception):
     pass
@@ -131,6 +124,66 @@ def validate_transition_conditions(protocol):
     )
 
 
+def validate_evidence_provenance():
+    evidence_schema = load_json(ROOT / "evidence" / "evidence-record.schema.json")
+    policy_path = ROOT / "evidence" / "fact-provenance.json"
+    policy_schema_path = ROOT / "evidence" / "fact-provenance.schema.json"
+
+    jsonschema.Draft202012Validator.check_schema(evidence_schema)
+    validate_json_schema(policy_path, policy_schema_path)
+
+    policy = load_json(policy_path)
+    conditions = load_json(ROOT / "protocol" / "conditions.json")
+    known_facts = set(conditions["facts"])
+    governed_facts = set(policy["fact_rules"])
+
+    require(
+        governed_facts.issubset(known_facts),
+        f"Fact provenance policy references unknown facts: {sorted(governed_facts - known_facts)}",
+    )
+
+    evidence_kinds = set(evidence_schema["properties"]["kind"]["enum"])
+    producer_roles = set(evidence_schema["properties"]["producer_role"]["enum"])
+    result_values = set(evidence_schema["properties"]["result"]["enum"])
+
+    for fact, rule in policy["fact_rules"].items():
+        for requirement in rule["requirements"]:
+            require(
+                requirement["kind"] in evidence_kinds,
+                f"Provenance rule {fact} references unknown evidence kind: {requirement['kind']}",
+            )
+            require(
+                set(requirement["producer_roles"]).issubset(producer_roles),
+                f"Provenance rule {fact} references unknown producer role.",
+            )
+            require(
+                set(requirement["results"]).issubset(result_values),
+                f"Provenance rule {fact} references unknown evidence result.",
+            )
+
+
+def validate_privacy_registry():
+    registry_path = ROOT / "privacy" / "sensitive-patterns.json"
+    schema_path = ROOT / "privacy" / "sensitive-patterns.schema.json"
+    validate_json_schema(registry_path, schema_path)
+
+    registry = load_json(registry_path)
+    ids = set()
+
+    for group in ("content_patterns", "sensitive_filename_patterns", "forbidden_path_patterns"):
+        for entry in registry[group]:
+            require(entry["id"] not in ids, f"Duplicate privacy pattern ID: {entry['id']}")
+            ids.add(entry["id"])
+            try:
+                re.compile(entry["regex"])
+            except re.error as exc:
+                raise ValidationFailure(
+                    f"Invalid privacy regex {entry['id']}: {exc}"
+                ) from exc
+
+    return registry
+
+
 def validate_specialists():
     registry_path = ROOT / "specialists" / "registry.yaml"
     schema_path = ROOT / "specialists" / "registry.schema.json"
@@ -178,6 +231,22 @@ def validate_case_template(protocol):
     require(
         set(schema["$defs"]["terminalOutcome"]["enum"]) == protocol_outcomes,
         "Patient chart outcome vocabulary does not match protocol outcomes.",
+    )
+
+    condition_registry = load_json(ROOT / "protocol" / "conditions.json")
+    chart_facts = set(
+        schema["$defs"]["policyContext"]["properties"]["facts"]["propertyNames"]["enum"]
+    )
+    condition_facts = set(condition_registry["facts"])
+    require(
+        chart_facts == condition_facts,
+        "Patient chart policy facts do not match the transition fact registry.",
+    )
+
+    provenance_policy = load_json(ROOT / "evidence" / "fact-provenance.json")
+    require(
+        set(provenance_policy["fact_rules"]).issubset(chart_facts),
+        "Patient chart is missing one or more governed provenance facts.",
     )
 
 
@@ -250,16 +319,48 @@ def validate_behavioral_runs():
 
 def validate_public_text():
     failures = []
+    registry = validate_privacy_registry()
+    excluded = {Path(path) for path in registry["excluded_paths"]}
+
+    content_patterns = [
+        (entry["id"], re.compile(entry["regex"]))
+        for entry in registry["content_patterns"]
+    ]
+    filename_patterns = [
+        (entry["id"], re.compile(entry["regex"]))
+        for entry in registry["sensitive_filename_patterns"]
+    ]
+    forbidden_path_patterns = [
+        (entry["id"], re.compile(entry["regex"]))
+        for entry in registry["forbidden_path_patterns"]
+    ]
 
     for path in ROOT.rglob("*"):
-        if not path.is_file() or path.suffix.lower() not in TEXT_SUFFIXES:
+        if not path.is_file():
             continue
 
         if ".git" in path.parts:
             continue
 
-        text = path.read_text(encoding="utf-8")
         relative = path.relative_to(ROOT)
+        relative_text = relative.as_posix()
+
+        for pattern_id, pattern in filename_patterns:
+            if pattern.search(relative_text):
+                failures.append(
+                    f"{relative}: sensitive filename pattern matched: {pattern_id}"
+                )
+
+        for pattern_id, pattern in forbidden_path_patterns:
+            if pattern.search(relative_text):
+                failures.append(
+                    f"{relative}: forbidden public path matched: {pattern_id}"
+                )
+
+        if path.suffix.lower() not in TEXT_SUFFIXES or relative in excluded:
+            continue
+
+        text = path.read_text(encoding="utf-8")
 
         if EM_DASH in text:
             failures.append(f"{relative}: contains an em dash character")
@@ -270,12 +371,17 @@ def validate_public_text():
         if re.search(r"\bpoint\s+your\s+ai\s+here\b", text, flags=re.IGNORECASE):
             failures.append(f"{relative}: contains retired public narrative wording")
 
-        if relative != Path("scripts/validate_hospital.py"):
-            for pattern in PRIVATE_PATTERNS:
-                if pattern.search(text):
-                    failures.append(f"{relative}: contains a value matching a sensitive-data pattern")
+        for pattern_id, pattern in content_patterns:
+            if pattern.search(text):
+                failures.append(
+                    f"{relative}: sensitive content pattern matched: {pattern_id}"
+                )
 
-    require(not failures, "Public text validation failed:\n" + "\n".join(f"  - {x}" for x in failures))
+    require(
+        not failures,
+        "Public text validation failed:\n"
+        + "\n".join(f"  - {item}" for item in failures),
+    )
 
 
 def main():
@@ -287,6 +393,12 @@ def main():
 
         validate_transition_conditions(protocol)
         checks.append("transition-policy")
+
+        validate_evidence_provenance()
+        checks.append("evidence-provenance")
+
+        validate_privacy_registry()
+        checks.append("privacy-policy")
 
         specialists = validate_specialists()
         checks.append("specialists")
