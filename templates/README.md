@@ -19,6 +19,8 @@ The machine-readable `case-state.yaml` should remain the canonical summary of cu
 
 Its `policy_context` stores the currently asserted transition facts and the opaque evidence IDs supporting governed high-impact facts. Fact names must come from the Hospital transition registry.
 
+Before applying a state change, the patient environment may use the read-only case-promotion evaluator with the local chart and a patient-controlled evidence bundle. An ALLOWED result is permission to consider the state transition under the control plane. It is not permission to perform treatment or any other side effect.
+
 ## Privacy
 
 Keep real patient evidence, private repository details, credentials, raw logs, sensitive prompts, memory contents, and proprietary implementation material inside the patient-controlled environment unless the operator explicitly authorizes disclosure.
