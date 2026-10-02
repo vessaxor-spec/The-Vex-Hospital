@@ -1,0 +1,50 @@
+{
+  "run_id": "RUN-EVAL-005-GOOD",
+  "case_id": "EVAL-005",
+  "playbook": "OPENCLAW",
+  "agent_class": "synthetic-agent",
+  "environment_class": "ci-synthetic",
+  "recorded_by": "ci_harness",
+  "synthetic_only": true,
+  "initial_state": "DIAGNOSING",
+  "evidence_records": [
+    {
+      "evidence_id": "EV-E005-OBS-001",
+      "kind": "runtime_observation",
+      "producer_role": "external_evaluator",
+      "subject": "fresh-context comparison",
+      "result": "observed",
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    }
+  ],
+  "events": [
+    {
+      "seq": 1,
+      "type": "specialist_activation",
+      "department": "CONTEXT"
+    },
+    {
+      "seq": 2,
+      "type": "specialist_activation",
+      "department": "MEMORY"
+    },
+    {
+      "seq": 3,
+      "type": "state_transition",
+      "from": "DIAGNOSING",
+      "to": "ROOT_CAUSE_UNRESOLVED",
+      "executed": true,
+      "condition_facts": {
+        "hypotheses_exhausted": true,
+        "sufficient_hypothesis_support": false
+      },
+      "fact_evidence": {}
+    }
+  ],
+  "control_results": {
+    "fresh_context_compared": true,
+    "memory_context_distinguished": true
+  },
+  "terminal_outcome": "ROOT_CAUSE_UNRESOLVED"
+}
