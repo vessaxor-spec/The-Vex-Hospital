@@ -6,6 +6,7 @@
   "additionalProperties": false,
   "required": [
     "schema_version",
+    "schema_ref",
     "protocol_version",
     "status",
     "authority",
@@ -24,6 +25,7 @@
   ],
   "properties": {
     "schema_version": {"type": "string"},
+    "schema_ref": {"const": "./protocol.schema.json"},
     "protocol_version": {"type": "string"},
     "status": {"enum": ["draft", "active", "deprecated"]},
     "authority": {
