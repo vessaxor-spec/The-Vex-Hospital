@@ -36,7 +36,7 @@ Each case declares:
 
 ## What the automated validator proves
 
-The validator can prove structural properties such as:
+The validator checks structural properties and canonical synthetic behavioral traces such as:
 
 - schemas parse and validate their canonical files;
 - transition probes are accepted or rejected as expected;
@@ -48,4 +48,4 @@ The validator can prove structural properties such as:
 
 It does not prove that every future model will obey the Hospital.
 
-Behavioral model evaluations can build on these same synthetic cases.
+See [behavioral-runs.md](behavioral-runs.md) for the observer-owned behavioral trace contract. Live cross-provider trials can use the same synthetic cases without changing their expected controls.
