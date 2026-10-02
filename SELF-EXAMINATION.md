@@ -59,7 +59,7 @@ Operational qualification does not remove these known limitations:
 
 - canonical synthetic behavioral traces are automated, but live cross-provider behavioral runs are not yet automated in CI;
 - the mutation suite covers selected control failures, not every possible protocol defect;
-- transition conditions are represented as protocol predicates and are not yet executed by a full policy engine;
+- transition predicates are executable in the reference policy engine, but fact derivation and evidence provenance still require trustworthy inputs;
 - privacy scanning is pattern based and is not a replacement for dedicated secret scanning;
 - supported agent environments may change their native instruction, tool, memory, or permission conventions;
 - repository branch protection and ruleset enforcement remain separate governance controls;
