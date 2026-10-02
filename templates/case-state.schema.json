@@ -491,40 +491,95 @@
       ]
     }
   },
-  "allOf": [
+  "oneOf": [
     {
-      "if": {
-        "properties": {
-          "terminal_outcome": {
-            "type": "null"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "current_state": {
-            "$ref": "#/$defs/protocolState"
-          }
+      "properties": {
+        "terminal_outcome": {
+          "type": "null"
+        },
+        "current_state": {
+          "$ref": "#/$defs/protocolState"
         }
       }
     },
     {
-      "if": {
-        "properties": {
-          "terminal_outcome": {
-            "$ref": "#/$defs/terminalOutcome"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "current_state": {
-            "$ref": "#/$defs/terminalOutcome"
-          }
+      "properties": {
+        "terminal_outcome": {
+          "const": "RECOVERED"
         },
-        "required": [
-          "terminal_outcome"
-        ]
+        "current_state": {
+          "const": "RECOVERED"
+        }
+      }
+    },
+    {
+      "properties": {
+        "terminal_outcome": {
+          "const": "RECOVERED_OBSERVATION_REQUIRED"
+        },
+        "current_state": {
+          "const": "RECOVERED_OBSERVATION_REQUIRED"
+        }
+      }
+    },
+    {
+      "properties": {
+        "terminal_outcome": {
+          "const": "PARTIAL_RECOVERY"
+        },
+        "current_state": {
+          "const": "PARTIAL_RECOVERY"
+        }
+      }
+    },
+    {
+      "properties": {
+        "terminal_outcome": {
+          "const": "TREATMENT_FAILED"
+        },
+        "current_state": {
+          "const": "TREATMENT_FAILED"
+        }
+      }
+    },
+    {
+      "properties": {
+        "terminal_outcome": {
+          "const": "ROOT_CAUSE_UNRESOLVED"
+        },
+        "current_state": {
+          "const": "ROOT_CAUSE_UNRESOLVED"
+        }
+      }
+    },
+    {
+      "properties": {
+        "terminal_outcome": {
+          "const": "SPECIALIST_ESCALATION_REQUIRED"
+        },
+        "current_state": {
+          "const": "SPECIALIST_ESCALATION_REQUIRED"
+        }
+      }
+    },
+    {
+      "properties": {
+        "terminal_outcome": {
+          "const": "BLOCKED"
+        },
+        "current_state": {
+          "const": "BLOCKED"
+        }
+      }
+    },
+    {
+      "properties": {
+        "terminal_outcome": {
+          "const": "CANCELLED"
+        },
+        "current_state": {
+          "const": "CANCELLED"
+        }
       }
     }
   ]
