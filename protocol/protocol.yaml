@@ -27,7 +27,7 @@ invariants:
 risk_classes:
   R0:
     name: routine
-    description: "Low-impact, non-consequential or trivially reversible work with no meaningful security, authority, data, deployment, or persistent-state effect."
+    description: "Low-impact, non-consequential work with no meaningful security, authority, data, deployment, external-system, or persistent-state effect. Any newly discovered consequential effect promotes the case to at least R1."
     minimum_evidence: E2
     independent_verification: optional
     adversarial_verification: optional
@@ -85,6 +85,15 @@ root_cause_confidence:
   - probable_cause
   - observed_cause
   - confirmed_root_cause
+
+retry_policy:
+  default_retry_budget: 0
+  retry_budget_must_be_explicit: true
+  budget_source: "case_authorization_or_treatment_authorization"
+  each_retry_requires_new_treatment_plan: true
+  changed_evidence_that_invalidates_diagnosis_requires_rediagnosis: true
+  rollback_or_safe_checkpoint_required_before_retry: true
+  R3_each_retry_requires_fresh_operator_authorization: true
 
 states:
   ADMITTED:
@@ -199,10 +208,14 @@ transitions:
   TREATING:
     - to: SELF_TESTING
       when: "authorized_treatment_completed_within_scope"
+    - to: TREATMENT_PROPOSED
+      when: "treatment_incomplete_but_diagnosis_remains_valid_and_safe_checkpoint_restored_and_retry_budget_available"
+    - to: DIAGNOSING
+      when: "treatment_evidence_invalidates_diagnosis_and_safe_checkpoint_restored"
     - to: BLOCKED
       when: "treatment_exceeds_authorized_blast_radius_or_safety_boundary"
     - to: TREATMENT_FAILED
-      when: "treatment_cannot_be_completed_or_recovered"
+      when: "treatment_cannot_be_completed_or_safely_recovered_or_no_authorized_retry_remains"
   SELF_TESTING:
     - to: INDEPENDENT_VERIFICATION
       when: "independent_verification_required_or_selected"
@@ -212,8 +225,12 @@ transitions:
       when: "only_resilience_verification_required_next"
     - to: REGRESSION_REVIEW
       when: "additional_verification_not_required"
+    - to: TREATMENT_PROPOSED
+      when: "self_test_fails_but_diagnosis_remains_valid_and_retry_budget_available"
+    - to: DIAGNOSING
+      when: "self_test_failure_invalidates_diagnosis"
     - to: TREATMENT_FAILED
-      when: "self_test_fails_and_no_safe_bounded_retry_is_authorized"
+      when: "self_test_fails_and_no_safe_authorized_retry_remains"
   INDEPENDENT_VERIFICATION:
     - to: ADVERSARIAL_VERIFICATION
       when: "independent_verification_passed_and_adversarial_required"
@@ -221,8 +238,12 @@ transitions:
       when: "independent_verification_passed_and_resilience_required_next"
     - to: REGRESSION_REVIEW
       when: "independent_verification_passed_and_no_additional_verification_required"
+    - to: TREATMENT_PROPOSED
+      when: "independent_verification_fails_but_diagnosis_remains_valid_and_retry_budget_available"
+    - to: DIAGNOSING
+      when: "independent_verification_failure_invalidates_diagnosis"
     - to: TREATMENT_FAILED
-      when: "independent_verification_fails"
+      when: "independent_verification_fails_and_no_safe_authorized_retry_remains"
     - to: BLOCKED
       when: "required_independent_verification_unavailable"
   ADVERSARIAL_VERIFICATION:
@@ -230,20 +251,32 @@ transitions:
       when: "adversarial_verification_passed_and_resilience_required"
     - to: REGRESSION_REVIEW
       when: "adversarial_verification_passed_and_resilience_not_required"
+    - to: TREATMENT_PROPOSED
+      when: "adversarial_verification_fails_but_diagnosis_remains_valid_and_retry_budget_available"
+    - to: DIAGNOSING
+      when: "adversarial_verification_failure_invalidates_diagnosis"
     - to: TREATMENT_FAILED
-      when: "adversarial_verification_fails"
+      when: "adversarial_verification_fails_and_no_safe_authorized_retry_remains"
   RESILIENCE_VERIFICATION:
     - to: REGRESSION_REVIEW
       when: "resilience_verification_passed"
+    - to: TREATMENT_PROPOSED
+      when: "resilience_verification_fails_but_diagnosis_remains_valid_and_retry_budget_available"
+    - to: DIAGNOSING
+      when: "resilience_verification_failure_invalidates_diagnosis"
     - to: TREATMENT_FAILED
-      when: "resilience_verification_fails"
+      when: "resilience_verification_fails_and_no_safe_authorized_retry_remains"
   REGRESSION_REVIEW:
     - to: DISCHARGE_REVIEW
       when: "required_capabilities_preserved_and_no_blocking_regression"
+    - to: TREATMENT_PROPOSED
+      when: "regression_found_but_diagnosis_remains_valid_and_safe_retry_budget_available"
+    - to: DIAGNOSING
+      when: "regression_or_capability_loss_invalidates_diagnosis"
     - to: PARTIAL_RECOVERY
       when: "material_recovery_with_known_unresolved_noncritical_conditions"
     - to: TREATMENT_FAILED
-      when: "blocking_regression_or_required_capability_loss"
+      when: "blocking_regression_or_required_capability_loss_and_no_safe_authorized_retry_remains"
   DISCHARGE_REVIEW:
     - to: RECOVERED
       when: "all_required_evidence_satisfied_and_no_blocking_residual_risk"
@@ -263,6 +296,9 @@ transition_rules:
   - "Missing mandatory evidence cannot be interpreted as a pass."
   - "A terminal outcome must include residual-risk and scope statements."
   - "R3 RECOVERED requires human discharge authorization."
+  - "Retries require an explicit retry budget; the default retry budget is zero."
+  - "Each retry requires a new treatment plan and restored safe checkpoint or equivalent recovery state."
+  - "R3 retries require fresh operator authorization for each retry."
   - "Retries must return to the earliest state whose assumptions are invalidated; do not loop treatment without renewed diagnosis when evidence changes."
 
 instruction_provenance:
