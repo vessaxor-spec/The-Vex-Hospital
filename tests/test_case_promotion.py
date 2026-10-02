@@ -113,9 +113,22 @@ class CasePromotionEngineTests(unittest.TestCase):
     def test_undeclared_edge_denied(self):
         chart = self.base_chart()
         chart["current_state"] = "DIAGNOSING"
+        chart["risk_class"] = "R2"
+        chart["root_cause_confidence"] = "confirmed_root_cause"
 
         result = self.evaluate(chart, "TREATING")
         self.assertEqual(result["decision"], "DENIED")
+
+    def test_missing_risk_class_blocks_clinical_promotion(self):
+        chart = self.base_chart()
+        chart["current_state"] = "AUTHORITY_MAPPED"
+        chart["policy_context"]["facts"] = {
+            "authority_envelope_established": True,
+        }
+
+        result = self.evaluate(chart, "DIAGNOSING")
+        self.assertEqual(result["decision"], "BLOCKED")
+        self.assertIn("Risk class is required", result["reasons"][0])
 
     def test_retry_fact_is_derived_from_budget(self):
         chart = self.base_chart()
@@ -192,7 +205,27 @@ class CasePromotionEngineTests(unittest.TestCase):
 
         result = self.evaluate(chart, "TREATING", [])
         self.assertEqual(result["decision"], "BLOCKED")
-        self.assertIn("conflicts with derived fact authorization_scoped", result["reasons"][0])
+        self.assertIn(
+            "treatment_authorized conflicts with current scoped authorization evidence",
+            result["reasons"][0],
+        )
+
+    def test_authorization_scoped_fact_cannot_exist_without_evidence(self):
+        chart = self.base_chart()
+        chart["current_state"] = "TREATMENT_PROPOSED"
+        chart["risk_class"] = "R2"
+        chart["root_cause_confidence"] = "confirmed_root_cause"
+        chart["authority"]["treatment_authorized"] = False
+        chart["policy_context"]["facts"] = {
+            "authorization_scoped": True,
+        }
+
+        result = self.evaluate(chart, "TREATING", [])
+        self.assertEqual(result["decision"], "BLOCKED")
+        self.assertIn(
+            "conflicts with derived fact authorization_scoped",
+            result["reasons"][0],
+        )
 
     def test_r2_authorization_fact_cannot_disable_required_authorization(self):
         chart = self.base_chart()
@@ -384,6 +417,21 @@ class CasePromotionEngineTests(unittest.TestCase):
 
         result = self.evaluate(chart, "ADMITTED")
         self.assertEqual(result["decision"], "DENIED")
+
+    def test_evaluation_does_not_modify_patient_chart(self):
+        chart = self.base_chart()
+        chart["current_state"] = "ADMITTED"
+        chart["policy_context"]["facts"] = {
+            "containment_required": False,
+        }
+
+        chart_path = self.write_chart(chart)
+        before = chart_path.read_bytes()
+        result = evaluate_case_promotion(chart_path, "BASELINING", None)
+        after = chart_path.read_bytes()
+
+        self.assertEqual(result["decision"], "ALLOWED")
+        self.assertEqual(before, after)
 
     def test_evidence_wrong_producer_role_blocks(self):
         chart, records = self.r3_discharge_chart()
