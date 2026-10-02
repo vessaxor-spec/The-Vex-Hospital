@@ -21,6 +21,7 @@
     "authority",
     "differential",
     "evidence",
+    "policy_context",
     "treatment",
     "verification",
     "residual_risk",
@@ -165,6 +166,9 @@
         "CANCELLED",
         null
       ]
+    },
+    "policy_context": {
+      "$ref": "#/$defs/policyContext"
     }
   },
   "$defs": {
@@ -367,7 +371,8 @@
         "refs": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^EV-[A-Z0-9-]+$"
           }
         },
         "sensitive_evidence_location": {
@@ -489,6 +494,34 @@
         "BLOCKED",
         "CANCELLED"
       ]
+    },
+    "policyContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "facts",
+        "fact_evidence"
+      ],
+      "properties": {
+        "facts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        },
+        "fact_evidence": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^EV-[A-Z0-9-]+$"
+            }
+          }
+        }
+      }
     }
   },
   "oneOf": [
