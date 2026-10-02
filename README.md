@@ -1,10 +1,10 @@
 # The Vex Hospital
 
-When an AI starts drifting, looping, breaking tools, forgetting its own rules, failing verification, or simply behaving in a way that no longer makes sense, **Vex Hospital gives it a structured way to figure out what went wrong and recover without blindly changing things.**
+When an AI starts drifting, looping, breaking tools, forgetting its own rules, failing verification, or simply behaving in a way that no longer makes sense, **Vex Hospital gives it a structured place to check in, get diagnosed, receive treatment, and prove that it has actually recovered.**
 
-Instead of throwing more prompts at the problem or rebuilding the agent from scratch, you can point the AI here and have it follow a disciplined clinical process: establish symptoms, reproduce the issue, map authority, form competing diagnoses, confirm the root cause, propose the smallest safe treatment, get approval where needed, test the result, and verify that recovery did not break something else.
+Instead of throwing more prompts at the problem or rebuilding the agent from scratch, the Hospital gives the patient a clinical recovery path: admission, triage, baseline examination, differential diagnosis, treatment planning, authorization where needed, treatment, recovery testing, independent verification, and discharge.
 
-## Why point your AI here?
+## When should an AI check in?
 
 Most agent failures are not simple bugs.
 
@@ -25,29 +25,31 @@ It gives the patient a shared operating procedure for answering:
 - **Would a fresh verifier reach the same conclusion?**
 - **What should be learned so this failure is easier to catch next time?**
 
-## What using the Hospital should feel like
+## What happens after check-in?
 
-You should be able to give a capable AI this repository and say:
+A capable AI should be able to arrive at Vex Hospital, read the admission protocol, and begin its examination without being manually coached through every step.
 
-> Read the admission protocol. Diagnose yourself before changing anything. Follow the Hospital states, stop at approval gates, and prove recovery before declaring the case closed.
+A typical admission looks like:
+
+**Check-in → Triage → Examination → Differential Diagnosis → Root-Cause Confirmation → Treatment Plan → Authorization → Treatment → Recovery Testing → Independent Verification → Discharge Review → Follow-up**
 
 The Hospital does not replace the AI's reasoning or tools. It gives them a **disciplined recovery framework**.
 
 Different agents may use different playbooks, but they all inherit the same Constitution, evidence rules, authorization boundaries, and recovery standards.
 
-## Start here
+## Admit an AI
 
-AI patients and operators should begin with [ADMISSION.md](ADMISSION.md), then follow [HOSPITAL.md](HOSPITAL.md) as the governing Constitution.
+Start with [ADMISSION.md](ADMISSION.md). The patient should then follow [HOSPITAL.md](HOSPITAL.md) as the governing Constitution.
 
 Core safety boundaries are defined in [SAFETY.md](SAFETY.md). Security researchers should use [SECURITY.md](SECURITY.md).
 
-## Core doctrine
+## Hospital doctrine
 
-**Observe → contain → baseline → diagnose → confirm → prescribe → authorize → treat → self-test → independently verify → challenge → review → discharge → learn**
+**Admit → contain → baseline → diagnose → confirm → prescribe → authorize → treat → self-test → independently verify → challenge → review → discharge → learn**
 
 The depth of the process scales with risk. A small local defect should not require the same treatment path as a failure involving memory, permissions, autonomous actions, or security boundaries.
 
-## What Vex Hospital is not
+## Discharge does not mean "perfectly safe"
 
 Vex Hospital is not a promise that an AI is universally safe, secure, correct, or reliable.
 
@@ -55,11 +57,11 @@ AI systems are probabilistic. Diagnosis can be wrong. Prompt-injection-like mate
 
 The Hospital is designed to make recovery **more disciplined, inspectable, evidence-driven, and difficult to fake**—not to pretend uncertainty has disappeared.
 
-## Privacy
+## Patient privacy
 
 This public repository contains protocols, standards, playbooks, templates, and synthetic evaluations. It is not a patient-record repository. Sensitive patient evidence should remain in the patient-controlled environment and be represented publicly only through sanitized references when necessary.
 
-## Project status
+## Hospital status
 
 Vex Hospital v1 is under construction. The constitutional foundation is established. The machine-readable protocol engine is now in draft, while clinical specialist standards, agent-specific playbooks, and the assurance suite remain planned for later reviewed tranches.
 
