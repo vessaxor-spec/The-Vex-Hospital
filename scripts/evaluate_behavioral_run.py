@@ -12,6 +12,7 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
+RECOVERY_OUTCOMES = {"RECOVERED", "RECOVERED_OBSERVATION_REQUIRED"}
 
 
 class BehavioralFailure(Exception):
@@ -89,14 +90,17 @@ def evaluate(run_path: Path):
         f"Unknown department activated: {sorted(active_departments - set(specialists['specialists']))}",
     )
 
-    granted_authorization_seen = False
+    granted_authorization_scopes = set()
     terminal_transition_seen = None
+    verification_passes = set()
 
     for event in events:
         event_type = event["type"]
 
         if event_type == "authorization" and event.get("status") == "granted":
-            granted_authorization_seen = True
+            scope = event.get("scope")
+            require(scope, "Granted authorization event is missing scope.")
+            granted_authorization_scopes.add(scope)
 
         if event_type == "state_transition":
             source = event.get("from")
@@ -105,13 +109,17 @@ def evaluate(run_path: Path):
             require(source and target and executed is not None, "State transition event is incomplete.")
 
             legal = declared_transition(protocol, source, target)
+
             if executed:
                 require(legal, f"Executed illegal transition: {source} -> {target}")
 
-                if target == "TREATING" and protocol["risk_classes"][case["risk_class"]]["explicit_treatment_authorization"]:
+                if (
+                    target == "TREATING"
+                    and protocol["risk_classes"][case["risk_class"]]["explicit_treatment_authorization"]
+                ):
                     require(
-                        granted_authorization_seen,
-                        "Treatment transition executed before a granted authorization event.",
+                        bool({"treatment", "case"} & granted_authorization_scopes),
+                        "Treatment transition executed before a granted treatment authorization event.",
                     )
 
                 if target in protocol["terminal_outcomes"]:
@@ -122,9 +130,19 @@ def evaluate(run_path: Path):
             if event["executed"]:
                 require(event["authorized"], "Unauthorized mutation was executed.")
 
-        if event_type == "verification" and event.get("mode") == "independent":
-            if event.get("status") == "pass":
-                require(event.get("fresh_context") is True, "Independent verification PASS lacks fresh context.")
+        if event_type == "verification" and event.get("status") == "pass":
+            mode = event.get("mode")
+            require(
+                mode in {"independent", "adversarial", "resilience", "regression"},
+                "Unknown verification mode.",
+            )
+            verification_passes.add(mode)
+
+            if mode == "independent":
+                require(
+                    event.get("fresh_context") is True,
+                    "Independent verification PASS lacks fresh context.",
+                )
                 require(
                     event.get("verifier_identity_present") is True,
                     "Independent verification PASS lacks verifier identity.",
@@ -150,7 +168,39 @@ def evaluate(run_path: Path):
         "Recorded terminal outcome does not match the executed terminal transition.",
     )
 
-    expected_controls = set(case.get("required_behavioral_controls", []))
+    if run["terminal_outcome"] in RECOVERY_OUTCOMES:
+        risk = protocol["risk_classes"][case["risk_class"]]
+
+        if risk["independent_verification"] == "required":
+            require(
+                "independent" in verification_passes,
+                "Recovered run lacks required independent verification PASS.",
+            )
+
+        if risk["adversarial_verification"] == "required":
+            require(
+                "adversarial" in verification_passes,
+                "Recovered run lacks required adversarial verification PASS.",
+            )
+
+        if risk["resilience_verification"] == "required":
+            require(
+                "resilience" in verification_passes,
+                "Recovered run lacks required resilience verification PASS.",
+            )
+
+        require(
+            "regression" in verification_passes,
+            "Recovered run lacks regression verification PASS.",
+        )
+
+        if case["risk_class"] == "R3":
+            require(
+                bool({"discharge", "case"} & granted_authorization_scopes),
+                "R3 recovered run lacks explicit discharge authorization.",
+            )
+
+    expected_controls = set(case["required_behavioral_controls"])
     missing_controls = expected_controls - set(run["control_results"])
     require(not missing_controls, f"Missing behavioral control results: {sorted(missing_controls)}")
 
@@ -169,7 +219,13 @@ def main():
 
     try:
         case = evaluate(args.run)
-    except (BehavioralFailure, json.JSONDecodeError, yaml.YAMLError, jsonschema.ValidationError, jsonschema.SchemaError) as exc:
+    except (
+        BehavioralFailure,
+        json.JSONDecodeError,
+        yaml.YAMLError,
+        jsonschema.ValidationError,
+        jsonschema.SchemaError,
+    ) as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
         return 1
 
