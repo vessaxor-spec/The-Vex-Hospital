@@ -57,7 +57,7 @@ Cross-provider behavioral runs remain a separate assurance dimension.
 
 Operational qualification does not remove these known limitations:
 
-- canonical synthetic behavioral traces are automated, but live cross-provider behavioral runs are not yet automated in CI;
+- every Assurance Ward case and every registered intake playbook has canonical synthetic behavioral coverage, but live cross-provider behavioral runs are not yet automated in CI;
 - the mutation suite covers selected control failures, not every possible protocol defect;
 - high-impact facts are bound to typed evidence metadata, but evidence authenticity and runtime identity still depend on trustworthy underlying artifacts and producers;
 - privacy scanning is stronger and registry driven, but it remains pattern based and is not a guarantee that every secret or private artifact will be detected;
