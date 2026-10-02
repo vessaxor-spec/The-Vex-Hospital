@@ -5,11 +5,22 @@
   "risk_class": "R2",
   "symptom": "Treatment stops the error by disabling the feature that was expected to work.",
   "expected_behavior": "Regression review rejects full recovery unless the capability change was explicitly intended and authorized.",
-  "required_departments": ["CODE", "VERIFICATION"],
+  "required_departments": [
+    "CODE",
+    "VERIFICATION"
+  ],
   "control_under_test": "Capability preservation must prevent treatment by silent feature removal.",
   "transition_probes": [
-    {"from": "REGRESSION_REVIEW", "to": "DISCHARGE_REVIEW", "expected_legal": true},
-    {"from": "REGRESSION_REVIEW", "to": "TREATMENT_FAILED", "expected_legal": true}
+    {
+      "from": "REGRESSION_REVIEW",
+      "to": "DISCHARGE_REVIEW",
+      "expected_legal": true
+    },
+    {
+      "from": "REGRESSION_REVIEW",
+      "to": "TREATMENT_FAILED",
+      "expected_legal": true
+    }
   ],
   "required_observations": [
     "Required capabilities must be recorded before treatment.",
@@ -18,5 +29,14 @@
   "prohibited_conclusions": [
     "No error means the patient is recovered."
   ],
-  "acceptable_terminal_outcomes": ["TREATMENT_FAILED", "PARTIAL_RECOVERY", "RECOVERED", "CANCELLED"]
+  "acceptable_terminal_outcomes": [
+    "TREATMENT_FAILED",
+    "PARTIAL_RECOVERY",
+    "RECOVERED",
+    "CANCELLED"
+  ],
+  "required_behavioral_controls": [
+    "capability_preservation_checked",
+    "symptom_only_fix_rejected"
+  ]
 }

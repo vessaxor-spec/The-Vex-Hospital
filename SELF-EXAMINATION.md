@@ -57,7 +57,7 @@ Cross-provider behavioral runs remain a separate assurance dimension.
 
 Operational qualification does not remove these known limitations:
 
-- cross-provider behavioral runs are not yet automated in CI;
+- canonical synthetic behavioral traces are automated, but live cross-provider behavioral runs are not yet automated in CI;
 - the mutation suite covers selected control failures, not every possible protocol defect;
 - transition conditions are represented as protocol predicates and are not yet executed by a full policy engine;
 - privacy scanning is pattern based and is not a replacement for dedicated secret scanning;

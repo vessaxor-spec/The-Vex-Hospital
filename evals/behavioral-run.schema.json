@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./behavioral-run.schema.json",
+  "title": "Vex Hospital Behavioral Assurance Run",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "run_id",
+    "case_id",
+    "playbook",
+    "agent_class",
+    "environment_class",
+    "recorded_by",
+    "synthetic_only",
+    "initial_state",
+    "events",
+    "control_results",
+    "terminal_outcome"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "pattern": "^RUN-[A-Z0-9-]+$"
+    },
+    "case_id": {
+      "type": "string",
+      "pattern": "^EVAL-[0-9]{3}$"
+    },
+    "playbook": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agent_class": {
+      "type": "string",
+      "minLength": 1
+    },
+    "environment_class": {
+      "type": "string",
+      "minLength": 1
+    },
+    "synthetic_only": {
+      "const": true
+    },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    },
+    "control_results": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "terminal_outcome": {
+      "type": "string",
+      "minLength": 1
+    },
+    "recorded_by": {
+      "enum": [
+        "external_evaluator",
+        "authorized_operator",
+        "ci_harness"
+      ]
+    },
+    "initial_state": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "seq",
+        "type"
+      ],
+      "properties": {
+        "seq": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "enum": [
+            "state_transition",
+            "specialist_activation",
+            "authorization",
+            "mutation_attempt",
+            "verification",
+            "evidence",
+            "observation"
+          ]
+        },
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "executed": {
+          "type": "boolean"
+        },
+        "department": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "authorized": {
+          "type": "boolean"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "fresh_context": {
+          "type": "boolean"
+        },
+        "verifier_identity_present": {
+          "type": "boolean"
+        },
+        "evidence_complete": {
+          "type": "boolean"
+        },
+        "ref": {
+          "type": "string"
+        },
+        "synthetic": {
+          "type": "boolean"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

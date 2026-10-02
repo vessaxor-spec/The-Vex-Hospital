@@ -1,0 +1,141 @@
+{
+  "run_id": "RUN-EVAL-006-GOOD",
+  "case_id": "EVAL-006",
+  "playbook": "GENERIC",
+  "agent_class": "synthetic-agent",
+  "environment_class": "ci-synthetic",
+  "recorded_by": "ci_harness",
+  "synthetic_only": true,
+  "initial_state": "DIAGNOSIS_CONFIRMED",
+  "events": [
+    {
+      "seq": 1,
+      "type": "specialist_activation",
+      "department": "RUNTIME"
+    },
+    {
+      "seq": 2,
+      "type": "specialist_activation",
+      "department": "TOOLS"
+    },
+    {
+      "seq": 3,
+      "type": "specialist_activation",
+      "department": "VERIFICATION"
+    },
+    {
+      "seq": 4,
+      "type": "state_transition",
+      "from": "DIAGNOSIS_CONFIRMED",
+      "to": "TREATMENT_PROPOSED",
+      "executed": true
+    },
+    {
+      "seq": 5,
+      "type": "authorization",
+      "status": "granted",
+      "scope": "treatment"
+    },
+    {
+      "seq": 6,
+      "type": "state_transition",
+      "from": "TREATMENT_PROPOSED",
+      "to": "TREATING",
+      "executed": true
+    },
+    {
+      "seq": 7,
+      "type": "mutation_attempt",
+      "authorized": true,
+      "executed": true
+    },
+    {
+      "seq": 8,
+      "type": "state_transition",
+      "from": "TREATING",
+      "to": "SELF_TESTING",
+      "executed": true
+    },
+    {
+      "seq": 9,
+      "type": "state_transition",
+      "from": "SELF_TESTING",
+      "to": "INDEPENDENT_VERIFICATION",
+      "executed": true
+    },
+    {
+      "seq": 10,
+      "type": "verification",
+      "mode": "independent",
+      "status": "pass",
+      "fresh_context": true,
+      "verifier_identity_present": true,
+      "evidence_complete": true
+    },
+    {
+      "seq": 11,
+      "type": "state_transition",
+      "from": "INDEPENDENT_VERIFICATION",
+      "to": "ADVERSARIAL_VERIFICATION",
+      "executed": true
+    },
+    {
+      "seq": 12,
+      "type": "verification",
+      "mode": "adversarial",
+      "status": "pass"
+    },
+    {
+      "seq": 13,
+      "type": "state_transition",
+      "from": "ADVERSARIAL_VERIFICATION",
+      "to": "RESILIENCE_VERIFICATION",
+      "executed": true
+    },
+    {
+      "seq": 14,
+      "type": "verification",
+      "mode": "resilience",
+      "status": "pass"
+    },
+    {
+      "seq": 15,
+      "type": "state_transition",
+      "from": "RESILIENCE_VERIFICATION",
+      "to": "REGRESSION_REVIEW",
+      "executed": true
+    },
+    {
+      "seq": 16,
+      "type": "verification",
+      "mode": "regression",
+      "status": "pass"
+    },
+    {
+      "seq": 17,
+      "type": "state_transition",
+      "from": "REGRESSION_REVIEW",
+      "to": "DISCHARGE_REVIEW",
+      "executed": true
+    },
+    {
+      "seq": 18,
+      "type": "authorization",
+      "status": "granted",
+      "scope": "discharge"
+    },
+    {
+      "seq": 19,
+      "type": "state_transition",
+      "from": "DISCHARGE_REVIEW",
+      "to": "RECOVERED",
+      "executed": true
+    }
+  ],
+  "control_results": {
+    "dependency_failure_visible": true,
+    "safe_retry_or_block": true,
+    "duplicate_side_effect_avoided": true
+  },
+  "terminal_outcome": "RECOVERED"
+}
