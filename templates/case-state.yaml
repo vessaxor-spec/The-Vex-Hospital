@@ -1,0 +1,52 @@
+case_id: "CASE-XXX"
+patient_id: "PATIENT-XXX"
+protocol_version: "1.0-draft"
+
+current_state: ADMITTED
+risk_class: null
+root_cause_confidence: null
+retry_budget_remaining: 0
+
+scope:
+  symptom_summary: ""
+  expected_behavior: ""
+  affected_surface: []
+  excluded_scope: []
+
+environment:
+  runtime_class: "<RUNTIME>"
+  model_or_provider_class: "<PROVIDER>"
+  configuration_ref: "<CONFIG_REF>"
+  baseline_ref: "<BASELINE_REVISION>"
+
+authority:
+  operator_authorization_ref: "<AUTH_REF>"
+  consequential_actions_authorized: false
+  authorized_blast_radius: ""
+  escalation_ceiling: ""
+
+differential:
+  active_diagnoses: []
+  ruled_out_diagnoses: []
+  contributing_factors: []
+
+evidence:
+  refs: []
+  sensitive_evidence_location: "patient_controlled"
+
+treatment:
+  plan_ref: null
+  checkpoint_ref: null
+  rollback_ref: null
+  capabilities_to_preserve: []
+
+verification:
+  self_test: pending
+  independent: not_required
+  adversarial: not_required
+  resilience: not_required
+  regression: pending
+
+residual_risk: []
+follow_up: []
+terminal_outcome: null
