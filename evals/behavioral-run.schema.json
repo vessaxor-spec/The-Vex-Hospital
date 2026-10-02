@@ -12,6 +12,7 @@
     "environment_class",
     "recorded_by",
     "synthetic_only",
+    "initial_state",
     "events",
     "control_results",
     "terminal_outcome"
@@ -63,6 +64,10 @@
         "authorized_operator",
         "ci_harness"
       ]
+    },
+    "initial_state": {
+      "type": "string",
+      "minLength": 1
     }
   },
   "$defs": {
