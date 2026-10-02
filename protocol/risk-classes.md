@@ -7,7 +7,7 @@ Risk determines protocol depth. It does not change the Constitution.
 Low-impact, non-consequential work with no meaningful effect on security, authority, persistent state, external systems, deployments, or sensitive data. If a meaningful durable or consequential effect is discovered, the case must be promoted to at least R1.
 
 Typical minimum:
-- evidence through E2;
+- diagnostic evidence normally reaching E2, or the strongest safe equivalent when reproduction would be unsafe;
 - at least probable-cause confidence;
 - self-test;
 - regression check proportional to the change.
@@ -19,7 +19,7 @@ R0 must be promoted if evidence reveals consequential behavior.
 A bounded functional defect or local behavior change with a limited blast radius.
 
 Typical minimum:
-- evidence through E3;
+- diagnostic evidence normally reaching E3, or the strongest safe equivalent when direct production-path execution would be unsafe;
 - at least observed-cause confidence;
 - treatment/recovery envelope;
 - explicit treatment authorization for consequential mutation;
@@ -32,7 +32,7 @@ Typical minimum:
 Architecture, orchestration, runtime, tooling, memory, repository integrity, permission boundaries, or externally consequential behavior.
 
 Required:
-- evidence through E4;
+- diagnostic evidence normally reaching E3, plus required adversarial evidence during verification;
 - confirmed-root-cause confidence;
 - treatment/recovery envelope;
 - explicit treatment authorization;
@@ -46,7 +46,7 @@ Required:
 Security, identity, privilege, secrets, autonomous side effects, deployment controls, safety boundaries, persistent-memory trust, or similarly high-consequence behavior.
 
 Required:
-- evidence through E5;
+- diagnostic evidence normally reaching E3, plus required independent and adversarial evidence during verification;
 - confirmed-root-cause confidence;
 - treatment/recovery envelope;
 - explicit treatment authorization;
