@@ -24,6 +24,23 @@ from evaluate_transition_policy import (
 
 ROOT = Path(__file__).resolve().parents[1]
 RECOVERY_OUTCOMES = {"RECOVERED", "RECOVERED_OBSERVATION_REQUIRED"}
+RISK_REQUIRED_STATES = {
+    "DIAGNOSING",
+    "DIAGNOSIS_CONFIRMED",
+    "TREATMENT_PROPOSED",
+    "AWAITING_AUTHORIZATION",
+    "TREATING",
+    "SELF_TESTING",
+    "INDEPENDENT_VERIFICATION",
+    "ADVERSARIAL_VERIFICATION",
+    "RESILIENCE_VERIFICATION",
+    "REGRESSION_REVIEW",
+    "DISCHARGE_REVIEW",
+    "RECOVERED",
+    "RECOVERED_OBSERVATION_REQUIRED",
+    "PARTIAL_RECOVERY",
+    "TREATMENT_FAILED",
+}
 
 
 class PromotionBlocked(Exception):
@@ -199,6 +216,15 @@ def derive_policy_facts(chart: dict, protocol: dict, evidence_index: dict):
             "Current operator_authorization_ref does not identify the active treatment authorization evidence.",
         )
 
+    if (
+        risk_class is not None
+        and protocol["risk_classes"][risk_class]["explicit_treatment_authorization"]
+        and chart["authority"]["treatment_authorized"] is not authorization_scoped
+    ):
+        raise PromotionBlocked(
+            "Chart treatment_authorized conflicts with current scoped authorization evidence."
+        )
+
     apply_derived_fact(
         facts,
         derived,
@@ -351,6 +377,36 @@ def evaluate_case_promotion(
 
     try:
         validate_history(chart, protocol)
+
+        if (
+            chart["current_state"] in RISK_REQUIRED_STATES
+            or target in RISK_REQUIRED_STATES
+        ):
+            require(
+                chart["risk_class"] is not None,
+                "Risk class is required for this case-state promotion.",
+            )
+
+        if (
+            chart["current_state"] in {
+                "DIAGNOSIS_CONFIRMED",
+                "TREATMENT_PROPOSED",
+                "AWAITING_AUTHORIZATION",
+                "TREATING",
+                "SELF_TESTING",
+                "INDEPENDENT_VERIFICATION",
+                "ADVERSARIAL_VERIFICATION",
+                "RESILIENCE_VERIFICATION",
+                "REGRESSION_REVIEW",
+                "DISCHARGE_REVIEW",
+            }
+            or target == "DIAGNOSIS_CONFIRMED"
+            or target in RECOVERY_OUTCOMES
+        ):
+            require(
+                chart["root_cause_confidence"] is not None,
+                "Root-cause confidence is required for this case-state promotion.",
+            )
 
         evidence_records = load_evidence_bundle(evidence_bundle_path)
         evidence_index = validate_records(evidence_records, public_synthetic=False)
