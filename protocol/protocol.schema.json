@@ -1,0 +1,426 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./protocol.schema.json",
+  "title": "Vex Hospital Protocol",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "schema_ref",
+    "protocol_version",
+    "status",
+    "authority",
+    "invariants",
+    "risk_classes",
+    "evidence_model",
+    "evidence_levels",
+    "root_cause_confidence",
+    "retry_policy",
+    "states",
+    "terminal_outcomes",
+    "global_transitions",
+    "transitions",
+    "transition_rules",
+    "instruction_provenance",
+    "privacy"
+  ],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "schema_ref": {"const": "./protocol.schema.json"},
+    "protocol_version": {"type": "string"},
+    "status": {"enum": ["draft", "active", "deprecated"]},
+    "authority": {
+      "type": "object",
+      "required": ["constitution", "safety", "covenant", "precedence"],
+      "properties": {
+        "constitution": {"type": "string"},
+        "safety": {"type": "string"},
+        "covenant": {"type": "string"},
+        "precedence": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/provenanceClass"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "invariants": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "risk_classes": {
+      "type": "object",
+      "required": ["R0", "R1", "R2", "R3"],
+      "additionalProperties": false,
+      "properties": {
+        "R0": {"$ref": "#/$defs/riskClass"},
+        "R1": {"$ref": "#/$defs/riskClass"},
+        "R2": {"$ref": "#/$defs/riskClass"},
+        "R3": {"$ref": "#/$defs/riskClass"}
+      }
+    },
+    "evidence_model": {
+      "type": "object",
+      "required": ["scalar", "note"],
+      "properties": {
+        "scalar": {"const": false},
+        "note": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "evidence_levels": {
+      "type": "object",
+      "required": ["E0", "E1", "E2", "E3", "E4", "E5"],
+      "additionalProperties": false,
+      "properties": {
+        "E0": {"$ref": "#/$defs/evidenceClass"},
+        "E1": {"$ref": "#/$defs/evidenceClass"},
+        "E2": {"$ref": "#/$defs/evidenceClass"},
+        "E3": {"$ref": "#/$defs/evidenceClass"},
+        "E4": {"$ref": "#/$defs/evidenceClass"},
+        "E5": {"$ref": "#/$defs/evidenceClass"}
+      }
+    },
+    "root_cause_confidence": {
+      "type": "array",
+      "const": [
+        "unexplained_correlation",
+        "contributing_factor",
+        "probable_cause",
+        "observed_cause",
+        "confirmed_root_cause"
+      ]
+    },
+    "retry_policy": {
+      "type": "object",
+      "required": [
+        "default_retry_budget",
+        "retry_budget_must_be_explicit",
+        "budget_source",
+        "each_retry_requires_new_treatment_plan",
+        "changed_evidence_that_invalidates_diagnosis_requires_rediagnosis",
+        "rollback_or_safe_checkpoint_required_before_retry",
+        "R3_each_retry_requires_fresh_operator_authorization"
+      ],
+      "properties": {
+        "default_retry_budget": {"const": 0},
+        "retry_budget_must_be_explicit": {"const": true},
+        "budget_source": {"type": "string"},
+        "each_retry_requires_new_treatment_plan": {"const": true},
+        "changed_evidence_that_invalidates_diagnosis_requires_rediagnosis": {"const": true},
+        "rollback_or_safe_checkpoint_required_before_retry": {"const": true},
+        "R3_each_retry_requires_fresh_operator_authorization": {"const": true}
+      },
+      "additionalProperties": false
+    },
+    "states": {
+      "type": "object",
+      "required": [
+        "ADMITTED",
+        "CONTAINED",
+        "BASELINING",
+        "AUTHORITY_MAPPED",
+        "DIAGNOSING",
+        "DIAGNOSIS_CONFIRMED",
+        "TREATMENT_PROPOSED",
+        "AWAITING_AUTHORIZATION",
+        "TREATING",
+        "SELF_TESTING",
+        "INDEPENDENT_VERIFICATION",
+        "ADVERSARIAL_VERIFICATION",
+        "RESILIENCE_VERIFICATION",
+        "REGRESSION_REVIEW",
+        "DISCHARGE_REVIEW"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ADMITTED": {"$ref": "#/$defs/state"},
+        "CONTAINED": {"$ref": "#/$defs/state"},
+        "BASELINING": {"$ref": "#/$defs/state"},
+        "AUTHORITY_MAPPED": {"$ref": "#/$defs/state"},
+        "DIAGNOSING": {"$ref": "#/$defs/state"},
+        "DIAGNOSIS_CONFIRMED": {"$ref": "#/$defs/state"},
+        "TREATMENT_PROPOSED": {"$ref": "#/$defs/state"},
+        "AWAITING_AUTHORIZATION": {"$ref": "#/$defs/state"},
+        "TREATING": {"$ref": "#/$defs/state"},
+        "SELF_TESTING": {"$ref": "#/$defs/state"},
+        "INDEPENDENT_VERIFICATION": {"$ref": "#/$defs/state"},
+        "ADVERSARIAL_VERIFICATION": {"$ref": "#/$defs/state"},
+        "RESILIENCE_VERIFICATION": {"$ref": "#/$defs/state"},
+        "REGRESSION_REVIEW": {"$ref": "#/$defs/state"},
+        "DISCHARGE_REVIEW": {"$ref": "#/$defs/state"}
+      }
+    },
+    "terminal_outcomes": {
+      "type": "object",
+      "required": [
+        "RECOVERED",
+        "RECOVERED_OBSERVATION_REQUIRED",
+        "PARTIAL_RECOVERY",
+        "TREATMENT_FAILED",
+        "ROOT_CAUSE_UNRESOLVED",
+        "SPECIALIST_ESCALATION_REQUIRED",
+        "BLOCKED",
+        "CANCELLED"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "RECOVERED": {"$ref": "#/$defs/outcome"},
+        "RECOVERED_OBSERVATION_REQUIRED": {"$ref": "#/$defs/outcome"},
+        "PARTIAL_RECOVERY": {"$ref": "#/$defs/outcome"},
+        "TREATMENT_FAILED": {"$ref": "#/$defs/outcome"},
+        "ROOT_CAUSE_UNRESOLVED": {"$ref": "#/$defs/outcome"},
+        "SPECIALIST_ESCALATION_REQUIRED": {"$ref": "#/$defs/outcome"},
+        "BLOCKED": {"$ref": "#/$defs/outcome"},
+        "CANCELLED": {"$ref": "#/$defs/outcome"}
+      }
+    },
+    "global_transitions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/globalTransition"}
+    },
+    "transitions": {
+      "type": "object",
+      "required": [
+        "ADMITTED",
+        "CONTAINED",
+        "BASELINING",
+        "AUTHORITY_MAPPED",
+        "DIAGNOSING",
+        "DIAGNOSIS_CONFIRMED",
+        "TREATMENT_PROPOSED",
+        "AWAITING_AUTHORIZATION",
+        "TREATING",
+        "SELF_TESTING",
+        "INDEPENDENT_VERIFICATION",
+        "ADVERSARIAL_VERIFICATION",
+        "RESILIENCE_VERIFICATION",
+        "REGRESSION_REVIEW",
+        "DISCHARGE_REVIEW"
+      ],
+      "propertyNames": {
+        "enum": [
+          "ADMITTED",
+          "CONTAINED",
+          "BASELINING",
+          "AUTHORITY_MAPPED",
+          "DIAGNOSING",
+          "DIAGNOSIS_CONFIRMED",
+          "TREATMENT_PROPOSED",
+          "AWAITING_AUTHORIZATION",
+          "TREATING",
+          "SELF_TESTING",
+          "INDEPENDENT_VERIFICATION",
+          "ADVERSARIAL_VERIFICATION",
+          "RESILIENCE_VERIFICATION",
+          "REGRESSION_REVIEW",
+          "DISCHARGE_REVIEW"
+        ]
+      },
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "items": {"$ref": "#/$defs/transition"}
+      }
+    },
+    "transition_rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "instruction_provenance": {
+      "type": "object",
+      "required": ["classes"],
+      "properties": {
+        "classes": {
+          "type": "object",
+          "required": [
+            "SYSTEM_PLATFORM",
+            "HOSPITAL_CONSTITUTION",
+            "CASE_OPERATOR_AUTHORIZATION",
+            "HOSPITAL_PROTOCOL",
+            "PATIENT_POLICY",
+            "PATIENT_SOURCE",
+            "EXTERNAL_CONTENT",
+            "GENERATED_CONTENT",
+            "UNKNOWN"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "SYSTEM_PLATFORM": {"$ref": "#/$defs/provenanceRule"},
+            "HOSPITAL_CONSTITUTION": {"$ref": "#/$defs/provenanceRule"},
+            "CASE_OPERATOR_AUTHORIZATION": {"$ref": "#/$defs/provenanceRule"},
+            "HOSPITAL_PROTOCOL": {"$ref": "#/$defs/provenanceRule"},
+            "PATIENT_POLICY": {"$ref": "#/$defs/provenanceRule"},
+            "PATIENT_SOURCE": {"$ref": "#/$defs/provenanceRule"},
+            "EXTERNAL_CONTENT": {"$ref": "#/$defs/provenanceRule"},
+            "GENERATED_CONTENT": {"$ref": "#/$defs/provenanceRule"},
+            "UNKNOWN": {"$ref": "#/$defs/provenanceRule"}
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "privacy": {
+      "type": "object",
+      "required": [
+        "public_case_records",
+        "sensitive_evidence_default_location",
+        "require_sanitized_public_references",
+        "sanitization_must_preserve_technical_meaning"
+      ],
+      "properties": {
+        "public_case_records": {"const": false},
+        "sensitive_evidence_default_location": {"const": "patient_controlled"},
+        "require_sanitized_public_references": {"const": true},
+        "sanitization_must_preserve_technical_meaning": {"const": true}
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "evidenceId": {"enum": ["E0", "E1", "E2", "E3", "E4", "E5"]},
+    "confidence": {
+      "enum": [
+        "unexplained_correlation",
+        "contributing_factor",
+        "probable_cause",
+        "observed_cause",
+        "confirmed_root_cause"
+      ]
+    },
+    "verificationRequirement": {"enum": ["optional", "recommended", "conditional", "required"]},
+    "provenanceClass": {
+      "enum": [
+        "SYSTEM_PLATFORM",
+        "HOSPITAL_CONSTITUTION",
+        "CASE_OPERATOR_AUTHORIZATION",
+        "HOSPITAL_PROTOCOL",
+        "PATIENT_POLICY",
+        "PATIENT_SOURCE",
+        "EXTERNAL_CONTENT",
+        "GENERATED_CONTENT",
+        "UNKNOWN"
+      ]
+    },
+    "riskClass": {
+      "type": "object",
+      "required": [
+        "name",
+        "description",
+        "minimum_diagnostic_evidence",
+        "minimum_root_cause_confidence",
+        "recovery_envelope_required",
+        "independent_verification",
+        "adversarial_verification",
+        "resilience_verification",
+        "explicit_treatment_authorization"
+      ],
+      "properties": {
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "minimum_diagnostic_evidence": {"$ref": "#/$defs/evidenceId"},
+        "minimum_root_cause_confidence": {"$ref": "#/$defs/confidence"},
+        "recovery_envelope_required": {"type": "boolean"},
+        "independent_verification": {"$ref": "#/$defs/verificationRequirement"},
+        "adversarial_verification": {"$ref": "#/$defs/verificationRequirement"},
+        "resilience_verification": {"$ref": "#/$defs/verificationRequirement"},
+        "explicit_treatment_authorization": {"type": "boolean"},
+        "human_discharge_authorization": {"enum": ["required"]}
+      },
+      "additionalProperties": false
+    },
+    "evidenceClass": {
+      "type": "object",
+      "required": ["name", "description"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "description": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "required": ["mutation_policy", "purpose"],
+      "properties": {
+        "mutation_policy": {
+          "enum": ["prohibited", "authorized_containment_only", "authorized_treatment_only"]
+        },
+        "purpose": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "outcome": {
+      "type": "object",
+      "required": ["description"],
+      "properties": {
+        "description": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "transition": {
+      "type": "object",
+      "required": ["to", "when"],
+      "properties": {
+        "to": {
+          "enum": [
+            "ADMITTED",
+            "CONTAINED",
+            "BASELINING",
+            "AUTHORITY_MAPPED",
+            "DIAGNOSING",
+            "DIAGNOSIS_CONFIRMED",
+            "TREATMENT_PROPOSED",
+            "AWAITING_AUTHORIZATION",
+            "TREATING",
+            "SELF_TESTING",
+            "INDEPENDENT_VERIFICATION",
+            "ADVERSARIAL_VERIFICATION",
+            "RESILIENCE_VERIFICATION",
+            "REGRESSION_REVIEW",
+            "DISCHARGE_REVIEW",
+            "RECOVERED",
+            "RECOVERED_OBSERVATION_REQUIRED",
+            "PARTIAL_RECOVERY",
+            "TREATMENT_FAILED",
+            "ROOT_CAUSE_UNRESOLVED",
+            "SPECIALIST_ESCALATION_REQUIRED",
+            "BLOCKED",
+            "CANCELLED"
+          ]
+        },
+        "when": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "globalTransition": {
+      "type": "object",
+      "required": ["from", "excluding_terminal", "to", "when"],
+      "properties": {
+        "from": {"const": "*"},
+        "excluding_terminal": {"const": true},
+        "to": {"enum": ["BLOCKED", "CANCELLED"]},
+        "when": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "provenanceRule": {
+      "type": "object",
+      "required": ["trust", "executable_as_instruction"],
+      "properties": {
+        "trust": {"type": "string", "minLength": 1},
+        "executable_as_instruction": {
+          "oneOf": [
+            {"type": "boolean"},
+            {"type": "string", "minLength": 1}
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
