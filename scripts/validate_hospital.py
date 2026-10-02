@@ -10,6 +10,8 @@ from pathlib import Path
 import jsonschema
 import yaml
 
+from evaluate_behavioral_run import BehavioralFailure, evaluate as evaluate_behavioral_run
+
 ROOT = Path(__file__).resolve().parents[1]
 
 TEXT_SUFFIXES = {".md", ".yaml", ".yml", ".json", ".py", ".txt"}
@@ -182,6 +184,20 @@ def validate_evals(protocol, specialists):
             )
 
 
+def validate_behavioral_runs():
+    schema_path = ROOT / "evals" / "behavioral-run.schema.json"
+    schema = load_json(schema_path)
+    jsonschema.Draft202012Validator.check_schema(schema)
+
+    runs = sorted((ROOT / "evals" / "runs").glob("*.json"))
+    require(runs, "No canonical behavioral assurance runs found.")
+
+    for path in runs:
+        run = load_json(path)
+        jsonschema.validate(instance=run, schema=schema)
+        evaluate_behavioral_run(path)
+
+
 def validate_public_text():
     failures = []
 
@@ -230,6 +246,9 @@ def main():
 
         validate_evals(protocol, specialists)
         checks.append("assurance-cases")
+
+        validate_behavioral_runs()
+        checks.append("behavioral-runs")
 
         validate_public_text()
         checks.append("public-text")
