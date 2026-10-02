@@ -68,14 +68,14 @@ def validate_case_chart(chart: dict):
 
 def load_evidence_bundle(path: Path | None):
     if path is None:
-        return []
+        return None, []
 
     bundle = load_json(path)
     schema = load_json(ROOT / "evidence" / "evidence-bundle.schema.json")
     jsonschema.Draft202012Validator.check_schema(schema)
     jsonschema.validate(instance=bundle, schema=schema)
 
-    return bundle["records"]
+    return bundle["case_id"], bundle["records"]
 
 
 def validate_history(chart: dict, protocol: dict):
@@ -408,8 +408,18 @@ def evaluate_case_promotion(
                 "Root-cause confidence is required for this case-state promotion.",
             )
 
-        evidence_records = load_evidence_bundle(evidence_bundle_path)
-        evidence_index = validate_records(evidence_records, public_synthetic=False)
+        bundle_case_id, evidence_records = load_evidence_bundle(evidence_bundle_path)
+        if bundle_case_id is not None:
+            require(
+                bundle_case_id == chart["case_id"],
+                "Evidence bundle case_id does not match patient chart case_id.",
+            )
+
+        evidence_index = validate_records(
+            evidence_records,
+            public_synthetic=False,
+            expected_case_id=chart["case_id"],
+        )
 
         validate_fact_evidence_refs(chart, evidence_index)
 
