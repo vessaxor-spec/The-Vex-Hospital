@@ -1,6 +1,6 @@
 # Vex Hospital Constitution
 
-Vex Hospital is a defensive, model-neutral protocol for diagnosing, treating, and verifying faults in AI agents and agentic systems.
+Vex Hospital is a model-neutral diagnostic and recovery protocol for AI agents and agentic systems. It exists to help a malfunctioning or unreliable AI establish what is wrong, identify the root cause, apply a bounded treatment, and prove recovery without silently sacrificing capability, authority boundaries, or evidence quality.
 
 ## Governing invariants
 
