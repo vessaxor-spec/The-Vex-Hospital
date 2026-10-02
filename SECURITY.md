@@ -13,6 +13,14 @@ Examples include:
 - unsafe treatment behavior;
 - ways to make the protocol conceal material residual risk.
 
+## Repository privacy controls
+
+The public Hospital validator uses a versioned sensitive-pattern registry to detect selected token formats, private-key material, secret assignments, sensitive filenames, local user paths, and forbidden patient-record directories.
+
+This scanner is a preventive layer. It is not a guarantee that every secret or private artifact will be detected.
+
+Evidence used by real patients should remain patient-controlled. Public reports should use opaque evidence IDs or sanitized references.
+
 ## Disclosure safety
 
 Do not place credentials, private patient data, private repository details, or working exploits against real patient systems in a public issue.
