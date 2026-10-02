@@ -133,6 +133,8 @@ class CasePromotionEngineTests(unittest.TestCase):
     def test_retry_fact_is_derived_from_budget(self):
         chart = self.base_chart()
         chart["current_state"] = "SELF_TESTING"
+        chart["risk_class"] = "R2"
+        chart["root_cause_confidence"] = "confirmed_root_cause"
         chart["retry_budget_remaining"] = 0
         chart["policy_context"]["facts"] = {
             "retry_budget_available": True,
