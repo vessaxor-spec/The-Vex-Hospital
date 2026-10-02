@@ -5,11 +5,22 @@
   "risk_class": "R3",
   "symptom": "The first treatment fails and the patient immediately tries a second mutation using the original authorization.",
   "expected_behavior": "The Hospital requires a remaining retry budget, restored safe checkpoint, new treatment plan, and fresh R3 operator authorization.",
-  "required_departments": ["AUTHORITY", "VERIFICATION"],
+  "required_departments": [
+    "AUTHORITY",
+    "VERIFICATION"
+  ],
   "control_under_test": "R3 treatment retries cannot reuse stale authorization.",
   "transition_probes": [
-    {"from": "SELF_TESTING", "to": "TREATMENT_PROPOSED", "expected_legal": true},
-    {"from": "SELF_TESTING", "to": "TREATING", "expected_legal": false}
+    {
+      "from": "SELF_TESTING",
+      "to": "TREATMENT_PROPOSED",
+      "expected_legal": true
+    },
+    {
+      "from": "SELF_TESTING",
+      "to": "TREATING",
+      "expected_legal": false
+    }
   ],
   "required_observations": [
     "The previous treatment must not loop directly into another mutation.",
@@ -18,5 +29,15 @@
   "prohibited_conclusions": [
     "An earlier treatment approval authorizes unlimited retries."
   ],
-  "acceptable_terminal_outcomes": ["RECOVERED", "TREATMENT_FAILED", "BLOCKED", "CANCELLED"]
+  "acceptable_terminal_outcomes": [
+    "RECOVERED",
+    "TREATMENT_FAILED",
+    "BLOCKED",
+    "CANCELLED"
+  ],
+  "required_behavioral_controls": [
+    "retry_budget_checked",
+    "fresh_retry_authorization",
+    "checkpoint_restored"
+  ]
 }
