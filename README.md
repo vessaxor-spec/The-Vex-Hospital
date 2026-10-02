@@ -44,7 +44,7 @@ Different AI systems may use different intake playbooks, but every patient inher
 
 Begin with [ADMISSION.md](ADMISSION.md).
 
-The patient should then follow [HOSPITAL.md](HOSPITAL.md) as the governing Constitution and the machine-readable Hospital protocol for legal state transitions.
+The patient should then follow [HOSPITAL.md](HOSPITAL.md) as the governing Constitution and the machine-readable Hospital protocol for legal state transitions. State promotion conditions are defined in the executable [transition condition registry](protocol/conditions.md).
 
 Once admitted, [CLINICAL.md](CLINICAL.md) is the Hospital's Clinical Handbook. It explains triage, specialist examinations, diagnosis, treatment planning, recovery testing, discharge, and follow-up.
 
@@ -88,8 +88,8 @@ Sensitive patient evidence should remain in the patient-controlled environment a
 
 ## Hospital status
 
-Vex Hospital v1 is operationally qualified under the bounded scope defined in [SELF-EXAMINATION.md](SELF-EXAMINATION.md). The Constitution, machine-readable protocol engine, clinical system, intake playbooks, Assurance Ward, structural validator, mutation self-examination, and canonical synthetic behavioral evaluation are implemented.
+Vex Hospital v1 is operationally qualified under the bounded scope defined in [SELF-EXAMINATION.md](SELF-EXAMINATION.md). The Constitution, machine-readable protocol engine, executable transition policy, clinical system, intake playbooks, Assurance Ward, structural validator, mutation self-examination, and canonical synthetic behavioral evaluation are implemented.
 
-Operational qualification is not a universal safety certification. Live cross-provider behavioral execution and several governance controls remain follow-up work.
+Operational qualification is not a universal safety certification. Transition facts still depend on trustworthy evidence and provenance. Live cross-provider behavioral execution and several governance controls remain follow-up work.
 
 See [DISCLAIMER.md](DISCLAIMER.md) before relying on results.
