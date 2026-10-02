@@ -1,3 +1,4 @@
+schema_ref: "./registry.schema.json"
 registry_version: "1.0-draft"
 
 routing_policy:
