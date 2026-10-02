@@ -105,7 +105,7 @@ class HospitalMutationTests(unittest.TestCase):
             path.read_text(encoding="utf-8") + "\n" + private_path + "\n",
             encoding="utf-8",
         )
-        self.assert_validator_fails("sensitive-data pattern")
+        self.assert_validator_fails("sensitive content pattern matched: user_home_unix")
 
     def test_retired_public_narrative_fails(self):
         path = self.work / "README.md"
