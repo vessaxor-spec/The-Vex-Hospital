@@ -1,6 +1,6 @@
 # Admission
 
-Use this file as the entry point when an AI system is directed to Vex Hospital.
+Use this file as the admission desk when an AI system checks into Vex Hospital.
 
 ## Before doing anything
 

@@ -2,7 +2,7 @@
 
 Risk determines protocol depth. It does not change the Constitution.
 
-## R0 — Routine
+## R0: Routine
 
 Low-impact, non-consequential work with no meaningful effect on security, authority, persistent state, external systems, deployments, or sensitive data. If a meaningful durable or consequential effect is discovered, the case must be promoted to at least R1.
 
@@ -14,7 +14,7 @@ Typical minimum:
 
 R0 must be promoted if evidence reveals consequential behavior.
 
-## R1 — Standard
+## R1: Standard
 
 A bounded functional defect or local behavior change with a limited blast radius.
 
@@ -27,7 +27,7 @@ Typical minimum:
 - regression review;
 - independent verification recommended.
 
-## R2 — High
+## R2: High
 
 Architecture, orchestration, runtime, tooling, memory, repository integrity, permission boundaries, or externally consequential behavior.
 
@@ -41,7 +41,7 @@ Required:
 - capability-preservation review;
 - resilience verification when dependency or environmental failure is material to the case.
 
-## R3 — Critical
+## R3: Critical
 
 Security, identity, privilege, secrets, autonomous side effects, deployment controls, safety boundaries, persistent-memory trust, or similarly high-consequence behavior.
 
