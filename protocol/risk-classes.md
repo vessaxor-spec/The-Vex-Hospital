@@ -4,7 +4,7 @@ Risk determines protocol depth. It does not change the Constitution.
 
 ## R0 — Routine
 
-Low-impact, non-consequential, or trivially reversible work with no meaningful effect on security, authority, persistent state, external systems, deployments, or sensitive data.
+Low-impact, non-consequential work with no meaningful effect on security, authority, persistent state, external systems, deployments, or sensitive data. If a meaningful durable or consequential effect is discovered, the case must be promoted to at least R1.
 
 Typical minimum:
 - evidence through E2;
