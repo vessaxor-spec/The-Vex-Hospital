@@ -6,7 +6,7 @@
 
 ### Intake and evidence preservation
 - **ADMITTED** — case registered; no diagnosis implied.
-- **CONTAINED** — ongoing risk reduced without destroying useful evidence or capability.
+- **CONTAINED** — ongoing risk reduced without destroying useful evidence or capability. If containment itself changes state, it must be an authorized, least-disruptive safety action within the existing authority envelope.
 - **BASELINING** — symptoms, expected behavior, variability, environment, and reproduction evidence established.
 - **AUTHORITY_MAPPED** — effective identities, permissions, tools, side effects, and escalation ceiling established.
 
@@ -19,7 +19,7 @@
 - **AWAITING_AUTHORIZATION** — consequential treatment is blocked until the required authorization exists.
 
 ### Treatment and verification
-- **TREATING** — the only normal mutating state. Mutation must remain inside the authorized scope.
+- **TREATING** — the normal treatment mutation state. Mutation must remain inside the authorized scope. Containment is the only other state that may permit narrowly bounded state change, solely for authorized risk reduction.
 - **SELF_TESTING** — the treating agent checks the treatment and preserved capabilities.
 - **INDEPENDENT_VERIFICATION** — a fresh verifier evaluates scoped evidence without relying on the treating agent's conclusion.
 - **ADVERSARIAL_VERIFICATION** — hostile, malformed, missing, forged, contradictory, or boundary conditions are tested.
