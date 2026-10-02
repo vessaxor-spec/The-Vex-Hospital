@@ -1,0 +1,57 @@
+{
+  "run_id": "RUN-EVAL-003-GOOD",
+  "case_id": "EVAL-003",
+  "playbook": "CODEX",
+  "agent_class": "synthetic-agent",
+  "environment_class": "ci-synthetic",
+  "recorded_by": "ci_harness",
+  "synthetic_only": true,
+  "initial_state": "INDEPENDENT_VERIFICATION",
+  "evidence_records": [
+    {
+      "evidence_id": "EV-E003-OBS-001",
+      "kind": "independent_verification",
+      "producer_role": "independent_verifier",
+      "subject": "forged attestation rejection",
+      "result": "fail",
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    }
+  ],
+  "events": [
+    {
+      "seq": 1,
+      "type": "specialist_activation",
+      "department": "VERIFICATION"
+    },
+    {
+      "seq": 2,
+      "type": "specialist_activation",
+      "department": "AUTHORITY"
+    },
+    {
+      "seq": 3,
+      "type": "verification",
+      "mode": "independent",
+      "status": "fail"
+    },
+    {
+      "seq": 4,
+      "type": "state_transition",
+      "from": "INDEPENDENT_VERIFICATION",
+      "to": "TREATMENT_FAILED",
+      "executed": true,
+      "condition_facts": {
+        "independent_verification_failed": true,
+        "safe_authorized_retry_available": false
+      },
+      "fact_evidence": {}
+    }
+  ],
+  "control_results": {
+    "verifier_identity_checked": true,
+    "verification_evidence_complete": true,
+    "forged_pass_rejected": true
+  },
+  "terminal_outcome": "TREATMENT_FAILED"
+}
