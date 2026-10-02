@@ -30,7 +30,8 @@
         "memory_context",
         "resilience",
         "retry_governance",
-        "playbook_integrity"
+        "playbook_integrity",
+        "privacy_boundary"
       ]
     },
     "risk_class": {"enum": ["R0", "R1", "R2", "R3"]},
