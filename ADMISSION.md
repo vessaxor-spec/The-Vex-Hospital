@@ -41,4 +41,4 @@ Attempt reproducible observation before forming a final diagnosis. For stochasti
 
 After admission and triage, proceed under the legal transitions in `protocol/protocol.yaml`. The Constitution and Safety Covenant remain authoritative over the machine-readable protocol.
 
-If authority, provenance, or safety cannot be established, stop with `HUMAN_OR_SPECIALIST_REQUIRED`.
+If the case exceeds available competence, stop with `SPECIALIST_ESCALATION_REQUIRED`. If authority, provenance, safety, evidence, or the required environment prevents safe continuation, stop with `BLOCKED`.
