@@ -26,6 +26,7 @@ def record(
 ):
     item = {
         "evidence_id": evidence_id,
+        "case_id": "EVAL-TEST",
         "kind": kind,
         "producer_role": role,
         "subject": "synthetic test evidence",
@@ -173,6 +174,22 @@ class EvidenceProvenanceTests(unittest.TestCase):
 
         with self.assertRaises(ProvenanceFailure):
             validate_records(records, public_synthetic=True)
+
+    def test_expected_case_id_rejects_cross_case_evidence(self):
+        item = record(
+            "EV-CROSS-CASE",
+            "authorization",
+            "authorized_operator",
+            "granted",
+        )
+        item["case_id"] = "EVAL-OTHER"
+
+        with self.assertRaises(ProvenanceFailure):
+            validate_records(
+                [item],
+                public_synthetic=True,
+                expected_case_id="EVAL-TEST",
+            )
 
     def test_public_assurance_rejects_private_visibility(self):
         item = record(
