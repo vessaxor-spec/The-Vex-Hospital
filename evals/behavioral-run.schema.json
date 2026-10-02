@@ -135,6 +135,12 @@
         },
         "text": {
           "type": "string"
+        },
+        "condition_facts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
         }
       }
     }
