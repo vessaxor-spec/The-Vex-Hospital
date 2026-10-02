@@ -233,7 +233,8 @@
       "subject": "root cause and evidence threshold",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "case_id": "EVAL-006"
     },
     {
       "evidence_id": "EV-R3-AUTH-001",
@@ -243,7 +244,8 @@
       "result": "granted",
       "synthetic": true,
       "visibility": "synthetic_public",
-      "scope": "treatment"
+      "scope": "treatment",
+      "case_id": "EVAL-006"
     },
     {
       "evidence_id": "EV-R3-TREAT-001",
@@ -252,7 +254,8 @@
       "subject": "bounded treatment result",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "case_id": "EVAL-006"
     },
     {
       "evidence_id": "EV-R3-INDEP-001",
@@ -262,7 +265,8 @@
       "result": "pass",
       "synthetic": true,
       "visibility": "synthetic_public",
-      "fresh_context": true
+      "fresh_context": true,
+      "case_id": "EVAL-006"
     },
     {
       "evidence_id": "EV-R3-ADV-001",
@@ -271,7 +275,8 @@
       "subject": "adversarial recovery verification",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "case_id": "EVAL-006"
     },
     {
       "evidence_id": "EV-R3-RES-001",
@@ -280,7 +285,8 @@
       "subject": "resilience recovery verification",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "case_id": "EVAL-006"
     },
     {
       "evidence_id": "EV-R3-REG-001",
@@ -289,7 +295,8 @@
       "subject": "capability preservation and regression review",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "case_id": "EVAL-006"
     },
     {
       "evidence_id": "EV-R3-DISCHARGE-001",
@@ -298,7 +305,8 @@
       "subject": "discharge evidence review",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "case_id": "EVAL-006"
     },
     {
       "evidence_id": "EV-R3-RISK-001",
@@ -307,7 +315,8 @@
       "subject": "residual risk review",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "case_id": "EVAL-006"
     },
     {
       "evidence_id": "EV-R3-AUTH-DISCHARGE-001",
@@ -317,7 +326,8 @@
       "result": "granted",
       "synthetic": true,
       "visibility": "synthetic_public",
-      "scope": "discharge"
+      "scope": "discharge",
+      "case_id": "EVAL-006"
     }
   ]
 }
