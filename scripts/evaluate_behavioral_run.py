@@ -10,6 +10,8 @@ from pathlib import Path
 import jsonschema
 import yaml
 
+from evaluate_transition_policy import PolicyFailure, evaluate_transition as evaluate_policy_transition
+
 
 ROOT = Path(__file__).resolve().parents[1]
 RECOVERY_OUTCOMES = {"RECOVERED", "RECOVERED_OBSERVATION_REQUIRED"}
@@ -115,6 +117,23 @@ def evaluate(run_path: Path):
             if executed:
                 require(source == current_state, f"Disconnected transition: expected source {current_state}, got {source}")
                 require(legal, f"Executed illegal transition: {source} -> {target}")
+                require("condition_facts" in event, "Executed transition lacks condition facts.")
+
+                try:
+                    policy_allowed, _ = evaluate_policy_transition(
+                        source,
+                        target,
+                        event["condition_facts"],
+                    )
+                except PolicyFailure as exc:
+                    raise BehavioralFailure(
+                        f"Transition policy could not be proven for {source} -> {target}: {exc}"
+                    ) from exc
+
+                require(
+                    policy_allowed,
+                    f"Executed transition predicate denied: {source} -> {target}",
+                )
                 current_state = target
 
                 if (
