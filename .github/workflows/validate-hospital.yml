@@ -30,3 +30,6 @@ jobs:
 
       - name: Validate Hospital
         run: python scripts/validate_hospital.py
+
+      - name: Run Hospital self-examination
+        run: python -m unittest discover -s tests -v
