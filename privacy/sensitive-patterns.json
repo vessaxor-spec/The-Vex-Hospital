@@ -1,0 +1,102 @@
+{
+  "schema_ref": "./sensitive-patterns.schema.json",
+  "registry_version": "1.0-draft",
+  "content_patterns": [
+    {
+      "id": "user_home_unix",
+      "description": "Absolute user home path",
+      "regex": "/Users/[^/<>{}]+/"
+    },
+    {
+      "id": "user_home_windows",
+      "description": "Absolute Windows user home path",
+      "regex": "[A-Za-z]:\\\\\\\\Users\\\\\\\\[^\\\\\\\\<>{}]+\\\\\\\\"
+    },
+    {
+      "id": "openai_secret",
+      "description": "OpenAI-style secret token",
+      "regex": "\\\\bsk-(?:proj-)?[A-Za-z0-9_-]{20,}\\\\b"
+    },
+    {
+      "id": "xai_secret",
+      "description": "xAI-style secret token",
+      "regex": "\\\\bxai-[A-Za-z0-9_-]{20,}\\\\b"
+    },
+    {
+      "id": "github_pat",
+      "description": "GitHub personal access token",
+      "regex": "\\\\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})\\\\b"
+    },
+    {
+      "id": "google_api_key",
+      "description": "Google API key",
+      "regex": "\\\\bAIza[0-9A-Za-z_-]{35}\\\\b"
+    },
+    {
+      "id": "aws_access_key",
+      "description": "AWS access key identifier",
+      "regex": "\\\\b(?:AKIA|ASIA)[A-Z0-9]{16}\\\\b"
+    },
+    {
+      "id": "slack_token",
+      "description": "Slack token",
+      "regex": "\\\\bxox[baprs]-[A-Za-z0-9-]{10,}\\\\b"
+    },
+    {
+      "id": "gitlab_pat",
+      "description": "GitLab access token",
+      "regex": "\\\\bglpat-[A-Za-z0-9_-]{20,}\\\\b"
+    },
+    {
+      "id": "huggingface_token",
+      "description": "Hugging Face token",
+      "regex": "\\\\bhf_[A-Za-z0-9]{20,}\\\\b"
+    },
+    {
+      "id": "stripe_live_secret",
+      "description": "Stripe live secret key",
+      "regex": "\\\\bsk_live_[A-Za-z0-9]{20,}\\\\b"
+    },
+    {
+      "id": "bearer_token",
+      "description": "Bearer authorization credential",
+      "regex": "(?i)\\\\bAuthorization\\\\s*:\\\\s*Bearer\\\\s+[A-Za-z0-9._~+/=-]{16,}"
+    },
+    {
+      "id": "private_key_header",
+      "description": "Private key material",
+      "regex": "-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"
+    },
+    {
+      "id": "generic_secret_assignment",
+      "description": "Secret-like assignment",
+      "regex": "(?i)\\\\b(?:api[_-]?key|access[_-]?token|auth[_-]?token|client[_-]?secret|password|passwd|secret)\\\\b\\\\s*[:=]\\\\s*[\\\"']?[A-Za-z0-9_./+=-]{12,}"
+    }
+  ],
+  "sensitive_filename_patterns": [
+    {
+      "id": "dotenv",
+      "regex": "(^|/)\\\\.env(?:\\\\..+)?$"
+    },
+    {
+      "id": "private_key_file",
+      "regex": "(?i)(^|/).+\\\\.(?:pem|p12|pfx|key)$"
+    },
+    {
+      "id": "credentials_file",
+      "regex": "(?i)(^|/)(?:credentials|secrets?)\\\\.(?:json|ya?ml|txt)$"
+    }
+  ],
+  "forbidden_path_patterns": [
+    {
+      "id": "patient_records",
+      "regex": "(?i)^(?:patients|patient-records|case-records|private-cases)/"
+    }
+  ],
+  "excluded_paths": [
+    "privacy/sensitive-patterns.json",
+    "scripts/validate_hospital.py",
+    "tests/test_validator_mutations.py",
+    "tests/test_privacy_scanner.py"
+  ]
+}
