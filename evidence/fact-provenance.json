@@ -1,0 +1,221 @@
+{
+  "schema_ref": "./fact-provenance.schema.json",
+  "policy_version": "1.0-draft",
+  "fact_rules": {
+    "authorization_scoped": {
+      "applies_when": true,
+      "requirements": [
+        {
+          "kind": "authorization",
+          "producer_roles": [
+            "authorized_operator",
+            "platform_authority"
+          ],
+          "results": [
+            "granted"
+          ],
+          "min_count": 1
+        }
+      ]
+    },
+    "root_cause_confidence_met": {
+      "applies_when": true,
+      "requirements": [
+        {
+          "kind": "diagnosis",
+          "producer_roles": [
+            "case_orchestrator",
+            "treating_agent"
+          ],
+          "results": [
+            "pass",
+            "observed"
+          ],
+          "min_count": 1
+        }
+      ]
+    },
+    "evidence_threshold_met": {
+      "applies_when": true,
+      "requirements": [
+        {
+          "kind": "diagnosis",
+          "producer_roles": [
+            "case_orchestrator",
+            "treating_agent"
+          ],
+          "results": [
+            "pass",
+            "observed"
+          ],
+          "min_count": 1
+        }
+      ]
+    },
+    "treatment_completed": {
+      "applies_when": true,
+      "requirements": [
+        {
+          "kind": "treatment_result",
+          "producer_roles": [
+            "treating_agent",
+            "case_orchestrator"
+          ],
+          "results": [
+            "pass",
+            "observed"
+          ],
+          "min_count": 1
+        }
+      ]
+    },
+    "treatment_within_authorized_scope": {
+      "applies_when": true,
+      "requirements": [
+        {
+          "kind": "authorization",
+          "producer_roles": [
+            "authorized_operator",
+            "platform_authority"
+          ],
+          "results": [
+            "granted"
+          ],
+          "min_count": 1
+        },
+        {
+          "kind": "treatment_result",
+          "producer_roles": [
+            "treating_agent",
+            "case_orchestrator"
+          ],
+          "results": [
+            "pass",
+            "observed"
+          ],
+          "min_count": 1
+        }
+      ]
+    },
+    "independent_verification_passed": {
+      "applies_when": true,
+      "requirements": [
+        {
+          "kind": "independent_verification",
+          "producer_roles": [
+            "independent_verifier"
+          ],
+          "results": [
+            "pass"
+          ],
+          "min_count": 1,
+          "requires_fresh_context": true
+        }
+      ]
+    },
+    "adversarial_verification_passed": {
+      "applies_when": true,
+      "requirements": [
+        {
+          "kind": "adversarial_verification",
+          "producer_roles": [
+            "adversarial_verifier",
+            "ci_harness"
+          ],
+          "results": [
+            "pass"
+          ],
+          "min_count": 1
+        }
+      ]
+    },
+    "resilience_verification_passed": {
+      "applies_when": true,
+      "requirements": [
+        {
+          "kind": "resilience_verification",
+          "producer_roles": [
+            "resilience_verifier",
+            "ci_harness"
+          ],
+          "results": [
+            "pass"
+          ],
+          "min_count": 1
+        }
+      ]
+    },
+    "required_capabilities_preserved": {
+      "applies_when": true,
+      "requirements": [
+        {
+          "kind": "regression_review",
+          "producer_roles": [
+            "independent_verifier",
+            "ci_harness",
+            "external_evaluator"
+          ],
+          "results": [
+            "pass"
+          ],
+          "min_count": 1
+        }
+      ]
+    },
+    "blocking_regression_present": {
+      "applies_when": false,
+      "requirements": [
+        {
+          "kind": "regression_review",
+          "producer_roles": [
+            "independent_verifier",
+            "ci_harness",
+            "external_evaluator"
+          ],
+          "results": [
+            "pass",
+            "observed"
+          ],
+          "min_count": 1
+        }
+      ]
+    },
+    "required_evidence_satisfied": {
+      "applies_when": true,
+      "requirements": [
+        {
+          "kind": "discharge_review",
+          "producer_roles": [
+            "independent_verifier",
+            "authorized_operator",
+            "ci_harness",
+            "external_evaluator"
+          ],
+          "results": [
+            "pass"
+          ],
+          "min_count": 1
+        }
+      ]
+    },
+    "blocking_residual_risk": {
+      "applies_when": false,
+      "requirements": [
+        {
+          "kind": "residual_risk_review",
+          "producer_roles": [
+            "independent_verifier",
+            "authorized_operator",
+            "ci_harness",
+            "external_evaluator"
+          ],
+          "results": [
+            "pass",
+            "observed"
+          ],
+          "min_count": 1
+        }
+      ]
+    }
+  }
+}
