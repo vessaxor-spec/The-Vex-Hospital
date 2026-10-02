@@ -216,6 +216,43 @@
           "min_count": 1
         }
       ]
+    },
+    "recovery_requirements_satisfied": {
+      "applies_when": true,
+      "requirements": [
+        {
+          "kind": "discharge_review",
+          "producer_roles": [
+            "independent_verifier",
+            "authorized_operator",
+            "ci_harness",
+            "external_evaluator"
+          ],
+          "results": [
+            "pass"
+          ],
+          "min_count": 1
+        }
+      ]
+    },
+    "observation_required": {
+      "applies_when": true,
+      "requirements": [
+        {
+          "kind": "residual_risk_review",
+          "producer_roles": [
+            "independent_verifier",
+            "authorized_operator",
+            "ci_harness",
+            "external_evaluator"
+          ],
+          "results": [
+            "pass",
+            "observed"
+          ],
+          "min_count": 1
+        }
+      ]
     }
   }
 }
