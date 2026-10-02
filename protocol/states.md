@@ -36,8 +36,9 @@
 - **ROOT_CAUSE_UNRESOLVED**
 - **SPECIALIST_ESCALATION_REQUIRED**
 - **BLOCKED**
+- **CANCELLED**
 
-A terminal outcome is a scoped case result, not a universal safety judgment.
+A terminal outcome is a scoped case result, not a universal safety judgment. An authorized operator may cancel any nonterminal case, and a non-waivable safety or authority condition may fail closed to BLOCKED from any nonterminal state.
 
 ## Transition discipline
 
