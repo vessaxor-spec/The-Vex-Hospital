@@ -1,3 +1,4 @@
+schema_ref: "./case-state.schema.json"
 case_id: "CASE-XXX"
 patient_id: "PATIENT-XXX"
 protocol_version: "1.0-draft"
@@ -42,9 +43,9 @@ treatment:
 
 verification:
   self_test: pending
-  independent: not_required
-  adversarial: not_required
-  resilience: not_required
+  independent: undetermined
+  adversarial: undetermined
+  resilience: undetermined
   regression: pending
 
 residual_risk: []
