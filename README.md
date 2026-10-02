@@ -22,6 +22,6 @@ This public repository contains protocols, standards, playbooks, templates, and 
 
 ## Project status
 
-Vex Hospital v1 is under construction. The constitutional foundation is being established before the machine-readable protocol, clinical standards, agent-specific playbooks, and assurance suite are added.
+Vex Hospital v1 is under construction. The constitutional foundation is established. The machine-readable protocol engine is now in draft, while clinical specialist standards, agent-specific playbooks, and the assurance suite remain planned for later reviewed tranches.
 
 See [DISCLAIMER.md](DISCLAIMER.md) before relying on results.
