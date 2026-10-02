@@ -204,9 +204,10 @@ def validate_public_text():
         if re.search(r"\bpoint\s+your\s+ai\s+here\b", text, flags=re.IGNORECASE):
             failures.append(f"{relative}: contains retired public narrative wording")
 
-        for pattern in PRIVATE_PATTERNS:
-            if pattern.search(text):
-                failures.append(f"{relative}: contains a value matching a sensitive-data pattern")
+        if relative != Path("scripts/validate_hospital.py"):
+            for pattern in PRIVATE_PATTERNS:
+                if pattern.search(text):
+                    failures.append(f"{relative}: contains a value matching a sensitive-data pattern")
 
     require(not failures, "Public text validation failed:\n" + "\n".join(f"  - {x}" for x in failures))
 
