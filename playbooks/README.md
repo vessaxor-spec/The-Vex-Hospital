@@ -19,6 +19,7 @@ A playbook cannot weaken those documents.
 
 - `generic.md`
 - `claude.md`
+- `anthropic.md`
 - `codex.md`
 - `hermes.md`
 - `openclaw.md`

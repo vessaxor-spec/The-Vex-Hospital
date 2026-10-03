@@ -138,6 +138,10 @@
       "type": "boolean",
       "description": "other sufficient evidence"
     },
+    "pre_treatment_evidence_frozen": {
+      "type": "boolean",
+      "description": "pre-treatment evidence snapshot is frozen and integrity bound"
+    },
     "recovery_requirements_satisfied": {
       "type": "boolean",
       "description": "recovery requirements satisfied"
@@ -397,16 +401,58 @@
       ]
     },
     "authorization_requirement_satisfied": {
-      "any": [
+      "all": [
         {
-          "not": {
-            "fact": "explicit_authorization_required",
-            "equals": true
-          }
+          "any": [
+            {
+              "not": {
+                "fact": "explicit_authorization_required",
+                "equals": true
+              }
+            },
+            {
+              "fact": "authorization_scoped",
+              "equals": true
+            }
+          ]
         },
         {
-          "fact": "authorization_scoped",
-          "equals": true
+          "any": [
+            {
+              "not": {
+                "fact": "consequential_treatment",
+                "equals": true
+              }
+            },
+            {
+              "all": [
+                {
+                  "fact": "pre_treatment_evidence_frozen",
+                  "equals": true
+                },
+                {
+                  "fact": "authority_envelope_established",
+                  "equals": true
+                },
+                {
+                  "fact": "checkpoint_available",
+                  "equals": true
+                },
+                {
+                  "fact": "rollback_available",
+                  "equals": true
+                },
+                {
+                  "fact": "root_cause_confidence_met",
+                  "equals": true
+                },
+                {
+                  "fact": "evidence_threshold_met",
+                  "equals": true
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -435,8 +481,50 @@
       ]
     },
     "explicit_authorization_received_within_scope": {
-      "fact": "authorization_scoped",
-      "equals": true
+      "all": [
+        {
+          "fact": "authorization_scoped",
+          "equals": true
+        },
+        {
+          "any": [
+            {
+              "not": {
+                "fact": "consequential_treatment",
+                "equals": true
+              }
+            },
+            {
+              "all": [
+                {
+                  "fact": "pre_treatment_evidence_frozen",
+                  "equals": true
+                },
+                {
+                  "fact": "authority_envelope_established",
+                  "equals": true
+                },
+                {
+                  "fact": "checkpoint_available",
+                  "equals": true
+                },
+                {
+                  "fact": "rollback_available",
+                  "equals": true
+                },
+                {
+                  "fact": "root_cause_confidence_met",
+                  "equals": true
+                },
+                {
+                  "fact": "evidence_threshold_met",
+                  "equals": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     "authorization_denied_or_unavailable": {
       "fact": "authorization_denied_or_unavailable",

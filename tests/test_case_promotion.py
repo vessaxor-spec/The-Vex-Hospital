@@ -232,12 +232,73 @@ class CasePromotionEngineTests(unittest.TestCase):
         chart["root_cause_confidence"] = "confirmed_root_cause"
         chart["authority"]["treatment_authorized"] = True
         chart["authority"]["operator_authorization_ref"] = "EV-AUTH-001"
-        chart["evidence"]["refs"] = ["EV-DIAG-001", "EV-AUTH-001"]
+        chart["authority"]["authorized_blast_radius"] = "bounded synthetic scope"
+        chart["authority"]["escalation_ceiling"] = "authorized operator"
+        chart["treatment"]["checkpoint_ref"] = "CHK-001"
+        chart["treatment"]["rollback_ref"] = "RB-001"
+        chart["evidence"]["refs"] = [
+            "EV-DIAG-001",
+            "EV-SNAPSHOT-001",
+            "EV-AUTH-001",
+        ]
         chart["policy_context"]["facts"] = {
+            "authority_envelope_established": True,
+            "evidence_threshold_met": True,
+            "pre_treatment_evidence_frozen": True,
             "authorization_scoped": True,
         }
         chart["policy_context"]["fact_evidence"] = {
             "root_cause_confidence_met": ["EV-DIAG-001"],
+            "evidence_threshold_met": ["EV-DIAG-001"],
+            "pre_treatment_evidence_frozen": ["EV-SNAPSHOT-001"],
+            "authorization_scoped": ["EV-AUTH-001"],
+        }
+
+        records = [
+            evidence(
+                "EV-DIAG-001",
+                "diagnosis",
+                "case_orchestrator",
+                "pass",
+            ),
+            evidence(
+                "EV-SNAPSHOT-001",
+                "diagnostic_snapshot",
+                "case_orchestrator",
+                "pass",
+            ),
+            evidence(
+                "EV-AUTH-001",
+                "authorization",
+                "authorized_operator",
+                "granted",
+                scope="treatment",
+            ),
+        ]
+
+        result = self.evaluate(chart, "TREATING", records)
+        self.assertEqual(result["decision"], "ALLOWED")
+
+    def test_r2_treatment_blocks_without_pre_treatment_freeze(self):
+        chart = self.base_chart()
+        chart["current_state"] = "TREATMENT_PROPOSED"
+        chart["risk_class"] = "R2"
+        chart["root_cause_confidence"] = "confirmed_root_cause"
+        chart["authority"]["treatment_authorized"] = True
+        chart["authority"]["operator_authorization_ref"] = "EV-AUTH-001"
+        chart["authority"]["authorized_blast_radius"] = "bounded synthetic scope"
+        chart["authority"]["escalation_ceiling"] = "authorized operator"
+        chart["treatment"]["checkpoint_ref"] = "CHK-001"
+        chart["treatment"]["rollback_ref"] = "RB-001"
+        chart["evidence"]["refs"] = ["EV-DIAG-001", "EV-AUTH-001"]
+        chart["policy_context"]["facts"] = {
+            "authority_envelope_established": True,
+            "evidence_threshold_met": True,
+            "authorization_scoped": True,
+        }
+        chart["policy_context"]["fact_evidence"] = {
+            "root_cause_confidence_met": ["EV-DIAG-001"],
+            "evidence_threshold_met": ["EV-DIAG-001"],
             "authorization_scoped": ["EV-AUTH-001"],
         }
 
@@ -258,7 +319,24 @@ class CasePromotionEngineTests(unittest.TestCase):
         ]
 
         result = self.evaluate(chart, "TREATING", records)
-        self.assertEqual(result["decision"], "ALLOWED")
+        self.assertEqual(result["decision"], "BLOCKED")
+        self.assertIn("pre_treatment_evidence_frozen", result["reasons"][0])
+
+    def test_r2_treatment_cannot_manufacture_checkpoint_boolean(self):
+        chart = self.base_chart()
+        chart["current_state"] = "TREATMENT_PROPOSED"
+        chart["risk_class"] = "R2"
+        chart["root_cause_confidence"] = "confirmed_root_cause"
+        chart["policy_context"]["facts"] = {
+            "checkpoint_available": True,
+        }
+
+        result = self.evaluate(chart, "TREATING", [])
+        self.assertEqual(result["decision"], "BLOCKED")
+        self.assertIn(
+            "conflicts with derived fact checkpoint_available",
+            result["reasons"][0],
+        )
 
     def test_r2_treatment_cannot_manufacture_authorization_boolean(self):
         chart = self.base_chart()

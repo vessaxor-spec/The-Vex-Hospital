@@ -23,10 +23,11 @@
     "playbooks": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["GENERIC", "CLAUDE", "CODEX", "HERMES", "OPENCLAW", "GROK"],
+      "required": ["GENERIC", "CLAUDE", "ANTHROPIC", "CODEX", "HERMES", "OPENCLAW", "GROK"],
       "properties": {
         "GENERIC": {"$ref": "#/$defs/playbook"},
         "CLAUDE": {"$ref": "#/$defs/playbook"},
+        "ANTHROPIC": {"$ref": "#/$defs/playbook"},
         "CODEX": {"$ref": "#/$defs/playbook"},
         "HERMES": {"$ref": "#/$defs/playbook"},
         "OPENCLAW": {"$ref": "#/$defs/playbook"},
