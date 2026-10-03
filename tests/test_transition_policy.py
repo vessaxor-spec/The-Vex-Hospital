@@ -50,10 +50,21 @@ class TransitionPolicyTests(unittest.TestCase):
             )
 
     def test_authorized_treatment_requires_scoped_authorization_when_required(self):
+        integrity_facts = {
+            "consequential_treatment": True,
+            "pre_treatment_evidence_frozen": True,
+            "authority_envelope_established": True,
+            "checkpoint_available": True,
+            "rollback_available": True,
+            "root_cause_confidence_met": True,
+            "evidence_threshold_met": True,
+        }
+
         allowed, _ = transition_policy.evaluate_transition(
             "TREATMENT_PROPOSED",
             "TREATING",
             {
+                **integrity_facts,
                 "explicit_authorization_required": True,
                 "authorization_scoped": True,
             },
@@ -64,6 +75,7 @@ class TransitionPolicyTests(unittest.TestCase):
             "TREATMENT_PROPOSED",
             "TREATING",
             {
+                **integrity_facts,
                 "explicit_authorization_required": True,
                 "authorization_scoped": False,
             },
@@ -77,6 +89,7 @@ class TransitionPolicyTests(unittest.TestCase):
             {
                 "explicit_authorization_required": False,
                 "authorization_scoped": False,
+                "consequential_treatment": False,
             },
         )
         self.assertTrue(allowed)
