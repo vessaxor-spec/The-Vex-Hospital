@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import tempfile
 import unittest
@@ -19,6 +20,44 @@ from evaluate_case_promotion import evaluate_case_promotion  # noqa: E402
 TEMPLATE = ROOT / "templates" / "case-state.yaml"
 
 
+def identity_id(role):
+    return "ID-TEST-" + role.upper().replace("_", "-")
+
+
+def identity_for_role(role):
+    kind_by_role = {
+        "authorized_operator": "human_operator",
+        "platform_authority": "platform_authority",
+        "case_orchestrator": "agent_runtime",
+        "treating_agent": "agent_runtime",
+        "independent_verifier": "verifier_runtime",
+        "adversarial_verifier": "verifier_runtime",
+        "resilience_verifier": "verifier_runtime",
+        "runtime": "agent_runtime",
+        "tool": "tool_runtime",
+        "ci_harness": "ci_runtime",
+        "external_evaluator": "ci_runtime",
+    }
+
+    item = {
+        "identity_id": identity_id(role),
+        "identity_kind": kind_by_role[role],
+        "role": role,
+        "runtime_class": "synthetic-local-promotion-test",
+        "observer_role": "ci_harness",
+        "observed_runtime": True,
+        "synthetic": True,
+        "visibility": "local_private",
+    }
+
+    if item["identity_kind"] == "agent_runtime":
+        item["session_ref"] = "SYN-CASE-TEST-PATIENT"
+    elif item["identity_kind"] == "verifier_runtime":
+        item["session_ref"] = "SYN-CASE-TEST-" + role.upper().replace("_", "-")
+
+    return item
+
+
 def evidence(
     evidence_id,
     kind,
@@ -29,15 +68,23 @@ def evidence(
     fresh_context=None,
     case_id="CASE-TEST",
 ):
+    payload = f"{evidence_id}|{kind}|{role}|{result}"
     item = {
         "evidence_id": evidence_id,
         "case_id": case_id,
         "kind": kind,
         "producer_role": role,
+        "producer_identity_ref": identity_id(role),
         "subject": "synthetic local promotion test",
         "result": result,
         "synthetic": True,
         "visibility": "local_private",
+        "integrity": {
+            "algorithm": "sha256",
+            "digest": "sha256:" + hashlib.sha256(payload.encode("utf-8")).hexdigest(),
+            "scope": "synthetic_payload",
+            "synthetic_payload": payload,
+        },
     }
     if scope is not None:
         item["scope"] = scope
@@ -75,10 +122,14 @@ class CasePromotionEngineTests(unittest.TestCase):
             encoding="utf-8",
             delete=False,
         )
+        roles = sorted({record["producer_role"] for record in records})
         json.dump(
             {
                 "schema_ref": "./evidence-bundle.schema.json",
                 "case_id": case_id,
+                "identity_attestations": [
+                    identity_for_role(role) for role in roles
+                ],
                 "records": records,
             },
             handle,
@@ -91,6 +142,13 @@ class CasePromotionEngineTests(unittest.TestCase):
         return path
 
     def evaluate(self, chart, target, records=None):
+        if records is not None:
+            identity_refs = set(chart["environment"]["identity_refs"])
+            identity_refs.update(
+                identity_id(record["producer_role"]) for record in records
+            )
+            chart["environment"]["identity_refs"] = sorted(identity_refs)
+
         chart_path = self.write_chart(chart)
         bundle_path = (
             self.write_bundle(records, chart["case_id"])
