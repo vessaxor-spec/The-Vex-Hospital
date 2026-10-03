@@ -94,19 +94,57 @@ The project license remains unresolved.
 
 This is a separate legal and distribution decision.
 
+## Post-V1.1E adoption gate
+
+**Status:** COMPLETE
+
+### Findings
+
+Already implemented by V1.1A through V1.1E:
+
+- executable transition policy
+- evidence provenance
+- privacy controls
+- behavioral trace evaluation
+- full synthetic Assurance Ward case coverage
+- playbook coverage
+- evidence integrity binding
+- observed runtime identity and verifier-session separation
+
+Genuine remaining technical gap:
+
+- provider-neutral execution of behavioral trials through real external runtimes
+
+Separate non-clinical topics:
+
+- repository governance
+- project license
+
+Rejected as the next step:
+
+- another case-promotion or parallel control-plane subsystem
+
+### Selected next tranche
+
+**V1.2A: Provider-Neutral Live Behavioral Trial Harness**
+
+Goal:
+
+Create the smallest safe execution boundary that can later host real provider adapters without changing the canonical behavioral evaluator.
+
+V1.2A must:
+
+- remain synthetic-only by default
+- require per-run authorization for future live execution
+- isolate adapter execution in a temporary workspace
+- filter credential environment variables
+- enforce declared network policy and budgets
+- reuse existing behavioral assurance instead of creating another verification stack
+- ship with mock adapters only until a provider-specific adapter is separately reviewed
+
 ## Exact next move
 
-Run a **post-V1.1E adoption gate** before implementing another clinical tranche.
-
-The gate must answer:
-
-1. Which remaining problems are already covered by V1.1A through V1.1E?
-2. Which are genuine unresolved recovery or assurance gaps?
-3. Which gap materially improves the Hospital rather than adding another control-plane layer?
-4. Is live cross-provider behavioral testing the highest-value next technical step?
-5. What is the smallest reversible tranche that addresses the selected gap?
-
-No new V1.1F or V1.2A clinical architecture should be created before this gate is complete.
+Complete and verify V1.2A. Do not claim live-provider validation until a real provider adapter is separately authorized, implemented, and exercised.
 
 ## Anti-drift rules
 
