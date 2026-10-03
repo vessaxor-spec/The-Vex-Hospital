@@ -61,6 +61,25 @@ class HospitalMutationTests(unittest.TestCase):
         path.write_text(yaml.safe_dump(protocol, sort_keys=False), encoding="utf-8")
         self.assert_validator_fails("Transition condition registry must exactly match protocol predicates")
 
+    def test_pre_treatment_freeze_gate_removal_fails(self):
+        path = self.work / "protocol" / "conditions.json"
+        registry = json.loads(path.read_text(encoding="utf-8"))
+        registry["conditions"]["authorization_requirement_satisfied"] = {
+            "any": [
+                {
+                    "not": {
+                        "fact": "explicit_authorization_required",
+                        "equals": True,
+                    }
+                },
+                {"fact": "authorization_scoped", "equals": True},
+            ]
+        }
+        path.write_text(json.dumps(registry, indent=2) + "\\n", encoding="utf-8")
+        self.assert_validator_fails(
+            "Treatment boundary condition authorization_requirement_satisfied missing required V1.2A facts"
+        )
+
     def test_undeclared_specialist_department_fails(self):
         path = self.work / "specialists" / "registry.yaml"
         registry = yaml.safe_load(path.read_text(encoding="utf-8"))
