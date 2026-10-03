@@ -66,6 +66,14 @@ The Assurance Ward also includes canonical observer-owned behavioral traces. The
 
 The Hospital also undergoes its own [Self-Examination](SELF-EXAMINATION.md), where deliberately corrupted copies must be rejected before operational promotion.
 
+## Repository governance
+
+Vex Hospital's desired repository governance is documented in [GOVERNANCE.md](GOVERNANCE.md) and enforced as a version-controlled policy through CI.
+
+The intended model requires PR-based promotion to `main`, the Hospital `validate` check, squash promotion, release qualification from an exact green commit, changelog and residual-risk disclosure, and no open-source claim while the project license remains unresolved.
+
+These repository files do not enable GitHub branch protection or rulesets by themselves. Live repository-setting enforcement remains a separate approved action.
+
 ## Hospital doctrine
 
 **Admit → contain → baseline → diagnose → confirm → prescribe → authorize → treat → self-test → independently verify → challenge → review → discharge → learn**
@@ -92,6 +100,6 @@ Sensitive patient evidence should remain in the patient-controlled environment. 
 
 Vex Hospital v1 is operationally qualified under the bounded scope defined in [SELF-EXAMINATION.md](SELF-EXAMINATION.md). The Constitution, machine-readable protocol engine, executable transition policy, read-only case-promotion engine, evidence provenance controls, evidence integrity binding, observed runtime identity attestations, clinical system, intake playbooks, Assurance Ward, structural validator, mutation self-examination, privacy scanner, and canonical synthetic behavioral evaluation are implemented.
 
-Operational qualification is not a universal safety certification. Hashes bind evidence content and identity attestations bind observed roles, but neither mechanism proves that an underlying artifact or observer is truthful. Live cross-provider behavioral execution and several governance controls remain follow-up work.
+Operational qualification is not a universal safety certification. Hashes bind evidence content and identity attestations bind observed roles, but neither mechanism proves that an underlying artifact or observer is truthful. Live cross-provider behavioral execution and live GitHub governance enforcement remain follow-up work.
 
 See [DISCLAIMER.md](DISCLAIMER.md) before relying on results.
