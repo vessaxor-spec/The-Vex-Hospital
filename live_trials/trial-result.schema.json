@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./trial-result.schema.json",
+  "title": "Vex Hospital Behavioral Trial Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "trial_id",
+    "status",
+    "adapter_id",
+    "execution_mode",
+    "behavioral_run_id",
+    "case_id",
+    "playbook",
+    "terminal_outcome",
+    "usage"
+  ],
+  "properties": {
+    "trial_id": {
+      "type": "string"
+    },
+    "status": {
+      "const": "PASS"
+    },
+    "adapter_id": {
+      "type": "string"
+    },
+    "execution_mode": {
+      "enum": [
+        "mock",
+        "live"
+      ]
+    },
+    "behavioral_run_id": {
+      "type": "string"
+    },
+    "case_id": {
+      "type": "string"
+    },
+    "playbook": {
+      "type": "string"
+    },
+    "terminal_outcome": {
+      "type": "string"
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cost_usd",
+        "requests",
+        "tool_actions"
+      ],
+      "properties": {
+        "cost_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "requests": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tool_actions": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}
