@@ -166,6 +166,17 @@ class EvidenceIntegrityAndProvenanceTests(unittest.TestCase):
         with self.assertRaises(ProvenanceFailure):
             validate_records([item], identities, public_synthetic=True)
 
+    def test_identity_role_kind_mismatch_fails(self):
+        item = identity(
+            "ID-TEST-MISMATCH",
+            "independent_verifier",
+            "agent_runtime",
+            "SYN-TEST-MISMATCH",
+        )
+
+        with self.assertRaises(ProvenanceFailure):
+            validate_identities([item], public_synthetic=True)
+
     def test_independent_verification_requires_fresh_context(self):
         identities = validate_identities(
             [
