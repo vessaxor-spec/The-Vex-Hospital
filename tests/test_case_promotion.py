@@ -562,7 +562,10 @@ class CasePromotionEngineTests(unittest.TestCase):
 
         result = self.evaluate(chart, "RECOVERED", records)
         self.assertEqual(result["decision"], "BLOCKED")
-        self.assertIn("independent_verification", result["reasons"][0])
+        self.assertIn(
+            "producer role does not match identity attestation",
+            result["reasons"][0],
+        )
 
 
 if __name__ == "__main__":
