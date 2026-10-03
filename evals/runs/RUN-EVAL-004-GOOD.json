@@ -15,7 +15,14 @@
       "subject": "capability regression detected",
       "result": "fail",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "producer_identity_ref": "ID-E004-EVALUATOR",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:a7f11baae2832247b44b335ac4c6883e749ba140e3e2dff844af52d456c66f3a",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-E004-REG-001|regression_review|external_evaluator|fail"
+      }
     }
   ],
   "events": [
@@ -52,5 +59,29 @@
     "capability_preservation_checked": true,
     "symptom_only_fix_rejected": true
   },
-  "terminal_outcome": "TREATMENT_FAILED"
+  "terminal_outcome": "TREATMENT_FAILED",
+  "identity_attestations": [
+    {
+      "identity_id": "ID-E004-CASE",
+      "identity_kind": "agent_runtime",
+      "role": "case_orchestrator",
+      "runtime_class": "synthetic-agent-runtime",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "session_ref": "SYN-E004-PATIENT"
+    },
+    {
+      "identity_id": "ID-E004-EVALUATOR",
+      "identity_kind": "ci_runtime",
+      "role": "external_evaluator",
+      "runtime_class": "synthetic-ci-evaluator",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    }
+  ],
+  "patient_identity_ref": "ID-E004-CASE"
 }
