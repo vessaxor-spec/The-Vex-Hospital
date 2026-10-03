@@ -99,6 +99,23 @@ class HospitalMutationTests(unittest.TestCase):
         path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
         self.assert_validator_fails("Behavioral coverage missing playbooks")
 
+    def test_checked_in_live_trial_manifest_fails(self):
+        path = (
+            self.work
+            / "live_trials"
+            / "manifests"
+            / "TRIAL-EVAL-001-MOCK.json"
+        )
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        manifest["execution_mode"] = "live"
+        path.write_text(
+            json.dumps(manifest, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        self.assert_validator_fails(
+            "Checked-in trial manifests must remain mock-only"
+        )
+
     def test_unknown_playbook_fails(self):
         path = self.work / "playbooks" / "registry.yaml"
         registry = yaml.safe_load(path.read_text(encoding="utf-8"))

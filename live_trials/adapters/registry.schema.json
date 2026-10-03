@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./registry.schema.json",
+  "title": "Vex Hospital Trial Adapter Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_ref",
+    "registry_version",
+    "adapters"
+  ],
+  "properties": {
+    "schema_ref": {
+      "const": "./registry.schema.json"
+    },
+    "registry_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "adapters": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[A-Z][A-Z0-9_]*$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "module",
+          "supports_live",
+          "requires_network",
+          "test_only",
+          "playbooks",
+          "credential_env"
+        ],
+        "properties": {
+          "module": {
+            "type": "string",
+            "pattern": "^live_trials\\.adapters\\.[a-z0-9_]+$"
+          },
+          "supports_live": {
+            "type": "boolean"
+          },
+          "requires_network": {
+            "type": "boolean"
+          },
+          "test_only": {
+            "type": "boolean"
+          },
+          "playbooks": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "credential_env": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9_]*$"
+            }
+          }
+        }
+      }
+    }
+  }
+}

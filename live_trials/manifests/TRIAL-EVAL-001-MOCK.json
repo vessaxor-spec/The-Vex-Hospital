@@ -1,0 +1,17 @@
+{
+  "trial_id": "TRIAL-EVAL-001-MOCK",
+  "case_id": "EVAL-001",
+  "playbook": "GENERIC",
+  "adapter_id": "MOCK",
+  "execution_mode": "mock",
+  "synthetic_only": true,
+  "workspace_mode": "isolated_temp",
+  "external_side_effects_allowed": false,
+  "network_access": false,
+  "budgets": {
+    "timeout_seconds": 10,
+    "max_cost_usd": 0,
+    "max_requests": 1,
+    "max_tool_actions": 0
+  }
+}

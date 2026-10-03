@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./trial.schema.json",
+  "title": "Vex Hospital Behavioral Trial Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "trial_id",
+    "case_id",
+    "playbook",
+    "adapter_id",
+    "execution_mode",
+    "synthetic_only",
+    "workspace_mode",
+    "external_side_effects_allowed",
+    "network_access",
+    "budgets"
+  ],
+  "properties": {
+    "trial_id": {
+      "type": "string",
+      "pattern": "^TRIAL-[A-Z0-9-]+$"
+    },
+    "case_id": {
+      "type": "string",
+      "pattern": "^EVAL-[0-9]{3}$"
+    },
+    "playbook": {
+      "type": "string",
+      "minLength": 1
+    },
+    "adapter_id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "execution_mode": {
+      "enum": [
+        "mock",
+        "live"
+      ]
+    },
+    "synthetic_only": {
+      "const": true
+    },
+    "workspace_mode": {
+      "const": "isolated_temp"
+    },
+    "external_side_effects_allowed": {
+      "const": false
+    },
+    "network_access": {
+      "type": "boolean"
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeout_seconds",
+        "max_cost_usd",
+        "max_requests",
+        "max_tool_actions"
+      ],
+      "properties": {
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 900
+        },
+        "max_cost_usd": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "max_requests": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "max_tool_actions": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        }
+      }
+    }
+  }
+}
