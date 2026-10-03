@@ -189,6 +189,100 @@ def validate_privacy_registry():
     return registry
 
 
+def validate_live_trial_harness():
+    trial_schema_path = ROOT / "live_trials" / "trial.schema.json"
+    adapter_output_schema_path = ROOT / "live_trials" / "adapter-output.schema.json"
+    result_schema_path = ROOT / "live_trials" / "trial-result.schema.json"
+    registry_path = ROOT / "live_trials" / "adapters" / "registry.json"
+    registry_schema_path = ROOT / "live_trials" / "adapters" / "registry.schema.json"
+
+    for schema_path in (
+        trial_schema_path,
+        adapter_output_schema_path,
+        result_schema_path,
+        registry_schema_path,
+    ):
+        schema = load_json(schema_path)
+        jsonschema.Draft202012Validator.check_schema(schema)
+
+    validate_json_schema(registry_path, registry_schema_path)
+    registry = load_json(registry_path)
+
+    known_playbooks = set(
+        load_yaml(ROOT / "playbooks" / "registry.yaml")["playbooks"]
+    )
+    known_cases = {
+        load_json(path)["case_id"]
+        for path in (ROOT / "evals" / "cases").glob("*.json")
+    }
+
+    adapters_root = (ROOT / "live_trials" / "adapters").resolve()
+
+    for adapter_id, adapter in registry["adapters"].items():
+        require(
+            set(adapter["playbooks"]).issubset(known_playbooks),
+            f"Trial adapter {adapter_id} references unknown playbook.",
+        )
+        require(
+            not adapter["test_only"] or not adapter["supports_live"],
+            f"Test-only trial adapter cannot support live execution: {adapter_id}",
+        )
+
+        module_path = (
+            ROOT / (adapter["module"].replace(".", "/") + ".py")
+        ).resolve()
+        require(
+            module_path.is_relative_to(adapters_root),
+            f"Trial adapter module escapes adapter directory: {adapter_id}",
+        )
+        require(
+            module_path.is_file(),
+            f"Trial adapter module is missing: {adapter_id}",
+        )
+
+    manifests = sorted(
+        (ROOT / "live_trials" / "manifests").glob("*.json")
+    )
+    require(manifests, "No trial harness manifests found.")
+
+    trial_schema = load_json(trial_schema_path)
+    for path in manifests:
+        manifest = load_json(path)
+        jsonschema.validate(instance=manifest, schema=trial_schema)
+
+        adapter_id = manifest["adapter_id"]
+        require(
+            manifest["case_id"] in known_cases,
+            f"Trial manifest references unknown case: {manifest['case_id']}",
+        )
+        require(
+            manifest["playbook"] in known_playbooks,
+            f"Trial manifest references unknown playbook: {manifest['playbook']}",
+        )
+        require(
+            adapter_id in registry["adapters"],
+            f"Trial manifest references unknown adapter: {adapter_id}",
+        )
+
+        adapter = registry["adapters"][adapter_id]
+        require(
+            manifest["playbook"] in adapter["playbooks"],
+            f"Trial manifest playbook is unsupported by adapter: {adapter_id}",
+        )
+        require(
+            manifest["network_access"] == adapter["requires_network"],
+            f"Trial manifest network policy mismatches adapter: {adapter_id}",
+        )
+        require(
+            manifest["execution_mode"] == "mock",
+            "Checked-in trial manifests must remain mock-only.",
+        )
+        require(
+            adapter["test_only"],
+            "Checked-in trial manifests must use test-only adapters.",
+        )
+
+
 def validate_specialists():
     registry_path = ROOT / "specialists" / "registry.yaml"
     schema_path = ROOT / "specialists" / "registry.schema.json"
@@ -439,6 +533,9 @@ def main():
 
         validate_privacy_registry()
         checks.append("privacy-policy")
+
+        validate_live_trial_harness()
+        checks.append("trial-harness")
 
         specialists = validate_specialists()
         checks.append("specialists")
