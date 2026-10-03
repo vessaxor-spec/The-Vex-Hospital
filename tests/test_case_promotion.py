@@ -554,6 +554,84 @@ class CasePromotionEngineTests(unittest.TestCase):
         self.assertEqual(result["decision"], "BLOCKED")
         self.assertIn("Evidence bundle case_id does not match", result["reasons"][0])
 
+    def test_evidence_record_case_mismatch_blocks(self):
+        chart = self.base_chart()
+        chart["current_state"] = "ADMITTED"
+        chart["policy_context"]["facts"] = {
+            "containment_required": False,
+        }
+
+        records = [
+            evidence(
+                "EV-CROSS-CASE",
+                "repository_inspection",
+                "external_evaluator",
+                "observed",
+                case_id="CASE-OTHER",
+            )
+        ]
+
+        result = self.evaluate(chart, "BASELINING", records)
+        self.assertEqual(result["decision"], "BLOCKED")
+        self.assertIn(
+            "Evidence case_id does not match active case",
+            result["reasons"][0],
+        )
+
+    def test_tampered_evidence_integrity_blocks(self):
+        chart = self.base_chart()
+        chart["current_state"] = "ADMITTED"
+        chart["policy_context"]["facts"] = {
+            "containment_required": False,
+        }
+
+        records = [
+            evidence(
+                "EV-TAMPERED",
+                "repository_inspection",
+                "external_evaluator",
+                "observed",
+            )
+        ]
+        records[0]["integrity"]["digest"] = "sha256:" + ("0" * 64)
+
+        result = self.evaluate(chart, "BASELINING", records)
+        self.assertEqual(result["decision"], "BLOCKED")
+        self.assertIn(
+            "Evidence integrity digest mismatch",
+            result["reasons"][0],
+        )
+
+    def test_bundle_identity_must_be_referenced_by_chart(self):
+        chart = self.base_chart()
+        chart["current_state"] = "ADMITTED"
+        chart["policy_context"]["facts"] = {
+            "containment_required": False,
+        }
+
+        records = [
+            evidence(
+                "EV-IDENTITY-REF",
+                "repository_inspection",
+                "external_evaluator",
+                "observed",
+            )
+        ]
+
+        chart_path = self.write_chart(chart)
+        bundle_path = self.write_bundle(records, chart["case_id"])
+        result = evaluate_case_promotion(
+            chart_path,
+            "BASELINING",
+            bundle_path,
+        )
+
+        self.assertEqual(result["decision"], "BLOCKED")
+        self.assertIn(
+            "identity attestations not referenced by the patient chart",
+            result["reasons"][0],
+        )
+
     def test_evidence_wrong_producer_role_blocks(self):
         chart, records = self.r3_discharge_chart()
         for record in records:
