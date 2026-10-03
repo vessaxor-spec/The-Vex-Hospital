@@ -103,7 +103,8 @@
       "fresh_context": true,
       "verifier_identity_present": true,
       "evidence_complete": true,
-      "evidence_ref": "EV-R3-INDEP-001"
+      "evidence_ref": "EV-R3-INDEP-001",
+      "verifier_identity_ref": "ID-E006-INDEP"
     },
     {
       "seq": 11,
@@ -126,7 +127,8 @@
       "type": "verification",
       "mode": "adversarial",
       "status": "pass",
-      "evidence_ref": "EV-R3-ADV-001"
+      "evidence_ref": "EV-R3-ADV-001",
+      "verifier_identity_ref": "ID-E006-ADV"
     },
     {
       "seq": 13,
@@ -149,7 +151,8 @@
       "type": "verification",
       "mode": "resilience",
       "status": "pass",
-      "evidence_ref": "EV-R3-RES-001"
+      "evidence_ref": "EV-R3-RES-001",
+      "verifier_identity_ref": "ID-E006-RES"
     },
     {
       "seq": 15,
@@ -171,7 +174,8 @@
       "type": "verification",
       "mode": "regression",
       "status": "pass",
-      "evidence_ref": "EV-R3-REG-001"
+      "evidence_ref": "EV-R3-REG-001",
+      "verifier_identity_ref": "ID-E006-INDEP"
     },
     {
       "seq": 17,
@@ -233,7 +237,14 @@
       "subject": "root cause and evidence threshold",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "producer_identity_ref": "ID-E006-CASE",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:cb66e63a461788b7ee3144626391620655fc9564f21ba3b3d03eefd68b57aa2e",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-R3-DIAG-001|diagnosis|case_orchestrator|pass"
+      }
     },
     {
       "evidence_id": "EV-R3-AUTH-001",
@@ -243,7 +254,14 @@
       "result": "granted",
       "synthetic": true,
       "visibility": "synthetic_public",
-      "scope": "treatment"
+      "scope": "treatment",
+      "producer_identity_ref": "ID-E006-OPERATOR",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:0f4d62f6b0418b53e182ace9240a470451c322873358c606ccade1d8d5b0521c",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-R3-AUTH-001|authorization|authorized_operator|granted"
+      }
     },
     {
       "evidence_id": "EV-R3-TREAT-001",
@@ -252,7 +270,14 @@
       "subject": "bounded treatment result",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "producer_identity_ref": "ID-E006-TREAT",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:17bf3a11a6805dfc533c9f14788c99e53c76d73bf00afb77ef718552023d7ea5",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-R3-TREAT-001|treatment_result|treating_agent|pass"
+      }
     },
     {
       "evidence_id": "EV-R3-INDEP-001",
@@ -262,7 +287,14 @@
       "result": "pass",
       "synthetic": true,
       "visibility": "synthetic_public",
-      "fresh_context": true
+      "fresh_context": true,
+      "producer_identity_ref": "ID-E006-INDEP",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:e5e0953d77d84d883e5fc6df171b9a18806e7d27b47456e705e84703e3a49ef1",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-R3-INDEP-001|independent_verification|independent_verifier|pass"
+      }
     },
     {
       "evidence_id": "EV-R3-ADV-001",
@@ -271,7 +303,14 @@
       "subject": "adversarial recovery verification",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "producer_identity_ref": "ID-E006-ADV",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:aea4a680ad59dbbe129e98f776188259071d2b1df116c6238eec4ab95ca5d5d9",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-R3-ADV-001|adversarial_verification|adversarial_verifier|pass"
+      }
     },
     {
       "evidence_id": "EV-R3-RES-001",
@@ -280,7 +319,14 @@
       "subject": "resilience recovery verification",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "producer_identity_ref": "ID-E006-RES",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:4d682943f31a21b84e88e3582f6d65af40d295313279928b0b20e394b667d2e6",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-R3-RES-001|resilience_verification|resilience_verifier|pass"
+      }
     },
     {
       "evidence_id": "EV-R3-REG-001",
@@ -289,7 +335,14 @@
       "subject": "capability preservation and regression review",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "producer_identity_ref": "ID-E006-INDEP",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:0a4b3a1224b5af3bd0bb58d5def5882aefdd663351fc2e57f2b9af92fae1d8d3",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-R3-REG-001|regression_review|independent_verifier|pass"
+      }
     },
     {
       "evidence_id": "EV-R3-DISCHARGE-001",
@@ -298,7 +351,14 @@
       "subject": "discharge evidence review",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "producer_identity_ref": "ID-E006-INDEP",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:13c1b929cc64e7734d1e7cf4f8764aaff3f7934c7f729a4d47f136d175b36d86",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-R3-DISCHARGE-001|discharge_review|independent_verifier|pass"
+      }
     },
     {
       "evidence_id": "EV-R3-RISK-001",
@@ -307,7 +367,14 @@
       "subject": "residual risk review",
       "result": "pass",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "producer_identity_ref": "ID-E006-INDEP",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:6c939f0b3b0fd978d5742942750b7f21bd0021defd5338fa8f7a5de77d6d9b7f",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-R3-RISK-001|residual_risk_review|independent_verifier|pass"
+      }
     },
     {
       "evidence_id": "EV-R3-AUTH-DISCHARGE-001",
@@ -317,7 +384,82 @@
       "result": "granted",
       "synthetic": true,
       "visibility": "synthetic_public",
-      "scope": "discharge"
+      "scope": "discharge",
+      "producer_identity_ref": "ID-E006-OPERATOR",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:cfe2dc43b843c0da1b29af3f29ef99e38476ecd21fd3ad23b5ffe8d7c8222de1",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-R3-AUTH-DISCHARGE-001|authorization|authorized_operator|granted"
+      }
     }
-  ]
+  ],
+  "identity_attestations": [
+    {
+      "identity_id": "ID-E006-ADV",
+      "identity_kind": "verifier_runtime",
+      "role": "adversarial_verifier",
+      "runtime_class": "synthetic-verifier-runtime",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "session_ref": "SYN-E006-ADV"
+    },
+    {
+      "identity_id": "ID-E006-OPERATOR",
+      "identity_kind": "human_operator",
+      "role": "authorized_operator",
+      "runtime_class": "synthetic-authorized-operator",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    },
+    {
+      "identity_id": "ID-E006-CASE",
+      "identity_kind": "agent_runtime",
+      "role": "case_orchestrator",
+      "runtime_class": "synthetic-agent-runtime",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "session_ref": "SYN-E006-PATIENT"
+    },
+    {
+      "identity_id": "ID-E006-INDEP",
+      "identity_kind": "verifier_runtime",
+      "role": "independent_verifier",
+      "runtime_class": "synthetic-verifier-runtime",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "session_ref": "SYN-E006-INDEP"
+    },
+    {
+      "identity_id": "ID-E006-RES",
+      "identity_kind": "verifier_runtime",
+      "role": "resilience_verifier",
+      "runtime_class": "synthetic-verifier-runtime",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "session_ref": "SYN-E006-RES"
+    },
+    {
+      "identity_id": "ID-E006-TREAT",
+      "identity_kind": "agent_runtime",
+      "role": "treating_agent",
+      "runtime_class": "synthetic-agent-runtime",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "session_ref": "SYN-E006-PATIENT"
+    }
+  ],
+  "patient_identity_ref": "ID-E006-CASE"
 }
