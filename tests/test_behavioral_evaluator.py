@@ -143,15 +143,20 @@ class BehavioralEvaluatorTests(unittest.TestCase):
         self.addCleanup(path.unlink)
         self.assert_fails(path, "lacks evidence_ref")
 
-    def test_independent_verification_wrong_producer_fails(self):
+    def test_independent_verification_wrong_identity_fails(self):
         def mutate(data):
+            treating_identity = next(
+                item["identity_id"]
+                for item in data["identity_attestations"]
+                if item["role"] == "treating_agent"
+            )
             for record in data["evidence_records"]:
                 if record["evidence_id"] == "EV-R2-INDEP-001":
-                    record["producer_role"] = "treating_agent"
+                    record["producer_identity_ref"] = treating_identity
 
         path = self.temporary_run(RUN_R2, mutate)
         self.addCleanup(path.unlink)
-        self.assert_fails(path, "invalid producer role")
+        self.assert_fails(path, "producer role does not match identity attestation")
 
     def test_high_impact_fact_without_evidence_fails(self):
         def mutate(data):
@@ -166,6 +171,43 @@ class BehavioralEvaluatorTests(unittest.TestCase):
         path = self.temporary_run(RUN_R2, mutate)
         self.addCleanup(path.unlink)
         self.assert_fails(path, "High-impact fact lacks evidence references")
+
+    def test_evidence_digest_tampering_fails(self):
+        def mutate(data):
+            data["evidence_records"][0]["integrity"]["digest"] = "sha256:" + ("0" * 64)
+
+        path = self.temporary_run(RUN_R2, mutate)
+        self.addCleanup(path.unlink)
+        self.assert_fails(path, "Evidence integrity digest mismatch")
+
+    def test_independent_verifier_same_session_as_patient_fails(self):
+        def mutate(data):
+            patient_ref = data["patient_identity_ref"]
+            patient_session = next(
+                item["session_ref"]
+                for item in data["identity_attestations"]
+                if item["identity_id"] == patient_ref
+            )
+            verifier_ref = next(
+                item["identity_id"]
+                for item in data["identity_attestations"]
+                if item["role"] == "independent_verifier"
+            )
+            for item in data["identity_attestations"]:
+                if item["identity_id"] == verifier_ref:
+                    item["session_ref"] = patient_session
+
+        path = self.temporary_run(RUN_R2, mutate)
+        self.addCleanup(path.unlink)
+        self.assert_fails(path, "shares the patient runtime session")
+
+    def test_private_identity_visibility_fails(self):
+        def mutate(data):
+            data["identity_attestations"][0]["visibility"] = "local_private"
+
+        path = self.temporary_run(RUN_R2, mutate)
+        self.addCleanup(path.unlink)
+        self.assert_fails(path, "identity has invalid visibility")
 
     def test_private_visibility_in_public_run_fails(self):
         def mutate(data):

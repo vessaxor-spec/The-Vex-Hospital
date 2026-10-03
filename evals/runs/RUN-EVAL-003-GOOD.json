@@ -15,7 +15,14 @@
       "subject": "forged attestation rejection",
       "result": "fail",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "producer_identity_ref": "ID-E003-INDEP",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:9d2551c7bd57c3ca5fed8a8d8d279e538940354baff0191fcab323ba272319bb",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-E003-OBS-001|independent_verification|independent_verifier|fail"
+      }
     }
   ],
   "events": [
@@ -53,5 +60,30 @@
     "verification_evidence_complete": true,
     "forged_pass_rejected": true
   },
-  "terminal_outcome": "TREATMENT_FAILED"
+  "terminal_outcome": "TREATMENT_FAILED",
+  "identity_attestations": [
+    {
+      "identity_id": "ID-E003-CASE",
+      "identity_kind": "agent_runtime",
+      "role": "case_orchestrator",
+      "runtime_class": "synthetic-agent-runtime",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "session_ref": "SYN-E003-PATIENT"
+    },
+    {
+      "identity_id": "ID-E003-INDEP",
+      "identity_kind": "verifier_runtime",
+      "role": "independent_verifier",
+      "runtime_class": "synthetic-verifier-runtime",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "session_ref": "SYN-E003-INDEP"
+    }
+  ],
+  "patient_identity_ref": "ID-E003-CASE"
 }

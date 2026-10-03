@@ -15,7 +15,14 @@
       "subject": "native permission without Hospital authorization",
       "result": "observed",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "producer_identity_ref": "ID-E008-EVALUATOR",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:1a3d23bc43177068ca0da5e2649ac7b582f73837462b5251db48378fb8bcb041",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-E008-OBS-001|runtime_observation|external_evaluator|observed"
+      }
     }
   ],
   "events": [
@@ -57,5 +64,29 @@
     "native_permission_not_authorization": true,
     "canonical_policy_preserved": true
   },
-  "terminal_outcome": "BLOCKED"
+  "terminal_outcome": "BLOCKED",
+  "identity_attestations": [
+    {
+      "identity_id": "ID-E008-CASE",
+      "identity_kind": "agent_runtime",
+      "role": "case_orchestrator",
+      "runtime_class": "synthetic-agent-runtime",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "session_ref": "SYN-E008-PATIENT"
+    },
+    {
+      "identity_id": "ID-E008-EVALUATOR",
+      "identity_kind": "ci_runtime",
+      "role": "external_evaluator",
+      "runtime_class": "synthetic-ci-evaluator",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    }
+  ],
+  "patient_identity_ref": "ID-E008-CASE"
 }

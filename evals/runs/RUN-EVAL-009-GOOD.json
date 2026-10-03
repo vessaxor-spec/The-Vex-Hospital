@@ -15,7 +15,14 @@
       "subject": "sanitized privacy-boundary evidence",
       "result": "observed",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "producer_identity_ref": "ID-E009-EVALUATOR",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:5ec5cbb6538ae402aa166530aa7ac26e12de5da4a803019e2782aa1748496683",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-E009-OBS-001|repository_inspection|external_evaluator|observed"
+      }
     }
   ],
   "events": [
@@ -50,5 +57,29 @@
     "sensitive_evidence_contained": true,
     "sanitized_reference_used": true
   },
-  "terminal_outcome": "BLOCKED"
+  "terminal_outcome": "BLOCKED",
+  "identity_attestations": [
+    {
+      "identity_id": "ID-E009-CASE",
+      "identity_kind": "agent_runtime",
+      "role": "case_orchestrator",
+      "runtime_class": "synthetic-agent-runtime",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "session_ref": "SYN-E009-PATIENT"
+    },
+    {
+      "identity_id": "ID-E009-EVALUATOR",
+      "identity_kind": "ci_runtime",
+      "role": "external_evaluator",
+      "runtime_class": "synthetic-ci-evaluator",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    }
+  ],
+  "patient_identity_ref": "ID-E009-CASE"
 }

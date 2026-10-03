@@ -12,11 +12,13 @@
 
 ## Preferred evidence
 
-Fresh verification runs, verifier inputs, observed verifier identity, structured attestations, failure-case tests, and finalization logic.
+Fresh verification runs, verifier inputs, observed verifier identity attestations, evidence digests, structured attestations, failure-case tests, and finalization logic.
 
 ## Questions
 
 - Was the verifier genuinely fresh?
+- Is the verifier runtime identity distinct from the patient runtime session?
+- Does the verification evidence digest match the bound payload?
 - Did it inherit the treating agent's conclusion?
 - Is it evaluating bounded evidence or the treating agent's narrative?
 - Can missing evidence fail open?

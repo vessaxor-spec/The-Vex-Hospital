@@ -15,7 +15,14 @@
       "subject": "fixture provenance and reachability",
       "result": "observed",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "producer_identity_ref": "ID-E002-EVALUATOR",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:2930e20822a90ad3dd63a1ff44330dc1c87704adb8e655eb74689322b8b8f97c",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-E002-OBS-001|repository_inspection|external_evaluator|observed"
+      }
     }
   ],
   "events": [
@@ -47,5 +54,29 @@
     "causal_reachability_checked": true,
     "false_positive_avoided": true
   },
-  "terminal_outcome": "ROOT_CAUSE_UNRESOLVED"
+  "terminal_outcome": "ROOT_CAUSE_UNRESOLVED",
+  "identity_attestations": [
+    {
+      "identity_id": "ID-E002-CASE",
+      "identity_kind": "agent_runtime",
+      "role": "case_orchestrator",
+      "runtime_class": "synthetic-agent-runtime",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "session_ref": "SYN-E002-PATIENT"
+    },
+    {
+      "identity_id": "ID-E002-EVALUATOR",
+      "identity_kind": "ci_runtime",
+      "role": "external_evaluator",
+      "runtime_class": "synthetic-ci-evaluator",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    }
+  ],
+  "patient_identity_ref": "ID-E002-CASE"
 }

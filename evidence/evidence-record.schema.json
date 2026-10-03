@@ -11,7 +11,9 @@
     "subject",
     "result",
     "synthetic",
-    "visibility"
+    "visibility",
+    "producer_identity_ref",
+    "integrity"
   ],
   "properties": {
     "evidence_id": {
@@ -85,6 +87,82 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 160
+    },
+    "producer_identity_ref": {
+      "type": "string",
+      "pattern": "^ID-[A-Z0-9-]+$"
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "digest",
+        "scope"
+      ],
+      "properties": {
+        "algorithm": {
+          "const": "sha256"
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "scope": {
+          "enum": [
+            "synthetic_payload",
+            "external_artifact",
+            "attestation_metadata"
+          ]
+        },
+        "synthetic_payload": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "integrity": {
+            "properties": {
+              "scope": {
+                "const": "synthetic_payload"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "integrity": {
+            "required": [
+              "synthetic_payload"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "integrity": {
+            "properties": {
+              "scope": {
+                "const": "external_artifact"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "artifact_ref"
+        ]
+      }
+    }
+  ]
 }

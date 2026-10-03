@@ -44,7 +44,7 @@ Different AI systems may use different intake playbooks, but every patient inher
 
 Begin with [ADMISSION.md](ADMISSION.md).
 
-The patient should then follow [HOSPITAL.md](HOSPITAL.md) as the governing Constitution and the machine-readable Hospital protocol for legal state transitions. State promotion conditions are defined in the executable [transition condition registry](protocol/conditions.md). High-impact facts used for treatment, verification, and discharge are governed by the [evidence provenance policy](evidence/README.md).
+The patient should then follow [HOSPITAL.md](HOSPITAL.md) as the governing Constitution and the machine-readable Hospital protocol for legal state transitions. State promotion conditions are defined in the executable [transition condition registry](protocol/conditions.md). High-impact facts used for treatment, verification, and discharge are governed by the [evidence provenance policy](evidence/README.md). Evidence records are integrity bound, and observed runtime identities are represented through [runtime identity attestations](identity/README.md).
 
 Once admitted, [CLINICAL.md](CLINICAL.md) is the Hospital's Clinical Handbook. It explains triage, specialist examinations, diagnosis, treatment planning, recovery testing, discharge, and follow-up.
 
@@ -88,8 +88,8 @@ Sensitive patient evidence should remain in the patient-controlled environment. 
 
 ## Hospital status
 
-Vex Hospital v1 is operationally qualified under the bounded scope defined in [SELF-EXAMINATION.md](SELF-EXAMINATION.md). The Constitution, machine-readable protocol engine, executable transition policy, evidence provenance controls, clinical system, intake playbooks, Assurance Ward, structural validator, mutation self-examination, privacy scanner, and canonical synthetic behavioral evaluation are implemented.
+Vex Hospital v1 is operationally qualified under the bounded scope defined in [SELF-EXAMINATION.md](SELF-EXAMINATION.md). The Constitution, machine-readable protocol engine, executable transition policy, evidence provenance controls, evidence integrity binding, observed runtime identity attestations, clinical system, intake playbooks, Assurance Ward, structural validator, mutation self-examination, privacy scanner, and canonical synthetic behavioral evaluation are implemented.
 
-Operational qualification is not a universal safety certification. Evidence metadata still depends on truthful underlying artifacts and identities. Live cross-provider behavioral execution and several governance controls remain follow-up work.
+Operational qualification is not a universal safety certification. Hashes bind evidence content and identity attestations bind observed roles, but neither mechanism proves that an underlying artifact or observer is truthful. Live cross-provider behavioral execution and several governance controls remain follow-up work.
 
 See [DISCLAIMER.md](DISCLAIMER.md) before relying on results.

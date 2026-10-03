@@ -25,11 +25,13 @@ A record identifies:
 - an opaque evidence ID;
 - evidence kind;
 - producer role;
+- producer runtime identity reference;
 - subject;
 - result;
 - visibility;
 - whether it is synthetic;
 - fresh-context status where relevant;
+- integrity metadata using SHA-256;
 - optional scope and opaque artifact reference.
 
 The public Hospital must not require raw private evidence.
@@ -52,6 +54,10 @@ Examples:
 
 Structured provenance makes unsupported claims harder to pass through the control plane.
 
-It does not prove that an evidence artifact is truthful merely because its metadata validates.
+For public synthetic assurance records, CI recomputes the SHA-256 digest of a canonical synthetic payload. For real patient evidence, the Hospital can record a digest beside an opaque local artifact reference without publishing the artifact.
 
-Evidence authenticity, runtime identity, cryptographic attestations, and live provider integration remain additional assurance dimensions.
+Evidence producer roles are also bound to observed runtime identity attestations.
+
+A valid digest proves integrity of the bound payload, not truth. A valid identity attestation proves the Hospital observed a role and runtime relationship, not that the observer or provider is cryptographically trustworthy.
+
+Signed attestations, hardware-backed identity, provider-native audit evidence, and live runtime verification remain stronger future assurance options.

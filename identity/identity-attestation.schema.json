@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./identity-attestation.schema.json",
+  "title": "Vex Hospital Runtime Identity Attestation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity_id",
+    "identity_kind",
+    "role",
+    "runtime_class",
+    "observer_role",
+    "observed_runtime",
+    "synthetic",
+    "visibility"
+  ],
+  "properties": {
+    "identity_id": {
+      "type": "string",
+      "pattern": "^ID-[A-Z0-9-]+$"
+    },
+    "identity_kind": {
+      "enum": [
+        "human_operator",
+        "agent_runtime",
+        "verifier_runtime",
+        "tool_runtime",
+        "platform_authority",
+        "ci_runtime"
+      ]
+    },
+    "role": {
+      "enum": [
+        "authorized_operator",
+        "platform_authority",
+        "case_orchestrator",
+        "treating_agent",
+        "independent_verifier",
+        "adversarial_verifier",
+        "resilience_verifier",
+        "runtime",
+        "tool",
+        "ci_harness",
+        "external_evaluator"
+      ]
+    },
+    "runtime_class": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "provider_class": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "model_class": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "session_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "observer_role": {
+      "enum": [
+        "authorized_operator",
+        "platform_authority",
+        "ci_harness",
+        "external_evaluator"
+      ]
+    },
+    "observed_runtime": {
+      "const": true
+    },
+    "synthetic": {
+      "type": "boolean"
+    },
+    "visibility": {
+      "enum": [
+        "synthetic_public",
+        "sanitized_reference",
+        "local_private"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "identity_kind": {
+            "enum": [
+              "agent_runtime",
+              "verifier_runtime"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "session_ref"
+        ]
+      }
+    }
+  ]
+}
