@@ -253,6 +253,24 @@
           "min_count": 1
         }
       ]
+    },
+    "pre_treatment_evidence_frozen": {
+      "applies_when": true,
+      "requirements": [
+        {
+          "kind": "diagnostic_snapshot",
+          "producer_roles": [
+            "case_orchestrator",
+            "ci_harness",
+            "external_evaluator"
+          ],
+          "results": [
+            "pass",
+            "observed"
+          ],
+          "min_count": 1
+        }
+      ]
     }
   }
 }
