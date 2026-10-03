@@ -62,6 +62,8 @@ Repository validation runs automatically on pull requests and on changes to `mai
 
 The Assurance Ward also includes canonical observer-owned behavioral traces. These traces test continuous clinical trajectories, treatment authorization, risk-scaled verification, R3 discharge approval, and synthetic-evidence boundaries.
 
+Vex Hospital also includes a [provider-neutral behavioral trial harness](live_trials/README.md). The harness executes registered adapters through a bounded subprocess path and returns each trace to the existing Hospital evaluator. V1.2A currently registers mock adapters only, so no live external provider validation is claimed.
+
 The Hospital also undergoes its own [Self-Examination](SELF-EXAMINATION.md), where deliberately corrupted copies must be rejected before operational promotion.
 
 ## Hospital doctrine
@@ -88,8 +90,8 @@ Sensitive patient evidence should remain in the patient-controlled environment. 
 
 ## Hospital status
 
-Vex Hospital v1 is operationally qualified under the bounded scope defined in [SELF-EXAMINATION.md](SELF-EXAMINATION.md). The Constitution, machine-readable protocol engine, executable transition policy, evidence provenance controls, evidence integrity binding, observed runtime identity attestations, clinical system, intake playbooks, Assurance Ward, structural validator, mutation self-examination, privacy scanner, and canonical synthetic behavioral evaluation are implemented.
+Vex Hospital v1 is operationally qualified under the bounded scope defined in [SELF-EXAMINATION.md](SELF-EXAMINATION.md). The Constitution, machine-readable protocol engine, executable transition policy, evidence provenance controls, evidence integrity binding, observed runtime identity attestations, clinical system, intake playbooks, Assurance Ward, provider-neutral trial harness, structural validator, mutation self-examination, privacy scanner, and canonical synthetic behavioral evaluation are implemented.
 
-Operational qualification is not a universal safety certification. Hashes bind evidence content and identity attestations bind observed roles, but neither mechanism proves that an underlying artifact or observer is truthful. Live cross-provider behavioral execution and several governance controls remain follow-up work.
+Operational qualification is not a universal safety certification. Hashes bind evidence content and identity attestations bind observed roles, but neither mechanism proves that an underlying artifact or observer is truthful. The trial harness has been verified with mock adapters only. Live external provider execution and several governance controls remain follow-up work.
 
 See [DISCLAIMER.md](DISCLAIMER.md) before relying on results.
