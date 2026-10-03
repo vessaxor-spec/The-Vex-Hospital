@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./adapter-output.schema.json",
+  "title": "Vex Hospital Trial Adapter Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "behavioral_run",
+    "usage"
+  ],
+  "properties": {
+    "behavioral_run": {
+      "type": "object"
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cost_usd",
+        "requests",
+        "tool_actions"
+      ],
+      "properties": {
+        "cost_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "requests": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tool_actions": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}
