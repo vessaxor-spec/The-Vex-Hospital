@@ -13,6 +13,7 @@ import yaml
 from evaluate_evidence_provenance import (
     ProvenanceFailure,
     validate_fact_provenance,
+    validate_identities,
     validate_records,
 )
 from evaluate_transition_policy import (
@@ -68,14 +69,18 @@ def validate_case_chart(chart: dict):
 
 def load_evidence_bundle(path: Path | None):
     if path is None:
-        return None, []
+        return None, [], []
 
     bundle = load_json(path)
     schema = load_json(ROOT / "evidence" / "evidence-bundle.schema.json")
     jsonschema.Draft202012Validator.check_schema(schema)
     jsonschema.validate(instance=bundle, schema=schema)
 
-    return bundle["case_id"], bundle["records"]
+    return (
+        bundle["case_id"],
+        bundle["identity_attestations"],
+        bundle["records"],
+    )
 
 
 def validate_history(chart: dict, protocol: dict):
@@ -408,17 +413,30 @@ def evaluate_case_promotion(
                 "Root-cause confidence is required for this case-state promotion.",
             )
 
-        bundle_case_id, evidence_records = load_evidence_bundle(evidence_bundle_path)
+        bundle_case_id, identity_attestations, evidence_records = load_evidence_bundle(
+            evidence_bundle_path
+        )
         if bundle_case_id is not None:
             require(
                 bundle_case_id == chart["case_id"],
                 "Evidence bundle case_id does not match patient chart case_id.",
             )
 
+        identity_index = validate_identities(
+            identity_attestations,
+            public_synthetic=False,
+        )
         evidence_index = validate_records(
             evidence_records,
+            identity_index,
             public_synthetic=False,
             expected_case_id=chart["case_id"],
+        )
+
+        chart_identity_refs = set(chart["environment"]["identity_refs"])
+        require(
+            set(identity_index).issubset(chart_identity_refs),
+            "Evidence bundle contains identity attestations not referenced by the patient chart.",
         )
 
         validate_fact_evidence_refs(chart, evidence_index)
