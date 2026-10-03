@@ -16,6 +16,10 @@ The reference command accepts:
 
 Evidence bundles use `evidence/evidence-bundle.schema.json`.
 
+A bundle contains typed evidence records plus the runtime identity attestations needed to validate their producer roles. During promotion evaluation, evidence records must match the active case ID, pass the current integrity checks, and reference producer identities accepted by the current Hospital identity model.
+
+Bundle identities must also be referenced by the patient chart's environment identity list.
+
 The evidence bundle may remain entirely inside the patient environment. It is not a public Hospital record.
 
 ## Decision outcomes
@@ -55,7 +59,7 @@ If the chart supplies a conflicting value for a derived fact, promotion is BLOCK
 
 ## Evidence provenance
 
-High-impact facts are validated through the same provenance policy used by the Assurance Ward.
+High-impact facts are validated through the same provenance, runtime-identity, and evidence-integrity controls used by the Assurance Ward.
 
 Fact evidence IDs in `policy_context.fact_evidence` must:
 
@@ -81,6 +85,6 @@ Historical entries are checked for declared state edges. The engine does not ret
 
 ## Privacy
 
-The engine consumes patient-controlled evidence metadata locally.
+The engine consumes patient-controlled evidence and identity metadata locally.
 
 Do not commit real case charts, real evidence bundles, private artifact paths, credentials, session material, or patient identifiers to the public Vex Hospital repository.
