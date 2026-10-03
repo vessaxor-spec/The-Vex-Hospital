@@ -18,6 +18,10 @@ playbooks:
       - "CLAUDE.md"
       - ".claude/rules/"
     persistent_surface_required: false
+  ANTHROPIC:
+    file: "./anthropic.md"
+    instruction_surfaces: []
+    persistent_surface_required: false
   CODEX:
     file: "./codex.md"
     instruction_surfaces:
