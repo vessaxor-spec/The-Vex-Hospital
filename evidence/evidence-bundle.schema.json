@@ -7,7 +7,8 @@
   "required": [
     "schema_ref",
     "case_id",
-    "records"
+    "records",
+    "identity_attestations"
   ],
   "properties": {
     "schema_ref": {
@@ -24,6 +25,12 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 128
+    },
+    "identity_attestations": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     }
   }
 }
