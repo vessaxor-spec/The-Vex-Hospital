@@ -286,7 +286,9 @@
         "runtime_class",
         "model_or_provider_class",
         "configuration_ref",
-        "baseline_ref"
+        "baseline_ref",
+        "patient_identity_ref",
+        "identity_refs"
       ],
       "properties": {
         "runtime_class": {
@@ -300,6 +302,19 @@
         },
         "baseline_ref": {
           "type": "string"
+        },
+        "patient_identity_ref": {
+          "type": "string",
+          "pattern": "^ID-[A-Z0-9-]+$"
+        },
+        "identity_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^ID-[A-Z0-9-]+$"
+          }
         }
       }
     },
