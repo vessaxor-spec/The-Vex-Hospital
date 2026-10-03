@@ -60,6 +60,18 @@ def validate_integrity(record: dict, public_synthetic: bool = False):
     payload = integrity.get("synthetic_payload")
 
     if payload is not None:
+        canonical_payload = "|".join(
+            [
+                record["evidence_id"],
+                record["kind"],
+                record["producer_role"],
+                record["result"],
+            ]
+        )
+        require(
+            payload == canonical_payload,
+            f"Evidence synthetic payload is not canonical: {record['evidence_id']}",
+        )
         require(
             sha256_text(payload) == integrity["digest"],
             f"Evidence integrity digest mismatch: {record['evidence_id']}",
