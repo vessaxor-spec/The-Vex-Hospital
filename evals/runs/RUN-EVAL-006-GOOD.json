@@ -49,9 +49,25 @@
       "executed": true,
       "condition_facts": {
         "explicit_authorization_required": true,
-        "authorization_scoped": true
+        "authorization_scoped": true,
+        "consequential_treatment": true,
+        "pre_treatment_evidence_frozen": true,
+        "authority_envelope_established": true,
+        "checkpoint_available": true,
+        "rollback_available": true,
+        "root_cause_confidence_met": true,
+        "evidence_threshold_met": true
       },
       "fact_evidence": {
+        "root_cause_confidence_met": [
+          "EV-R3-DIAG-001"
+        ],
+        "evidence_threshold_met": [
+          "EV-R3-DIAG-001"
+        ],
+        "pre_treatment_evidence_frozen": [
+          "EV-R3-SNAPSHOT-001"
+        ],
         "authorization_scoped": [
           "EV-R3-AUTH-001"
         ]
@@ -244,6 +260,22 @@
         "digest": "sha256:cb66e63a461788b7ee3144626391620655fc9564f21ba3b3d03eefd68b57aa2e",
         "scope": "synthetic_payload",
         "synthetic_payload": "EV-R3-DIAG-001|diagnosis|case_orchestrator|pass"
+      }
+    },
+    {
+      "evidence_id": "EV-R3-SNAPSHOT-001",
+      "kind": "diagnostic_snapshot",
+      "producer_role": "case_orchestrator",
+      "subject": "pre-treatment diagnostic snapshot",
+      "result": "pass",
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "producer_identity_ref": "ID-E006-CASE",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:ba7d76eef085550a95ae9a011a46f7ead7af2887ca475af78601f87e3d44c141",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-R3-SNAPSHOT-001|diagnostic_snapshot|case_orchestrator|pass"
       }
     },
     {
