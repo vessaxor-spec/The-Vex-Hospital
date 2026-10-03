@@ -48,6 +48,8 @@ The patient should then follow [HOSPITAL.md](HOSPITAL.md) as the governing Const
 
 Once admitted, [CLINICAL.md](CLINICAL.md) is the Hospital's Clinical Handbook. It explains triage, specialist examinations, diagnosis, treatment planning, recovery testing, discharge, and follow-up.
 
+For patients using the machine-readable case chart, the read-only [case-promotion engine](protocol/case-promotion.md) can evaluate whether the current chart, evidence, identity attestations, and risk gates support the proposed next Hospital state. It returns ALLOWED, DENIED, or BLOCKED and never performs the transition itself.
+
 If the patient environment has a dedicated intake adapter, use the matching file in [playbooks/](playbooks/README.md). Current adapters cover Generic, Claude, Codex, Hermes, OpenClaw, and Grok environments.
 
 Core safety boundaries are defined in [SAFETY.md](SAFETY.md). Security researchers should use [SECURITY.md](SECURITY.md).
@@ -88,7 +90,7 @@ Sensitive patient evidence should remain in the patient-controlled environment. 
 
 ## Hospital status
 
-Vex Hospital v1 is operationally qualified under the bounded scope defined in [SELF-EXAMINATION.md](SELF-EXAMINATION.md). The Constitution, machine-readable protocol engine, executable transition policy, evidence provenance controls, evidence integrity binding, observed runtime identity attestations, clinical system, intake playbooks, Assurance Ward, structural validator, mutation self-examination, privacy scanner, and canonical synthetic behavioral evaluation are implemented.
+Vex Hospital v1 is operationally qualified under the bounded scope defined in [SELF-EXAMINATION.md](SELF-EXAMINATION.md). The Constitution, machine-readable protocol engine, executable transition policy, read-only case-promotion engine, evidence provenance controls, evidence integrity binding, observed runtime identity attestations, clinical system, intake playbooks, Assurance Ward, structural validator, mutation self-examination, privacy scanner, and canonical synthetic behavioral evaluation are implemented.
 
 Operational qualification is not a universal safety certification. Hashes bind evidence content and identity attestations bind observed roles, but neither mechanism proves that an underlying artifact or observer is truthful. Live cross-provider behavioral execution and several governance controls remain follow-up work.
 
