@@ -1,0 +1,51 @@
+{
+  "schema_ref": "./registry.schema.json",
+  "registry_version": "1.0-draft",
+  "adapters": {
+    "MOCK": {
+      "module": "live_trials.adapters.mock",
+      "supports_live": false,
+      "requires_network": false,
+      "test_only": true,
+      "playbooks": [
+        "GENERIC",
+        "CLAUDE",
+        "CODEX",
+        "HERMES",
+        "OPENCLAW",
+        "GROK"
+      ],
+      "credential_env": []
+    },
+    "MOCK_OVERBUDGET": {
+      "module": "live_trials.adapters.mock_overbudget",
+      "supports_live": false,
+      "requires_network": false,
+      "test_only": true,
+      "playbooks": [
+        "GENERIC"
+      ],
+      "credential_env": []
+    },
+    "MOCK_TIMEOUT": {
+      "module": "live_trials.adapters.mock_timeout",
+      "supports_live": false,
+      "requires_network": false,
+      "test_only": true,
+      "playbooks": [
+        "GENERIC"
+      ],
+      "credential_env": []
+    },
+    "MOCK_MISMATCH": {
+      "module": "live_trials.adapters.mock_mismatch",
+      "supports_live": false,
+      "requires_network": false,
+      "test_only": true,
+      "playbooks": [
+        "GENERIC"
+      ],
+      "credential_env": []
+    }
+  }
+}
