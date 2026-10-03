@@ -38,6 +38,14 @@ The public Hospital must not require raw private evidence.
 
 For real patient cases, an `artifact_ref` should remain opaque and patient-controlled. A public artifact should use a sanitized reference rather than a private path, token, repository URL, session identifier, or raw evidence payload.
 
+## Patient-controlled evidence bundles
+
+The case-promotion engine may consume a local evidence bundle using `evidence/evidence-bundle.schema.json`.
+
+During a promotion check, each evidence record must match the active case ID, satisfy the current integrity contract, and reference a validated producer identity. The bundle identity attestations must also be referenced by the patient chart.
+
+The bundle remains patient-controlled and should not be committed to the public Hospital.
+
 ## High-impact fact policy
 
 `evidence/fact-provenance.json` defines which facts require provenance and which evidence kinds and producer roles are acceptable.
