@@ -24,6 +24,7 @@
       "enum": [
         "authorization",
         "diagnosis",
+        "diagnostic_snapshot",
         "treatment_result",
         "self_test",
         "independent_verification",
