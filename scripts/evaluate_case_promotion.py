@@ -162,6 +162,27 @@ def derive_policy_facts(chart: dict, protocol: dict, evidence_index: dict):
     facts = dict(chart["policy_context"]["facts"])
     derived = {}
 
+    risk_class = chart["risk_class"]
+    if risk_class is not None:
+        apply_derived_fact(
+            facts,
+            derived,
+            "consequential_treatment",
+            risk_class != "R0",
+        )
+
+    apply_derived_fact(
+        facts,
+        derived,
+        "checkpoint_available",
+        bool(chart["treatment"]["checkpoint_ref"]),
+    )
+    apply_derived_fact(
+        facts,
+        derived,
+        "rollback_available",
+        bool(chart["treatment"]["rollback_ref"]),
+    )
     apply_derived_fact(
         facts,
         derived,
