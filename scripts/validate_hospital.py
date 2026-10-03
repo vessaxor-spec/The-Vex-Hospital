@@ -123,6 +123,26 @@ def validate_transition_conditions(protocol):
         f"Missing={sorted(referenced_facts - declared_facts)} Extra={sorted(declared_facts - referenced_facts)}",
     )
 
+    treatment_boundary_required = {
+        "consequential_treatment",
+        "pre_treatment_evidence_frozen",
+        "authority_envelope_established",
+        "checkpoint_available",
+        "rollback_available",
+        "root_cause_confidence_met",
+        "evidence_threshold_met",
+    }
+    for condition_id in (
+        "authorization_requirement_satisfied",
+        "explicit_authorization_received_within_scope",
+    ):
+        condition_facts = collect_condition_facts(registry["conditions"][condition_id])
+        missing = treatment_boundary_required - condition_facts
+        require(
+            not missing,
+            f"Treatment boundary condition {condition_id} missing required V1.2A facts: {sorted(missing)}",
+        )
+
 
 def validate_runtime_identity():
     identity_schema = load_json(ROOT / "identity" / "identity-attestation.schema.json")
@@ -138,6 +158,10 @@ def validate_evidence_provenance():
     validate_json_schema(policy_path, policy_schema_path)
 
     policy = load_json(policy_path)
+    require(
+        "pre_treatment_evidence_frozen" in policy["fact_rules"],
+        "Pre-treatment evidence freeze must remain provenance governed.",
+    )
     conditions = load_json(ROOT / "protocol" / "conditions.json")
     known_facts = set(conditions["facts"])
     governed_facts = set(policy["fact_rules"])
