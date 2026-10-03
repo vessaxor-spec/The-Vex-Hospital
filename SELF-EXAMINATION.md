@@ -15,7 +15,7 @@ This is an operational qualification, not a universal safety certification.
 V1 operational qualification requires:
 
 1. the clean Hospital validator passes;
-2. protocol, transition-policy, runtime-identity, evidence-integrity, evidence-provenance, specialist, playbook, patient-chart, assurance-case, privacy-policy, behavioral-run, and style checks pass in CI;
+2. protocol, transition-policy, case-promotion, runtime-identity, evidence-integrity, evidence-provenance, specialist, playbook, patient-chart, assurance-case, privacy-policy, behavioral-run, and style checks pass in CI;
 3. deliberate mutation of a protected treatment gate is detected;
 4. an undeclared specialist department is rejected;
 5. patient-chart and protocol-state drift is detected;
