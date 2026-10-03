@@ -17,6 +17,18 @@ If the patient environment has a matching adapter in [playbooks/](playbooks/READ
 
 The adapter may explain native instruction files, memory surfaces, tools, or permissions. It cannot weaken the Constitution, create authority, or replace the Hospital protocol.
 
+## Case-state promotion
+
+When a patient uses the machine-readable case chart, use the read-only [case-promotion engine](protocol/case-promotion.md) to evaluate a proposed state change.
+
+The engine may return:
+
+- `ALLOWED`: the control-plane requirements for that transition are supported;
+- `DENIED`: the edge is undeclared or its known predicate is false;
+- `BLOCKED`: required facts, evidence, identity, authority, risk, or provenance cannot be established safely.
+
+`ALLOWED` does not mutate the chart, execute treatment, or create authority.
+
 ## Clinical handbook
 
 Use [CLINICAL.md](CLINICAL.md) for the Hospital's clinical workflow and [standards/triage.md](standards/triage.md) for triage.
