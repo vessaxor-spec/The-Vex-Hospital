@@ -109,6 +109,7 @@ def validate_records(
     records: list[dict],
     identity_index: dict,
     public_synthetic: bool = False,
+    expected_case_id: str | None = None,
 ):
     schema = load_json(ROOT / "evidence" / "evidence-record.schema.json")
     jsonschema.Draft202012Validator.check_schema(schema)
@@ -118,6 +119,12 @@ def validate_records(
         jsonschema.validate(instance=record, schema=schema)
         evidence_id = record["evidence_id"]
         require(evidence_id not in index, f"Duplicate evidence ID: {evidence_id}")
+
+        if expected_case_id is not None:
+            require(
+                record.get("case_id") == expected_case_id,
+                f"Evidence case_id does not match active case: {evidence_id}",
+            )
 
         identity_id = record["producer_identity_ref"]
         require(
