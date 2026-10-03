@@ -75,7 +75,7 @@ class HospitalMutationTests(unittest.TestCase):
                 {"fact": "authorization_scoped", "equals": True},
             ]
         }
-        path.write_text(json.dumps(registry, indent=2) + "\\n", encoding="utf-8")
+        path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
         self.assert_validator_fails(
             "Treatment boundary condition authorization_requirement_satisfied missing required V1.2A facts"
         )
