@@ -122,5 +122,47 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "integrity": {
+            "properties": {
+              "scope": {
+                "const": "synthetic_payload"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "integrity": {
+            "required": [
+              "synthetic_payload"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "integrity": {
+            "properties": {
+              "scope": {
+                "const": "external_artifact"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "artifact_ref"
+        ]
+      }
+    }
+  ]
 }
