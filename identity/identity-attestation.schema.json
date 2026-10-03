@@ -85,5 +85,24 @@
         "local_private"
       ]
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "identity_kind": {
+            "enum": [
+              "agent_runtime",
+              "verifier_runtime"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "session_ref"
+        ]
+      }
+    }
+  ]
 }
