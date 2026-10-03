@@ -214,6 +214,15 @@ def evaluate(run_path: Path):
                     "Independent verification identity has wrong role.",
                 )
                 require(
+                    identity_index[verifier_identity_ref]["identity_kind"] == "verifier_runtime",
+                    "Independent verification identity is not a verifier runtime.",
+                )
+                require(
+                    identity_index[verifier_identity_ref]["session_ref"]
+                    != identity_index[patient_identity_ref]["session_ref"],
+                    "Independent verification shares the patient runtime session.",
+                )
+                require(
                     event.get("evidence_complete") is True,
                     "Independent verification PASS lacks complete evidence.",
                 )
