@@ -31,6 +31,7 @@ The synthetic trace suite includes:
 
 - Generic
 - Claude
+- Anthropic
 - Codex
 - Hermes
 - OpenClaw
