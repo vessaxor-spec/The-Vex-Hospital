@@ -216,6 +216,48 @@ def validate_case_promotion_contracts():
     )
 
 
+def validate_governance_policy():
+    policy_path = ROOT / "governance" / "repository-policy.json"
+    policy_schema_path = ROOT / "governance" / "repository-policy.schema.json"
+    release_schema_path = ROOT / "governance" / "release-manifest.schema.json"
+
+    validate_json_schema(policy_path, policy_schema_path)
+
+    release_schema = load_json(release_schema_path)
+    jsonschema.Draft202012Validator.check_schema(release_schema)
+
+    required_files = [
+        ROOT / "GOVERNANCE.md",
+        ROOT / "CONTRIBUTING.md",
+        ROOT / "CHANGELOG.md",
+        ROOT / ".github" / "pull_request_template.md",
+        ROOT / ".github" / "CODEOWNERS",
+        ROOT / "governance" / "release-policy.md",
+    ]
+
+    missing = [
+        str(path.relative_to(ROOT))
+        for path in required_files
+        if not path.is_file()
+    ]
+    require(
+        not missing,
+        f"Governance policy is missing required files: {missing}",
+    )
+
+    policy = load_json(policy_path)
+    require(
+        "validate" in policy["change_flow"]["required_status_checks"],
+        "Governance policy must require the validate status check.",
+    )
+
+    manifests_dir = ROOT / "releases" / "manifests"
+    if manifests_dir.is_dir():
+        for manifest_path in sorted(manifests_dir.glob("*.json")):
+            manifest = load_json(manifest_path)
+            jsonschema.validate(instance=manifest, schema=release_schema)
+
+
 def validate_specialists():
     registry_path = ROOT / "specialists" / "registry.yaml"
     schema_path = ROOT / "specialists" / "registry.schema.json"
@@ -469,6 +511,9 @@ def main():
 
         validate_case_promotion_contracts()
         checks.append("case-promotion")
+
+        validate_governance_policy()
+        checks.append("governance-policy")
 
         specialists = validate_specialists()
         checks.append("specialists")
