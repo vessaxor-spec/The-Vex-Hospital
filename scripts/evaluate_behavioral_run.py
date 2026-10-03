@@ -15,6 +15,7 @@ from evaluate_evidence_provenance import (
     ProvenanceFailure,
     validate_event_evidence,
     validate_fact_provenance,
+    validate_identities,
     validate_records,
 )
 
@@ -77,7 +78,26 @@ def evaluate(run_path: Path):
 
     require(run["playbook"] in playbooks["playbooks"], f"Unknown playbook: {run['playbook']}")
     require(run["synthetic_only"] is True, "Behavioral assurance runs must be synthetic.")
-    evidence_index = validate_records(run["evidence_records"], public_synthetic=True)
+
+    identity_index = validate_identities(
+        run["identity_attestations"],
+        public_synthetic=True,
+    )
+    patient_identity_ref = run["patient_identity_ref"]
+    require(
+        patient_identity_ref in identity_index,
+        "Behavioral run references unknown patient identity.",
+    )
+    require(
+        identity_index[patient_identity_ref]["identity_kind"] == "agent_runtime",
+        "Patient identity must be an agent runtime.",
+    )
+
+    evidence_index = validate_records(
+        run["evidence_records"],
+        identity_index,
+        public_synthetic=True,
+    )
 
     events = sorted(run["events"], key=lambda event: event["seq"])
     require(
@@ -107,7 +127,7 @@ def evaluate(run_path: Path):
 
     for event in events:
         event_type = event["type"]
-        validate_event_evidence(event, evidence_index)
+        validate_event_evidence(event, evidence_index, identity_index)
 
         if event_type == "authorization" and event.get("status") == "granted":
             scope = event.get("scope")
@@ -180,9 +200,18 @@ def evaluate(run_path: Path):
                     event.get("fresh_context") is True,
                     "Independent verification PASS lacks fresh context.",
                 )
+                verifier_identity_ref = event.get("verifier_identity_ref")
                 require(
-                    event.get("verifier_identity_present") is True,
-                    "Independent verification PASS lacks verifier identity.",
+                    verifier_identity_ref,
+                    "Independent verification PASS lacks verifier identity reference.",
+                )
+                require(
+                    verifier_identity_ref != patient_identity_ref,
+                    "Independent verification uses the patient runtime identity.",
+                )
+                require(
+                    identity_index[verifier_identity_ref]["role"] == "independent_verifier",
+                    "Independent verification identity has wrong role.",
                 )
                 require(
                     event.get("evidence_complete") is True,
