@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./repository-policy.schema.json",
+  "title": "Vex Hospital Repository Governance Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_ref",
+    "policy_version",
+    "scope",
+    "live_enforcement",
+    "default_branch",
+    "change_flow",
+    "reviews",
+    "assurance",
+    "release",
+    "license"
+  ],
+  "properties": {
+    "schema_ref": {
+      "const": "./repository-policy.schema.json"
+    },
+    "policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "const": "desired_repository_governance"
+    },
+    "live_enforcement": {
+      "const": "documented_only"
+    },
+    "default_branch": {
+      "const": "main"
+    },
+    "change_flow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pull_request_required_for_main",
+        "direct_push_to_main_allowed",
+        "required_status_checks",
+        "preferred_merge_method",
+        "merge_commit_allowed",
+        "rebase_merge_allowed",
+        "force_push_allowed",
+        "branch_deletion_allowed",
+        "conversation_resolution_required",
+        "linear_history_required"
+      ],
+      "properties": {
+        "pull_request_required_for_main": {
+          "const": true
+        },
+        "direct_push_to_main_allowed": {
+          "const": false
+        },
+        "required_status_checks": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "contains": {
+            "const": "validate"
+          },
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "preferred_merge_method": {
+          "const": "squash"
+        },
+        "merge_commit_allowed": {
+          "const": false
+        },
+        "rebase_merge_allowed": {
+          "const": false
+        },
+        "force_push_allowed": {
+          "const": false
+        },
+        "branch_deletion_allowed": {
+          "const": false
+        },
+        "conversation_resolution_required": {
+          "const": true
+        },
+        "linear_history_required": {
+          "const": true
+        }
+      }
+    },
+    "reviews": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "external_pr_requires_maintainer_review",
+        "solo_maintainer_self_approval_required",
+        "minimum_required_approvals_for_solo_maintainer"
+      ],
+      "properties": {
+        "external_pr_requires_maintainer_review": {
+          "const": true
+        },
+        "solo_maintainer_self_approval_required": {
+          "const": false
+        },
+        "minimum_required_approvals_for_solo_maintainer": {
+          "const": 0
+        }
+      }
+    },
+    "assurance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hospital_validation_required",
+        "self_examination_required",
+        "privacy_policy_required",
+        "case_promotion_contract_required"
+      ],
+      "properties": {
+        "hospital_validation_required": {
+          "const": true
+        },
+        "self_examination_required": {
+          "const": true
+        },
+        "privacy_policy_required": {
+          "const": true
+        },
+        "case_promotion_contract_required": {
+          "const": true
+        }
+      }
+    },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tag_pattern",
+        "exact_green_main_sha_required",
+        "hospital_validation_required",
+        "self_examination_required",
+        "release_manifest_required",
+        "changelog_update_required",
+        "residual_risk_disclosure_required",
+        "license_decision_required_for_open_source_claim"
+      ],
+      "properties": {
+        "tag_pattern": {
+          "const": "^v[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+        },
+        "exact_green_main_sha_required": {
+          "const": true
+        },
+        "hospital_validation_required": {
+          "const": true
+        },
+        "self_examination_required": {
+          "const": true
+        },
+        "release_manifest_required": {
+          "const": true
+        },
+        "changelog_update_required": {
+          "const": true
+        },
+        "residual_risk_disclosure_required": {
+          "const": true
+        },
+        "license_decision_required_for_open_source_claim": {
+          "const": true
+        }
+      }
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "current_status",
+        "open_source_claim_allowed"
+      ],
+      "properties": {
+        "current_status": {
+          "enum": [
+            "unresolved",
+            "resolved"
+          ]
+        },
+        "open_source_claim_allowed": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "license": {
+            "properties": {
+              "current_status": {
+                "const": "unresolved"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "license": {
+            "properties": {
+              "open_source_claim_allowed": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
