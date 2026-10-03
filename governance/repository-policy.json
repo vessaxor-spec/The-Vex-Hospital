@@ -1,0 +1,46 @@
+{
+  "schema_ref": "./repository-policy.schema.json",
+  "policy_version": "1.0-draft",
+  "scope": "desired_repository_governance",
+  "live_enforcement": "documented_only",
+  "default_branch": "main",
+  "change_flow": {
+    "pull_request_required_for_main": true,
+    "direct_push_to_main_allowed": false,
+    "required_status_checks": [
+      "validate"
+    ],
+    "preferred_merge_method": "squash",
+    "merge_commit_allowed": false,
+    "rebase_merge_allowed": false,
+    "force_push_allowed": false,
+    "branch_deletion_allowed": false,
+    "conversation_resolution_required": true,
+    "linear_history_required": true
+  },
+  "reviews": {
+    "external_pr_requires_maintainer_review": true,
+    "solo_maintainer_self_approval_required": false,
+    "minimum_required_approvals_for_solo_maintainer": 0
+  },
+  "assurance": {
+    "hospital_validation_required": true,
+    "self_examination_required": true,
+    "privacy_policy_required": true,
+    "case_promotion_contract_required": true
+  },
+  "release": {
+    "tag_pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$",
+    "exact_green_main_sha_required": true,
+    "hospital_validation_required": true,
+    "self_examination_required": true,
+    "release_manifest_required": true,
+    "changelog_update_required": true,
+    "residual_risk_disclosure_required": true,
+    "license_decision_required_for_open_source_claim": true
+  },
+  "license": {
+    "current_status": "unresolved",
+    "open_source_claim_allowed": false
+  }
+}
