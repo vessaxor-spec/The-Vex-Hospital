@@ -15,7 +15,7 @@ This is an operational qualification, not a universal safety certification.
 V1 operational qualification requires:
 
 1. the clean Hospital validator passes;
-2. protocol, transition-policy, case-promotion, runtime-identity, evidence-integrity, evidence-provenance, specialist, playbook, patient-chart, assurance-case, privacy-policy, behavioral-run, and style checks pass in CI;
+2. protocol, transition-policy, case-promotion, runtime-identity, evidence-integrity, evidence-provenance, governance-policy, specialist, playbook, patient-chart, assurance-case, privacy-policy, behavioral-run, and style checks pass in CI;
 3. deliberate mutation of a protected treatment gate is detected;
 4. an undeclared specialist department is rejected;
 5. patient-chart and protocol-state drift is detected;
@@ -62,8 +62,8 @@ Operational qualification does not remove these known limitations:
 - high-impact facts are bound to typed evidence, SHA-256 integrity metadata, and observed runtime identity attestations, but cryptographic producer authenticity and provider-native identity proof are not yet guaranteed;
 - privacy scanning is stronger and registry driven, but it remains pattern based and is not a guarantee that every secret or private artifact will be detected;
 - supported agent environments may change their native instruction, tool, memory, or permission conventions;
-- repository branch protection and ruleset enforcement remain separate governance controls;
-- the project license remains a separate legal and distribution decision.
+- repository governance is version controlled and CI checked, but live GitHub branch protection and ruleset enforcement remain unverified and are not enabled by the policy files themselves;
+- the project license remains unresolved, so the project must not claim open-source status.
 
 These items do not invalidate the structural qualification, but they define its scope and follow-up needs.
 
