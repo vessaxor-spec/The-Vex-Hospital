@@ -15,7 +15,14 @@
       "subject": "failed self-test and retry gate",
       "result": "fail",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "producer_identity_ref": "ID-E007-EVALUATOR",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:6033efdca3daee06823019c781906f3dbcdf0cd5382d8e04ee0f4f441ad0a405",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-E007-OBS-001|self_test|external_evaluator|fail"
+      }
     }
   ],
   "events": [
@@ -71,5 +78,29 @@
     "fresh_retry_authorization": true,
     "checkpoint_restored": true
   },
-  "terminal_outcome": "BLOCKED"
+  "terminal_outcome": "BLOCKED",
+  "identity_attestations": [
+    {
+      "identity_id": "ID-E007-CASE",
+      "identity_kind": "agent_runtime",
+      "role": "case_orchestrator",
+      "runtime_class": "synthetic-agent-runtime",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "session_ref": "SYN-E007-PATIENT"
+    },
+    {
+      "identity_id": "ID-E007-EVALUATOR",
+      "identity_kind": "ci_runtime",
+      "role": "external_evaluator",
+      "runtime_class": "synthetic-ci-evaluator",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    }
+  ],
+  "patient_identity_ref": "ID-E007-CASE"
 }
