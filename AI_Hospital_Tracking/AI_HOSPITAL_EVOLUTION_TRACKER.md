@@ -7,11 +7,11 @@
 
 The current canonical implementation stops at:
 
-**V1.1E: Evidence Integrity and Runtime Identity**
+**V1.2A: Provider-Neutral Live Behavioral Trial Harness**
 
-Canonical main commit at tracker reconstruction:
+Canonical main commit:
 
-`991acf488133819d0f16ae5c4f738ccd84d3a420`
+`9d8a6687aed787b8910a4b09db2e013bc3ab3a46`
 
 This baseline has passed the Hospital validator and self-examination after repository lineage repair.
 
@@ -27,6 +27,7 @@ This baseline has passed the Hospital validator and self-examination after repos
 - V1.1C: Evidence Provenance and Privacy Hardening
 - V1.1D: Assurance Coverage Expansion
 - V1.1E: Evidence Integrity and Runtime Identity
+- V1.2A: Provider-Neutral Live Behavioral Trial Harness
 
 ## Canonical capabilities at V1.1E
 
@@ -142,9 +143,51 @@ V1.2A must:
 - reuse existing behavioral assurance instead of creating another verification stack
 - ship with mock adapters only until a provider-specific adapter is separately reviewed
 
+## V1.2A verification
+
+**Status:** COMPLETE AND PROMOTED
+
+Main commit:
+
+`9d8a6687aed787b8910a4b09db2e013bc3ab3a46`
+
+Verification:
+
+- Hospital validator: PASS
+- trial-harness validation: PASS
+- self-examination: 63 tests
+- failures: 0
+- result: OK
+
+Implemented:
+
+- provider-neutral trial manifest
+- adapter registry
+- subprocess trial worker
+- temporary workspace
+- filtered credential environment
+- per-run live authorization gate
+- timeout and reported usage budgets
+- checked-in mock-only manifests
+- returned trace evaluation through the existing Hospital behavioral evaluator
+
+No real provider adapter is registered. V1.2A does not constitute live-provider validation.
+
 ## Exact next move
 
-Complete and verify V1.2A. Do not claim live-provider validation until a real provider adapter is separately authorized, implemented, and exercised.
+Run a **live adapter selection gate**.
+
+The gate must choose at most one initial external runtime for the first real provider adapter and must evaluate:
+
+1. current operator access and authorization
+2. credential handling
+3. provider or runtime API stability
+4. network and side-effect envelope
+5. cost controls
+6. observed runtime identity evidence
+7. ability to produce the canonical behavioral-run contract
+
+Do not build multiple live adapters in parallel. Do not claim cross-provider validation from the mock harness.
 
 ## Anti-drift rules
 
