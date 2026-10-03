@@ -27,6 +27,9 @@ environment:
   model_or_provider_class: "<PROVIDER>"
   configuration_ref: "<CONFIG_REF>"
   baseline_ref: "<BASELINE_REVISION>"
+  patient_identity_ref: "ID-PATIENT-001"
+  identity_refs:
+    - "ID-PATIENT-001"
 
 authority:
   operator_authorization_ref: "<AUTH_REF>"
