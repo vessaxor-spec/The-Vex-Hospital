@@ -37,7 +37,7 @@ Changes to Vex Hospital should follow the same principles the Hospital applies t
 ## Style
 
 - Do not use em dash characters.
-- Do not revive retired "point your AI here" wording.
+- Do not revive retired pointer-style intake wording. Keep admission language aligned with the Hospital check-in theme.
 - Keep the Hospital theme clear without weakening technical precision.
 - Avoid universal safety or certification claims.
 
