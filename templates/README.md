@@ -19,6 +19,8 @@ The machine-readable `case-state.yaml` should remain the canonical summary of cu
 
 Its `policy_context` stores the currently asserted transition facts and the opaque evidence IDs supporting governed high-impact facts. Fact names must come from the Hospital transition registry.
 
+Its environment section also records the patient runtime identity reference and the set of identity attestation references relevant to the case. Real identity artifacts remain patient-controlled.
+
 ## Privacy
 
 Keep real patient evidence, private repository details, credentials, raw logs, sensitive prompts, memory contents, and proprietary implementation material inside the patient-controlled environment unless the operator explicitly authorizes disclosure.
