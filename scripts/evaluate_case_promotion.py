@@ -383,6 +383,12 @@ def evaluate_case_promotion(
     try:
         validate_history(chart, protocol)
 
+        require(
+            chart["environment"]["patient_identity_ref"]
+            in set(chart["environment"]["identity_refs"]),
+            "Patient identity reference is not listed in environment identity_refs.",
+        )
+
         if (
             chart["current_state"] in RISK_REQUIRED_STATES
             or target in RISK_REQUIRED_STATES
