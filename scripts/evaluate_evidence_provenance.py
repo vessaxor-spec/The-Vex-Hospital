@@ -34,10 +34,27 @@ def validate_identities(identities: list[dict], public_synthetic: bool = False):
     schema = load_json(ROOT / "identity" / "identity-attestation.schema.json")
     jsonschema.Draft202012Validator.check_schema(schema)
 
+    allowed_roles_by_kind = {
+        "human_operator": {"authorized_operator"},
+        "platform_authority": {"platform_authority"},
+        "agent_runtime": {"case_orchestrator", "treating_agent", "runtime"},
+        "verifier_runtime": {
+            "independent_verifier",
+            "adversarial_verifier",
+            "resilience_verifier",
+        },
+        "tool_runtime": {"tool"},
+        "ci_runtime": {"ci_harness", "external_evaluator"},
+    }
+
     index = {}
     for identity in identities:
         jsonschema.validate(instance=identity, schema=schema)
         identity_id = identity["identity_id"]
+        require(
+            identity["role"] in allowed_roles_by_kind[identity["identity_kind"]],
+            f"Identity role is incompatible with identity kind: {identity_id}",
+        )
         require(identity_id not in index, f"Duplicate identity ID: {identity_id}")
 
         if public_synthetic:
