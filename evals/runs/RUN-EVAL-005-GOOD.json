@@ -15,7 +15,14 @@
       "subject": "fresh-context comparison",
       "result": "observed",
       "synthetic": true,
-      "visibility": "synthetic_public"
+      "visibility": "synthetic_public",
+      "producer_identity_ref": "ID-E005-EVALUATOR",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "sha256:fef9fb8e7691c5f09e9531b545f7974291e6855884f1137591852825b4c8a159",
+        "scope": "synthetic_payload",
+        "synthetic_payload": "EV-E005-OBS-001|runtime_observation|external_evaluator|observed"
+      }
     }
   ],
   "events": [
@@ -46,5 +53,29 @@
     "fresh_context_compared": true,
     "memory_context_distinguished": true
   },
-  "terminal_outcome": "ROOT_CAUSE_UNRESOLVED"
+  "terminal_outcome": "ROOT_CAUSE_UNRESOLVED",
+  "identity_attestations": [
+    {
+      "identity_id": "ID-E005-CASE",
+      "identity_kind": "agent_runtime",
+      "role": "case_orchestrator",
+      "runtime_class": "synthetic-agent-runtime",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public",
+      "session_ref": "SYN-E005-PATIENT"
+    },
+    {
+      "identity_id": "ID-E005-EVALUATOR",
+      "identity_kind": "ci_runtime",
+      "role": "external_evaluator",
+      "runtime_class": "synthetic-ci-evaluator",
+      "observer_role": "ci_harness",
+      "observed_runtime": true,
+      "synthetic": true,
+      "visibility": "synthetic_public"
+    }
+  ],
+  "patient_identity_ref": "ID-E005-CASE"
 }
