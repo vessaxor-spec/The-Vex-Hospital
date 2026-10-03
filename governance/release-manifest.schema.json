@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./release-manifest.schema.json",
+  "title": "Vex Hospital Release Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "commit_sha",
+    "validation_status",
+    "self_examination_tests",
+    "known_residual_risks",
+    "license_status",
+    "open_source_claim"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "commit_sha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "validation_status": {
+      "const": "PASS"
+    },
+    "self_examination_tests": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "known_residual_risks": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "license_status": {
+      "enum": [
+        "unresolved",
+        "resolved"
+      ]
+    },
+    "open_source_claim": {
+      "type": "boolean"
+    },
+    "validation_run_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "release_notes_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "open_source_claim": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "license_status": {
+            "const": "resolved"
+          }
+        }
+      }
+    }
+  ]
+}
