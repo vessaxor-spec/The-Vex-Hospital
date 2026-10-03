@@ -12,11 +12,13 @@
 
 ## Preferred evidence
 
-Runtime identity, environment snapshots, traces, dependency responses, timing data, repeated isolated trials, and observed configuration.
+Observed runtime identity attestations, environment snapshots, traces, dependency responses, timing data, repeated isolated trials, and observed configuration.
 
 ## Questions
 
 - What actually ran?
+- Which observed identity attestation supports that claim?
+- Does the runtime session match or differ from the patient and verifier sessions as expected?
 - Does the condition reproduce across runtime identities or environments?
 - Did execution state change between trials?
 - Is a dependency intermittently degraded?
