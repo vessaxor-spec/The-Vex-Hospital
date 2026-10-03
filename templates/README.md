@@ -29,7 +29,9 @@ Portable or public reports should use sanitized identifiers and opaque evidence 
 
 ## Continuity
 
-Update the case state when a legal protocol transition occurs.
+Before updating the case state, the read-only case-promotion engine can evaluate whether the proposed next state is supported by the current chart, evidence bundle, executable transition policy, and risk gates.
+
+Update the case state only when the applicable transition is authorized and the case workflow actually performs that transition. An ALLOWED promotion decision is not itself a chart mutation.
 
 Maintain enough structured information for a fresh agent or examiner to continue the case without relying on the previous agent's private reasoning or complete conversation history.
 
