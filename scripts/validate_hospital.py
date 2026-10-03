@@ -124,6 +124,11 @@ def validate_transition_conditions(protocol):
     )
 
 
+def validate_runtime_identity():
+    identity_schema = load_json(ROOT / "identity" / "identity-attestation.schema.json")
+    jsonschema.Draft202012Validator.check_schema(identity_schema)
+
+
 def validate_evidence_provenance():
     evidence_schema = load_json(ROOT / "evidence" / "evidence-record.schema.json")
     policy_path = ROOT / "evidence" / "fact-provenance.json"
@@ -425,7 +430,11 @@ def main():
         validate_transition_conditions(protocol)
         checks.append("transition-policy")
 
+        validate_runtime_identity()
+        checks.append("runtime-identity")
+
         validate_evidence_provenance()
+        checks.append("evidence-integrity")
         checks.append("evidence-provenance")
 
         validate_privacy_registry()
