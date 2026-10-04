@@ -50,7 +50,7 @@ jobs:
             registry.yarnpkg.com:443
 
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -113,14 +113,14 @@ jobs:
             rekor.sigstore.dev:443
 
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: true
 
       - name: Setup Node.js
-        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -140,7 +140,7 @@ jobs:
 
       - name: Run semantic-release
         id: semantic-release
-        uses: cycjimmy/semantic-release-action@v4.1.1
+        uses: cycjimmy/semantic-release-action@b12c8f6015dc215fe37bc154d4ad456dd3833c90
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -168,7 +168,7 @@ jobs:
 
       - name: Upload release assets
         if: success() && steps.semantic-release.outputs.new_release_published == 'true'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e9274886f13407ee6a
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: release-assets
           path: |
@@ -189,13 +189,13 @@ jobs:
       packages: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Generate SLSA provenance
-        uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.9.0
+        uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@f7dd8c54c2067bafc12ca7a55595d5ee9b75204a
         with:
           base64-subjects: ${{ toJson([format('github.com/vessaxor-spec/The-Vex-Hospital@refs/tags/v{0}', needs.semantic-release.outputs.release_version)]) }}
           provenance-name: vex-hospital-provenance
@@ -214,13 +214,13 @@ jobs:
       packages: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Install cosign
-        uses: sigstore/cosign-installer@d7d6b8e7c8b8a8f8e8d8c8b8a8f8e8d8c8b8a8f8
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6
         with:
           cosign-release: 'v2.4.1'
 
@@ -237,7 +237,7 @@ jobs:
           COSIGN_EXPERIMENTAL: 1
 
       - name: Generate SBOM
-        uses: anchore/sbom-action@v0.19.1
+        uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c
         with:
           path: .
           format: spdx-json
@@ -255,7 +255,7 @@ jobs:
           COSIGN_EXPERIMENTAL: 1
 
       - name: Upload signed artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e9274886f13407ee6a
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: signed-artifacts
           path: |
@@ -294,7 +294,7 @@ jobs:
           EOF
 
       - name: Submit attestation to GitHub
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8
         with:
           subject-path: CHANGELOG.md
           predicate-path: attestation.json
@@ -346,7 +346,7 @@ jobs:
 
       - name: Post release summary to issue
         if: success()
-        uses: actions/github-script@v7.0.1
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
         with:
           script: |
             const fs = require('fs');
