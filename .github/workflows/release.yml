@@ -2,52 +2,360 @@ name: Release
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (no actual release)'
+        type: boolean
+        default: false
+      release_type:
+        description: 'Release type override'
+        type: choice
+        options: [patch, minor, major]
+        required: false
 
 permissions:
   contents: write
   issues: write
   pull-requests: write
   id-token: write
+  packages: write
+  attestations: write
+  security-events: write
+
+env:
+  NODE_VERSION: "22"
+  SEMANTIC_RELEASE_VERSION: "24"
 
 jobs:
-  release:
-    name: Release
+  pre-release-checks:
+    name: Pre-Release Checks
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d7b864b4d183af3c8f0d4a1
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            files.pythonhosted.org:443
+            github.com:443
+            pypi.org:443
+            test.pypi.org:443
+            registry.npmjs.org:443
+            registry.yarnpkg.com:443
+
       - name: Checkout repository
-        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify conventional commits
+        run: |
+          git log --oneline -50 --pretty=format:"%s" | while read msg; do
+            if ! echo "$msg" | grep -qE '^(feat|fix|perf|refactor|docs|test|build|ci|chore|revert)(\(.+\))?: .+'; then
+              echo "::warning::Non-conventional commit: $msg"
+            fi
+          done
+
+      - name: Check for uncommitted changes
+        run: |
+          if ! git diff --quiet || ! git diff --cached --quiet; then
+            echo "::error::Uncommitted changes detected"
+            exit 1
+          fi
+
+      - name: Verify version bump needed
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -n "$LAST_TAG" ]; then
+            COMMITS=$(git log --oneline $LAST_TAG..HEAD --pretty=format:"%s" | grep -E '^(feat|fix|perf|refactor|docs|test|build|ci|chore|revert)(\(.+\))?: .+' | wc -l)
+            if [ "$COMMITS" -eq 0 ]; then
+              echo "::warning::No conventional commits since last tag ($LAST_TAG)"
+            fi
+          fi
+
+  semantic-release:
+    name: Semantic Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: pre-release-checks
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+      packages: write
+      attestations: write
+      security-events: write
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d7b864b4d183af3c8f0d4a1
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            files.pythonhosted.org:443
+            github.com:443
+            pypi.org:443
+            test.pypi.org:443
+            registry.npmjs.org:443
+            registry.yarnpkg.com:443
+            objects.githubusercontent.com:443
+            sigstore.dev:443
+            fulcio.sigstore.dev:443
+            rekor.sigstore.dev:443
+
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
 
       - name: Setup Node.js
-        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
         with:
-          node-version: "22"
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
           cache-dependency-path: package.json
+          registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts --audit=false --fund=false
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
 
       - name: Configure Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config commit.gpgsign false
 
       - name: Run semantic-release
-        uses: cycjimmy/semantic-release-action@v4
+        id: semantic-release
+        uses: cycjimmy/semantic-release-action@v4.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GIT_AUTHOR_NAME: "github-actions[bot]"
+          GIT_AUTHOR_EMAIL: "github-actions[bot]@users.noreply.github.com"
+          GIT_COMMITTER_NAME: "github-actions[bot]"
+          GIT_COMMITTER_EMAIL: "github-actions[bot]@users.noreply.github.com"
         with:
-          semantic_version: 24
+          semantic_version: ${{ env.SEMANTIC_RELEASE_VERSION }}
           extra_plugins: |
-            @semantic-release/changelog
-            @semantic-release/git
-            @semantic-release/github
+            @semantic-release/changelog@6.0.3
+            @semantic-release/git@10.0.1
+            @semantic-release/github@10.0.1
+            @semantic-release/exec@6.0.3
           working_directory: .
           branches: main
-          dry_run: false
+          dry_run: ${{ github.event.inputs.dry_run || 'false' }}
+
+      - name: Capture release info
+        if: success()
+        run: |
+          echo "release_version=${{ steps.semantic-release.outputs.new_release_version }}" >> $GITHUB_OUTPUT
+          echo "release_notes=${{ steps.semantic-release.outputs.release_notes }}" >> $GITHUB_OUTPUT
+          echo "release_published=${{ steps.semantic-release.outputs.new_release_published }}" >> $GITHUB_OUTPUT
+
+      - name: Upload release assets
+        if: success() && steps.semantic-release.outputs.new_release_published == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e9274886f13407ee6a
+        with:
+          name: release-assets
+          path: |
+            CHANGELOG.md
+            package.json
+          retention-days: 90
+
+  slsa-provenance:
+    name: SLSA Provenance
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: semantic-release
+    if: needs.semantic-release.outputs.release_published == 'true'
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Generate SLSA provenance
+        uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.9.0
+        with:
+          base64-subjects: ${{ toJson([format('github.com/vessaxor-spec/The-Vex-Hospital@refs/tags/v{0}', needs.semantic-release.outputs.release_version)]) }}
+          provenance-name: vex-hospital-provenance
+          upload-assets: true
+
+  sigstore-sign:
+    name: Sigstore Signing & Attestation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: semantic-release
+    if: needs.semantic-release.outputs.release_published == 'true'
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@d7d6b8e7c8b8a8f8e8d8c8b8a8f8e8d8c8b8a8f8
+        with:
+          cosign-release: 'v2.4.1'
+
+      - name: Sign release artifacts with cosign (keyless)
+        run: |
+          VERSION="${{ needs.semantic-release.outputs.release_version }}"
+          cosign sign-blob \
+            --yes \
+            --bundle=bundle.json \
+            --output-signature=artifact.sig \
+            --output-certificate=artifact.pem \
+            CHANGELOG.md
+        env:
+          COSIGN_EXPERIMENTAL: 1
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0.19.1
+        with:
+          path: .
+          format: spdx-json
+          output-file: sbom.spdx.json
+
+      - name: Sign SBOM
+        run: |
+          cosign sign-blob \
+            --yes \
+            --bundle=sbom-bundle.json \
+            --output-signature=sbom.sig \
+            --output-certificate=sbom.pem \
+            sbom.spdx.json
+        env:
+          COSIGN_EXPERIMENTAL: 1
+
+      - name: Upload signed artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e9274886f13407ee6a
+        with:
+          name: signed-artifacts
+          path: |
+            CHANGELOG.md
+            CHANGELOG.md.sig
+            CHANGELOG.md.pem
+            bundle.json
+            sbom.spdx.json
+            sbom.spdx.json.sig
+            sbom.spdx.json.pem
+            sbom-bundle.json
+          retention-days: 90
+
+      - name: Generate attestation
+        run: |
+          cat > attestation.json <<EOF
+          {
+            "predicateType": "https://slsa.dev/provenance/v1",
+            "predicate": {
+              "buildType": "https://github.com/vessaxor-spec/The-Vex-Hospital@v1",
+              "builder": {
+                "id": "https://github.com/actions/runner"
+              },
+              "buildConfig": {
+                "source": {
+                  "repository": "https://github.com/vessaxor-spec/The-Vex-Hospital",
+                  "ref": "refs/heads/main",
+                  "commit": "${{ github.sha }}"
+                }
+              },
+              "materials": [
+                {"uri": "git+https://github.com/vessaxor-spec/The-Vex-Hospital", "digest": {"sha256": "${{ github.sha }}"}}
+              ]
+            }
+          }
+          EOF
+
+      - name: Submit attestation to GitHub
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: CHANGELOG.md
+          predicate-path: attestation.json
+
+  post-release:
+    name: Post-Release Notification
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [semantic-release, slsa-provenance, sigstore-sign]
+    if: always()
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Check release status
+        run: |
+          if [[ "${{ needs.semantic-release.result }}" == "success" ]]; then
+            echo "Release ${{ needs.semantic-release.outputs.release_version }} published successfully"
+          else
+            echo "::error::Release failed"
+            exit 1
+          fi
+
+      - name: Create release summary
+        if: success()
+        run: |
+          cat > release-summary.md <<EOF
+          # Release ${{ needs.semantic-release.outputs.release_version }}
+
+          ${{ needs.semantic-release.outputs.release_notes }}
+
+          ## Artifacts
+          - CHANGELOG.md (signed)
+          - SBOM (SPDX, signed)
+          - SLSA Provenance (Level 3)
+          - Sigstore Bundle
+
+          ## Verification
+          \`\`\`bash
+          # Verify cosign signature
+          cosign verify-blob --bundle=bundle.json CHANGELOG.md
+
+          # Verify SBOM
+          cosign verify-blob --bundle=sbom-bundle.json sbom.spdx.json
+          \`\`\`
+          EOF
+          cat release-summary.md
+        continue-on-error: true
+
+      - name: Post release summary to issue
+        if: success()
+        uses: actions/github-script@v7.0.1
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('release-summary.md', 'utf8');
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Release ${{ needs.semantic-release.outputs.release_version }}`,
+              body: summary,
+              labels: ['release', 'automated']
+            });
+        continue-on-error: true

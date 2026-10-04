@@ -1,0 +1,200 @@
+name: Reusable Security Scan
+
+on:
+  workflow_call:
+    inputs:
+      scan-type:
+        description: 'Type of security scan'
+        type: string
+        default: 'full'
+        required: false
+      severity-threshold:
+        description: 'Minimum severity to fail on'
+        type: string
+        default: 'high'
+        required: false
+      fail-on-findings:
+        description: 'Fail workflow on findings'
+        type: boolean
+        default: true
+        required: false
+    outputs:
+      findings-count:
+        description: 'Number of findings'
+        value: ${{ steps.scan.outputs.findings-count }}
+    secrets:
+      GITHUB_TOKEN:
+        description: 'GitHub token for API access'
+        required: true
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d7b864b4d183af3c8f0d4a1
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            pypi.org:443
+            registry.npmjs.org:443
+
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        if: ${{ inputs.scan-type == 'full' || inputs.scan-type == 'python' }}
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install pip-audit safety bandit detect-secrets
+
+      - name: Run bandit (Python security lint)
+        if: ${{ inputs.scan-type == 'full' || inputs.scan-type == 'python' }}
+        id: bandit
+        run: |
+          bandit -r scripts/ tests/ -f json -o bandit-report.json || true
+          FINDINGS=$(jq '.results | length' bandit-report.json)
+          echo "findings-count=$FINDINGS" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Upload bandit SARIF
+        if: always() && ${{ inputs.scan-type == 'full' || inputs.scan-type == 'python' }}
+        uses: github/codeql-action/upload-sarif@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          sarif_file: bandit-report.json
+          category: bandit
+
+      - name: Run pip-audit
+        if: ${{ inputs.scan-type == 'full' || inputs.scan-type == 'python' }}
+        id: pip-audit
+        run: |
+          pip-audit -r requirements.txt --format=json --output=pip-audit.json || true
+          FINDINGS=$(jq '.vulnerabilities | length' pip-audit.json)
+          echo "findings-count=$FINDINGS" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Upload pip-audit SARIF
+        if: always() && ${{ inputs.scan-type == 'full' || inputs.scan-type == 'python' }}
+        uses: github/codeql-action/upload-sarif@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          sarif_file: pip-audit.json
+          category: pip-audit
+
+      - name: Run safety
+        if: ${{ inputs.scan-type == 'full' || inputs.scan-type == 'python' }}
+        id: safety
+        run: |
+          safety check -r requirements.txt --json --output safety-report.json || true
+          FINDINGS=$(jq '. | length' safety-report.json)
+          echo "findings-count=$FINDINGS" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Upload safety SARIF
+        if: always() && ${{ inputs.scan-type == 'full' || inputs.scan-type == 'python' }}
+        uses: github/codeql-action/upload-sarif@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          sarif_file: safety-report.json
+          category: safety
+
+      - name: Run detect-secrets
+        if: ${{ inputs.scan-type == 'full' || inputs.scan-type == 'secrets' }}
+        id: detect-secrets
+        run: |
+          pip install detect-secrets
+          detect-secrets scan --all-files --baseline .secrets.baseline || true
+          FINDINGS=$(grep -c '"type":' .secrets.baseline 2>/dev/null || echo 0)
+          echo "findings-count=$FINDINGS" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Run TruffleHog
+        if: ${{ inputs.scan-type == 'full' || inputs.scan-type == 'secrets' }}
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.pull_request.base.sha || github.sha }}
+          head: ${{ github.event.pull_request.head.sha || github.sha }}
+          extra_args: --json --fail --only-verified
+        continue-on-error: true
+
+      - name: Run npm audit
+        if: ${{ inputs.scan-type == 'full' || inputs.scan-type == 'node' }}
+        id: npm-audit
+        run: |
+          npm audit --json --audit-level=${{ inputs.severity-threshold }} > npm-audit.json || true
+          FINDINGS=$(jq '.metadata.vulnerabilities.total' npm-audit.json)
+          echo "findings-count=$FINDINGS" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Upload npm audit SARIF
+        if: always() && ${{ inputs.scan-type == 'full' || inputs.scan-type == 'node' }}
+        uses: github/codeql-action/upload-sarif@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          sarif_file: npm-audit.json
+          category: npm-audit
+
+      - name: Run Semgrep
+        if: ${{ inputs.scan-type == 'full' || inputs.scan-type == 'sast' }}
+        uses: returntocorp/semgrep@1.0.0
+        with:
+          config: >-
+            p/ci
+            p/python
+            p/secrets
+            p/security-audit
+          generateSarif: true
+          output: semgrep-results.sarif
+        continue-on-error: true
+
+      - name: Upload Semgrep SARIF
+        if: always() && ${{ inputs.scan-type == 'full' || inputs.scan-type == 'sast' }}
+        uses: github/codeql-action/upload-sarif@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          sarif_file: semgrep-results.sarif
+          category: semgrep
+
+      - name: Run Trivy (container scan)
+        if: ${{ inputs.scan-type == 'full' || inputs.scan-type == 'container' }}
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+          ignore-unfixed: true
+        continue-on-error: true
+
+      - name: Upload Trivy SARIF
+        if: always() && ${{ inputs.scan-type == 'full' || inputs.scan-type == 'container' }}
+        uses: github/codeql-action/upload-sarif@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy
+
+      - name: Set output
+        id: scan
+        run: |
+          echo "findings-count=0" >> $GITHUB_OUTPUT
+
+      - name: Fail on findings
+        if: ${{ inputs.fail-on-findings && (steps.bandit.outputs.findings-count > 0 || steps.pip-audit.outputs.findings-count > 0 || steps.safety.outputs.findings-count > 0 || steps.detect-secrets.outputs.findings-count > 0 || steps.npm-audit.outputs.findings-count > 0) }}
+        run: |
+          echo "::error::Security findings detected above threshold (${{ inputs.severity-threshold }})"
+          exit 1

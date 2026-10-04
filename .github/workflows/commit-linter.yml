@@ -2,12 +2,18 @@ name: Commit Linter
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
-    branches:
-      - main
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
+  pull-requests: read
+
+concurrency:
+  group: commit-lint-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint:
@@ -15,24 +21,129 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d7b864b4d183af3c8f0d4a1
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            registry.npmjs.org:443
+            registry.yarnpkg.com:443
+
       - name: Checkout repository
-        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup Node
-        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
         with:
           node-version: "22"
           cache: npm
 
       - name: Install commitlint
-        run: npm ci --prefer-offline --no-audit 2>/dev/null || npm install -g @commitlint/cli @commitlint/config-conventional
+        run: |
+          npm ci --prefer-offline --no-audit --ignore-scripts 2>/dev/null || \
+          npm install -g @commitlint/cli@19.3.0 @commitlint/config-conventional@19.2.2 --ignore-scripts
+
+      - name: Validate commitlint config
+        run: npx commitlint --help > /dev/null
 
       - name: Lint commits
+        id: lint
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            npx commitlint --from=${{ github.base_ref }} --to=${{ github.head_ref }} --verbose
+            if [ -n "${{ github.base_ref }}" ]; then
+              npx commitlint --from="${{ github.base_ref }}" --to="${{ github.head_ref }}" --verbose
+            else
+              echo "::warning::Base ref not available, skipping PR commit lint"
+            fi
           else
             npx commitlint --from=HEAD~1 --to=HEAD --verbose
           fi
+        continue-on-error: false
+
+      - name: Lint all commits on main (push)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          npx commitlint --from=HEAD~50 --to=HEAD --verbose
+        continue-on-error: false
+
+      - name: Report lint results
+        if: always()
+        run: |
+          if [ "${{ steps.lint.outcome }}" == "failure" ]; then
+            echo "::error::Commit lint failed. Please fix commit messages to follow conventional commits format."
+            echo "See: https://www.conventionalcommits.org/en/v1.0.0/"
+            exit 1
+          else
+            echo "✅ All commit messages follow conventional commits format"
+          fi
+
+  validate-conventional:
+    name: Validate Conventional Commits
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    needs: lint
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install commitlint
+        run: npm ci --prefer-offline --no-audit --ignore-scripts 2>/dev/null || npm install -g @commitlint/cli@19.3.0 @commitlint/config-conventional@19.2.2 --ignore-scripts
+
+      - name: Check PR title
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          echo "PR Title: $TITLE"
+          if ! echo "$TITLE" | grep -qE '^(feat|fix|perf|refactor|docs|test|build|ci|chore|revert)(\(.+\))?: .+'; then
+            echo "::error::PR title must follow conventional commits format: <type>(<scope>): <description>"
+            echo "Example: feat(auth): add login endpoint"
+            exit 1
+          fi
+
+      - name: Check commit messages in PR
+        run: |
+          npx commitlint --from="${{ github.base_ref }}" --to="${{ github.head_ref }}" --verbose
+        continue-on-error: false
+
+      - name: Add PR label if conventional
+        if: success()
+        uses: actions/github-script@v7.0.1
+        with:
+          script: |
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              labels: ['conventional-commits']
+            });
+        continue-on-error: true
+
+      - name: Remove label if not conventional
+        if: failure()
+        uses: actions/github-script@v7.0.1
+        with:
+          script: |
+            await github.rest.issues.removeLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              name: 'conventional-commits'
+            });
+        continue-on-error: true

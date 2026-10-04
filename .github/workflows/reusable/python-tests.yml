@@ -1,0 +1,138 @@
+name: Reusable Python Tests
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: 'Python version to use'
+        type: string
+        default: '3.13'
+        required: false
+      cache-dependency-path:
+        description: 'Path to requirements file for caching'
+        type: string
+        default: 'requirements.txt'
+        required: false
+      test-path:
+        description: 'Path to test directory'
+        type: string
+        default: 'tests'
+        required: false
+      test-pattern:
+        description: 'Test file pattern'
+        type: string
+        default: 'test_*.py'
+        required: false
+      extra-args:
+        description: 'Extra pytest/unittest arguments'
+        type: string
+        default: '-v --buffer'
+        required: false
+    outputs:
+      test-result:
+        description: 'Test result (passed/failed)'
+        value: ${{ steps.run-tests.outputs.result }}
+    secrets:
+      PYPI_TOKEN:
+        description: 'PyPI token for publishing'
+        required: false
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  test:
+    name: Run Python Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d7b864b4d183af3c8f0d4a1
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            files.pythonhosted.org:443
+            github.com:443
+            pypi.org:443
+            test.pypi.org:443
+
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: pip
+          cache-dependency-path: ${{ inputs.cache-dependency-path }}
+          allow-prereleases: false
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --no-cache-dir -r ${{ inputs.cache-dependency-path }}
+          python -m pip install --no-cache-dir pytest pytest-cov hypothesis
+        env:
+          PIP_DISABLE_PIP_VERSION_CHECK: 1
+          PIP_NO_CACHE_DIR: 0
+
+      - name: Run tests
+        id: run-tests
+        run: |
+          set +e
+          python -m pytest ${{ inputs.test-path }} \
+            -k "${{ inputs.test-pattern }}" \
+            ${{ inputs.extra-args }} \
+            --tb=short \
+            --junitxml=test-results.xml \
+            --cov=scripts --cov=tests \
+            --cov-report=xml:coverage.xml \
+            --cov-report=term-missing
+          TEST_EXIT_CODE=$?
+          if [ $TEST_EXIT_CODE -eq 0 ]; then
+            echo "result=passed" >> $GITHUB_OUTPUT
+          else
+            echo "result=failed" >> $GITHUB_OUTPUT
+          fi
+          exit $TEST_EXIT_CODE
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+          PYTHONHASHSEED: random
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e9274886f13407ee6a
+        with:
+          name: test-results
+          path: test-results.xml
+          retention-days: 30
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e9274886f13407ee6a
+        with:
+          name: coverage-report
+          path: coverage.xml
+          retention-days: 30
+
+      - name: Upload coverage to Codecov
+        if: always() && github.event_name != 'pull_request'
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+          flags: unittests
+          fail_ci_if_error: false
+        continue-on-error: true
+
+      - name: Upload SARIF (if any)
+        if: always()
+        uses: github/codeql-action/upload-sarif@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          sarif_file: bandit-report.json
+          category: bandit
+        continue-on-error: true

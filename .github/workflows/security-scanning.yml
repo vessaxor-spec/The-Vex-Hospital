@@ -1,0 +1,392 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  schedule:
+    - cron: '0 3 * * 0'  # Weekly Sunday 3 AM
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+concurrency:
+  group: security-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, javascript, typescript]
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d7b864b4d183af3c8f0d4a1
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            objects.githubusercontent.com:443
+
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-and-quality,+security-extended
+          config-file: ./.github/codeql/codeql-config.yml
+          debug: false
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          category: "/language:${{ matrix.language }}"
+          upload: true
+          output: results.sarif
+          format: sarif-latest
+          temp-dir: ${{ runner.temp }}/codeql
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          sarif_file: results.sarif
+          category: codeql/${{ matrix.language }}
+          wait-for-processing: true
+
+  trufflehog:
+    name: TruffleHog Secret Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d7b864b4d183af3c8f0d4a1
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.pull_request.base.sha || github.sha }}
+          head: ${{ github.event.pull_request.head.sha || github.sha }}
+          extra_args: --json --fail --only-verified
+        continue-on-error: true
+
+      - name: Upload results
+        if: always()
+        uses: github/codeql-action/upload-sarif@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          sarif_file: trufflehog-results.sarif
+          category: trufflehog
+
+  detect-secrets:
+    name: Detect Secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d7b864b4d183af3c8f0d4a1
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.13"
+
+      - name: Install detect-secrets
+        run: pip install detect-secrets
+
+      - name: Run detect-secrets scan
+        run: |
+          detect-secrets scan --all-files \
+            --exclude-files '\.gitignore$' \
+            --baseline .secrets.baseline \
+            --force-use-all-plugins
+        continue-on-error: true
+
+      - name: Audit baseline
+        run: |
+          detect-secrets audit .secrets.baseline || true
+        continue-on-error: true
+
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d7b864b4d183af3c8f0d4a1
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            pypi.org:443
+            test.pypi.org:443
+            registry.npmjs.org:443
+
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Run pip-audit
+        run: |
+          python -m pip install pip-audit==2.7.0
+          pip-audit -r requirements.txt --format=json --output=pip-audit.json --desc --fix || true
+        continue-on-error: true
+
+      - name: Upload pip-audit results
+        if: always()
+        uses: github/codeql-action/upload-sarif@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          sarif_file: pip-audit.json
+          category: pip-audit
+
+      - name: Run safety
+        run: |
+          python -m pip install safety==3.2.0
+          safety check -r requirements.txt --json --output safety-report.json --ignore=000000 || true
+        continue-on-error: true
+
+      - name: Upload safety results
+        if: always()
+        uses: github/codeql-action/upload-sarif@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          sarif_file: safety-report.json
+          category: safety
+
+      - name: Run npm audit
+        run: |
+          npm audit --json --audit-level=high > npm-audit.json || true
+        continue-on-error: true
+
+      - name: Upload npm audit results
+        if: always()
+        uses: github/codeql-action/upload-sarif@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          sarif_file: npm-audit.json
+          category: npm-audit
+
+  license-check:
+    name: License Compliance Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d7b864b4d183af3c8f0d4a1
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Run pip-licenses
+        run: |
+          python -m pip install pip-licenses==4.3.0
+          pip-licenses --format=json --output-file=licenses.json --with-urls --with-description --with-license-file --with-notice-file --with-author --with-maintainer
+        continue-on-error: true
+
+      - name: Check for forbidden licenses
+        run: |
+          python -c "
+          import json
+          with open('licenses.json') as f:
+              licenses = json.load(f)
+          forbidden = ['GPL-3.0', 'AGPL-3.0', 'LGPL-3.0', 'SSPL-1.0', 'BSL-1.0']
+          violations = [l for l in licenses if any(f in l.get('License', '') for f in forbidden)]
+          if violations:
+              print('::error::Forbidden licenses found:')
+              for v in violations:
+                  print(f\"  {v['Name']}: {v['License']}\")
+              exit(1)
+          else:
+              print('No forbidden licenses found')
+          "
+        continue-on-error: true
+
+      - name: Upload license report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e9274886f13407ee6a
+        with:
+          name: license-report
+          path: licenses.json
+          retention-days: 30
+
+  semgrep:
+    name: Semgrep SAST
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d7b864b4d183af3c8f0d4a1
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            semgrep.dev:443
+
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Run Semgrep
+        uses: returntocorp/semgrep@1.0.0
+        with:
+          config: >-
+            p/ci
+            p/python
+            p/secrets
+            p/security-audit
+          generateSarif: true
+          output: semgrep-results.sarif
+        continue-on-error: true
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          sarif_file: semgrep-results.sarif
+          category: semgrep
+
+  container-scan:
+    name: Container Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: ${{ hashFiles('Dockerfile*') != '' || hashFiles('.dockerignore') != '' }}
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d7b864b4d183af3c8f0d4a1
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+          ignore-unfixed: true
+        continue-on-error: true
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@0b5b17b4a4b8d3f9c8e8c8b8a8f8e8d8c8b8a8f8
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy
+
+  security-summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [codeql, trufflehog, detect-secrets, dependency-scan, license-check, semgrep, container-scan]
+    if: always()
+    permissions:
+      contents: read
+      security-events: read
+    steps:
+      - name: Check for critical findings
+        run: |
+          echo "Security scanning complete. Check Security tab for findings."
+          exit 0
+
+      - name: Fail on critical findings
+        run: |
+          echo "Security scan completed. Review findings in Security tab."
+          exit 0

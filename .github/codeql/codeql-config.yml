@@ -1,0 +1,44 @@
+name: "Vex Hospital CodeQL Config"
+
+disable-default-queries: false
+
+queries:
+  - uses: security-and-quality
+  - uses: security-extended
+
+paths-ignore:
+  - ".venv"
+  - "__pycache__"
+  - ".hypothesis"
+  - "*.pyc"
+  - ".pytest_cache"
+  - ".venv/**"
+  - "tests/__pycache__/**"
+  - "scripts/__pycache__/**"
+  - "live_trials/__pycache__/**"
+  - "live_trials/adapters/__pycache__/**"
+  - ".github/**"
+  - "node_modules/**"
+  - ".git/**"
+
+paths:
+  - "scripts/**"
+  - "tests/**"
+  - "protocol/**"
+  - "specialists/**"
+  - "playbooks/**"
+  - "evals/**"
+  - "live_trials/**"
+  - "templates/**"
+  - "privacy/**"
+  - "identity/**"
+  - "evidence/**"
+
+packs:
+  - githubsecuritylab/codeql-python-queries
+  - githubsecuritylab/codeql-javascript-queries
+
+severity-thresholds:
+  error: high
+  warning: medium
+  note: low

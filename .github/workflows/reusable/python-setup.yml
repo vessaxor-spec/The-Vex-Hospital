@@ -1,0 +1,84 @@
+name: Reusable Python Setup
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: 'Python version to use'
+        type: string
+        default: '3.13'
+        required: false
+      cache-dependency-path:
+        description: 'Path to requirements file for caching'
+        type: string
+        default: 'requirements.txt'
+        required: false
+      install-dev-deps:
+        description: 'Whether to install development dependencies'
+        type: boolean
+        default: false
+        required: false
+    outputs:
+      python-version:
+        description: 'Python version used'
+        value: ${{ steps.setup-python.outputs.python-version }}
+    secrets:
+      PYPI_TOKEN:
+        description: 'PyPI token for publishing'
+        required: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  setup:
+    name: Setup Python Environment
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d7b864b4d183af3c8f0d4a1
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            files.pythonhosted.org:443
+            github.com:443
+            pypi.org:443
+            test.pypi.org:443
+
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Python
+        id: setup-python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: pip
+          cache-dependency-path: ${{ inputs.cache-dependency-path }}
+          allow-prereleases: false
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --no-cache-dir -r ${{ inputs.cache-dependency-path }}
+          if [ "${{ inputs.install-dev-deps }}" = "true" ]; then
+            python -m pip install --no-cache-dir -r requirements-dev.txt 2>/dev/null || true
+          fi
+        env:
+          PIP_DISABLE_PIP_VERSION_CHECK: 1
+          PIP_NO_CACHE_DIR: 0
+
+      - name: Verify environment
+        run: |
+          python -c "
+          import sys
+          print(f'Python: {sys.version}')
+          import yaml, jsonschema, hypothesis, ruff, mypy
+          print('All critical dependencies available')
+          "

@@ -31,3 +31,8 @@ build/
 
 # Logs
 *.log
+
+# Node
+node_modules/
+npm-debug.log*
+node_modules/
