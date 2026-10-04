@@ -71,10 +71,11 @@ jobs:
           COMMIT_COUNT=$(git rev-list --count HEAD)
           if [ "$COMMIT_COUNT" -gt 50 ]; then
             FROM_COMMIT=$(git rev-list --max-count=50 HEAD | tail -1)
+            npx commitlint --from="${FROM_COMMIT}" --to=HEAD --verbose
           else
-            FROM_COMMIT=$(git rev-list --max-parents=0 HEAD)
+            ROOT_COMMIT=$(git rev-list --max-parents=0 HEAD)
+            npx commitlint --from="${ROOT_COMMIT}" --to=HEAD --verbose
           fi
-          npx commitlint --from="${FROM_COMMIT}"..HEAD --verbose
         continue-on-error: false
 
       - name: Report lint results
