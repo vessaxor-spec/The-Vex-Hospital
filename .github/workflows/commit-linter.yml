@@ -68,7 +68,13 @@ jobs:
       - name: Lint all commits on main (push)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          npx commitlint --from=HEAD~50 --to=HEAD --verbose
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          if [ "$COMMIT_COUNT" -gt 50 ]; then
+            FROM_COMMIT=$(git rev-list --max-count=50 HEAD | tail -1)
+          else
+            FROM_COMMIT=$(git rev-list --max-parents=0 HEAD)
+          fi
+          npx commitlint --from="${FROM_COMMIT}"..HEAD --verbose
         continue-on-error: false
 
       - name: Report lint results
