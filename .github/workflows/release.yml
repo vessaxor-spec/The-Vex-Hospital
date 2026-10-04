@@ -23,15 +23,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+      - name: Setup Node.js
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
         with:
-          python-version: "3.13"
-          cache: pip
-          cache-dependency-path: requirements.txt
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package.json
 
       - name: Install dependencies
-        run: python -m pip install -r requirements.txt
+        run: npm ci
 
       - name: Configure Git
         run: |
@@ -39,7 +39,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Run semantic-release
-        uses: cycjimmy/semantic-release-action@4e0b5d9f5d4a1c8b8f8e8d8c8b8a8f8e8d8c8b8a # v4
+        uses: cycjimmy/semantic-release-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
