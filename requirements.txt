@@ -4,4 +4,5 @@ ruff==0.16.10
 mypy==1.11.2
 hypothesis==6.100.0
 ollama==0.4.2
-sigstore==3.6.7# cache-bust Sun Oct  4 08:44:56 PM CEST 2026
+sigstore==3.6.7
+# cache-bust
