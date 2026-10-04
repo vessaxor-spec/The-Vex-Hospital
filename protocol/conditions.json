@@ -268,14 +268,6 @@
     }
   },
   "conditions": {
-    "authorized_operator_cancels_case": {
-      "fact": "operator_cancelled",
-      "equals": true
-    },
-    "nonwaivable_safety_or_authority_condition_prevents_continuation": {
-      "fact": "nonwaivable_blocker",
-      "equals": true
-    },
     "containment_needed": {
       "fact": "containment_required",
       "equals": true
@@ -286,27 +278,9 @@
         "equals": true
       }
     },
-    "safe_to_observe": {
-      "fact": "safe_to_observe",
-      "equals": true
-    },
     "baseline_sufficient": {
       "fact": "baseline_sufficient",
       "equals": true
-    },
-    "cannot_reproduce_and_no_other_sufficient_evidence": {
-      "all": [
-        {
-          "fact": "reproduction_failed",
-          "equals": true
-        },
-        {
-          "not": {
-            "fact": "other_sufficient_evidence",
-            "equals": true
-          }
-        }
-      ]
     },
     "safe_baseline_impossible": {
       "not": {
@@ -317,22 +291,6 @@
     "authority_envelope_established": {
       "fact": "authority_envelope_established",
       "equals": true
-    },
-    "authority_or_objective_is_unsafe_or_out_of_scope": {
-      "any": [
-        {
-          "not": {
-            "fact": "objective_safe",
-            "equals": true
-          }
-        },
-        {
-          "not": {
-            "fact": "objective_in_scope",
-            "equals": true
-          }
-        }
-      ]
     },
     "required_authority_facts_unavailable": {
       "not": {
@@ -366,6 +324,64 @@
         }
       ]
     },
+    "treatment_evidence_invalidates_diagnosis_and_safe_checkpoint_restored": {
+      "all": [
+        {
+          "fact": "treatment_evidence_invalidates_diagnosis",
+          "equals": true
+        },
+        {
+          "fact": "safe_checkpoint_restored",
+          "equals": true
+        }
+      ]
+    },
+    "discharge_review_invalidates_root_cause_confidence": {
+      "fact": "root_cause_confidence_invalidated",
+      "equals": true
+    },
+    "authorized_operator_cancels_case": {
+      "fact": "operator_cancelled",
+      "equals": true
+    },
+    "nonwaivable_safety_or_authority_condition_prevents_continuation": {
+      "fact": "nonwaivable_blocker",
+      "equals": true
+    },
+    "safe_to_observe": {
+      "fact": "safe_to_observe",
+      "equals": true
+    },
+    "cannot_reproduce_and_no_other_sufficient_evidence": {
+      "all": [
+        {
+          "fact": "reproduction_failed",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "other_sufficient_evidence",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "authority_or_objective_is_unsafe_or_out_of_scope": {
+      "any": [
+        {
+          "not": {
+            "fact": "objective_safe",
+            "equals": true
+          }
+        },
+        {
+          "not": {
+            "fact": "objective_in_scope",
+            "equals": true
+          }
+        }
+      ]
+    },
     "specialist_competence_required": {
       "not": {
         "fact": "current_competence_sufficient",
@@ -381,6 +397,140 @@
         "fact": "safe_treatment_designable",
         "equals": true
       }
+    },
+    "treatment_exceeds_authorized_blast_radius_or_safety_boundary": {
+      "any": [
+        {
+          "fact": "blast_radius_exceeded",
+          "equals": true
+        },
+        {
+          "fact": "safety_boundary_exceeded",
+          "equals": true
+        }
+      ]
+    },
+    "additional_verification_not_required": {
+      "all": [
+        {
+          "not": {
+            "fact": "independent_verification_required",
+            "equals": true
+          }
+        },
+        {
+          "not": {
+            "fact": "adversarial_verification_required",
+            "equals": true
+          }
+        },
+        {
+          "not": {
+            "fact": "resilience_verification_required",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "self_test_failure_invalidates_diagnosis": {
+      "all": [
+        {
+          "fact": "self_test_failed",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_invalidated",
+          "equals": true
+        }
+      ]
+    },
+    "some_required_recovery_conditions_remain_unmet": {
+      "fact": "required_recovery_conditions_unmet",
+      "equals": true
+    },
+    "residual_risk_exceeds_current_authority_or_competence": {
+      "any": [
+        {
+          "fact": "residual_risk_exceeds_authority",
+          "equals": true
+        },
+        {
+          "fact": "residual_risk_exceeds_competence",
+          "equals": true
+        }
+      ]
+    },
+    "required_capabilities_preserved_and_no_blocking_regression": {
+      "all": [
+        {
+          "fact": "required_capabilities_preserved",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "blocking_regression_present",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "regression_or_capability_loss_invalidates_diagnosis": {
+      "all": [
+        {
+          "any": [
+            {
+              "fact": "regression_found",
+              "equals": true
+            },
+            {
+              "fact": "required_capability_loss",
+              "equals": true
+            }
+          ]
+        },
+        {
+          "fact": "diagnosis_invalidated",
+          "equals": true
+        }
+      ]
+    },
+    "material_recovery_with_known_unresolved_noncritical_conditions": {
+      "all": [
+        {
+          "fact": "material_recovery",
+          "equals": true
+        },
+        {
+          "fact": "unresolved_noncritical_conditions",
+          "equals": true
+        }
+      ]
+    },
+    "all_required_evidence_satisfied_and_no_blocking_residual_risk": {
+      "all": [
+        {
+          "fact": "required_evidence_satisfied",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "blocking_residual_risk",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "recovery_satisfied_but_observation_required": {
+      "all": [
+        {
+          "fact": "recovery_requirements_satisfied",
+          "equals": true
+        },
+        {
+          "fact": "observation_required",
+          "equals": true
+        }
+      ]
     },
     "explicit_authorization_required_and_not_already_scoped": {
       "all": [
@@ -442,18 +592,6 @@
       "fact": "authorization_denied_or_unavailable",
       "equals": true
     },
-    "authorized_treatment_completed_within_scope": {
-      "all": [
-        {
-          "fact": "treatment_completed",
-          "equals": true
-        },
-        {
-          "fact": "treatment_within_authorized_scope",
-          "equals": true
-        }
-      ]
-    },
     "treatment_incomplete_but_diagnosis_remains_valid_and_safe_checkpoint_restored_and_retry_budget_available": {
       "all": [
         {
@@ -474,30 +612,6 @@
         }
       ]
     },
-    "treatment_evidence_invalidates_diagnosis_and_safe_checkpoint_restored": {
-      "all": [
-        {
-          "fact": "treatment_evidence_invalidates_diagnosis",
-          "equals": true
-        },
-        {
-          "fact": "safe_checkpoint_restored",
-          "equals": true
-        }
-      ]
-    },
-    "treatment_exceeds_authorized_blast_radius_or_safety_boundary": {
-      "any": [
-        {
-          "fact": "blast_radius_exceeded",
-          "equals": true
-        },
-        {
-          "fact": "safety_boundary_exceeded",
-          "equals": true
-        }
-      ]
-    },
     "treatment_cannot_be_completed_or_safely_recovered_or_no_authorized_retry_remains": {
       "any": [
         {
@@ -513,6 +627,180 @@
         {
           "not": {
             "fact": "authorized_retry_remains",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "authorized_treatment_completed_within_scope": {
+      "all": [
+        {
+          "fact": "treatment_completed",
+          "equals": true
+        },
+        {
+          "fact": "treatment_within_authorized_scope",
+          "equals": true
+        }
+      ]
+    },
+    "self_test_fails_but_diagnosis_remains_valid_and_retry_budget_available": {
+      "all": [
+        {
+          "fact": "self_test_failed",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_valid",
+          "equals": true
+        },
+        {
+          "fact": "retry_budget_available",
+          "equals": true
+        }
+      ]
+    },
+    "self_test_fails_and_no_safe_authorized_retry_remains": {
+      "all": [
+        {
+          "fact": "self_test_failed",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "safe_authorized_retry_available",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "independent_verification_fails_but_diagnosis_remains_valid_and_retry_budget_available": {
+      "all": [
+        {
+          "fact": "independent_verification_failed",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_valid",
+          "equals": true
+        },
+        {
+          "fact": "retry_budget_available",
+          "equals": true
+        }
+      ]
+    },
+    "independent_verification_fails_and_no_safe_authorized_retry_remains": {
+      "all": [
+        {
+          "fact": "independent_verification_failed",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "safe_authorized_retry_available",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "adversarial_verification_fails_but_diagnosis_remains_valid_and_retry_budget_available": {
+      "all": [
+        {
+          "fact": "adversarial_verification_failed",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_valid",
+          "equals": true
+        },
+        {
+          "fact": "retry_budget_available",
+          "equals": true
+        }
+      ]
+    },
+    "adversarial_verification_fails_and_no_safe_authorized_retry_remains": {
+      "all": [
+        {
+          "fact": "adversarial_verification_failed",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "safe_authorized_retry_available",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "resilience_verification_fails_but_diagnosis_remains_valid_and_retry_budget_available": {
+      "all": [
+        {
+          "fact": "resilience_verification_failed",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_valid",
+          "equals": true
+        },
+        {
+          "fact": "retry_budget_available",
+          "equals": true
+        }
+      ]
+    },
+    "resilience_verification_fails_and_no_safe_authorized_retry_remains": {
+      "all": [
+        {
+          "fact": "resilience_verification_failed",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "safe_authorized_retry_available",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "regression_found_but_diagnosis_remains_valid_and_safe_retry_budget_available": {
+      "all": [
+        {
+          "fact": "regression_found",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_valid",
+          "equals": true
+        },
+        {
+          "fact": "safe_retry_available",
+          "equals": true
+        },
+        {
+          "fact": "retry_budget_available",
+          "equals": true
+        }
+      ]
+    },
+    "blocking_regression_or_required_capability_loss_and_no_safe_authorized_retry_remains": {
+      "all": [
+        {
+          "any": [
+            {
+              "fact": "blocking_regression_present",
+              "equals": true
+            },
+            {
+              "fact": "required_capability_loss",
+              "equals": true
+            }
+          ]
+        },
+        {
+          "not": {
+            "fact": "safe_authorized_retry_available",
             "equals": true
           }
         }
@@ -559,70 +847,6 @@
         {
           "not": {
             "fact": "adversarial_verification_required",
-            "equals": true
-          }
-        }
-      ]
-    },
-    "additional_verification_not_required": {
-      "all": [
-        {
-          "not": {
-            "fact": "independent_verification_required",
-            "equals": true
-          }
-        },
-        {
-          "not": {
-            "fact": "adversarial_verification_required",
-            "equals": true
-          }
-        },
-        {
-          "not": {
-            "fact": "resilience_verification_required",
-            "equals": true
-          }
-        }
-      ]
-    },
-    "self_test_fails_but_diagnosis_remains_valid_and_retry_budget_available": {
-      "all": [
-        {
-          "fact": "self_test_failed",
-          "equals": true
-        },
-        {
-          "fact": "diagnosis_valid",
-          "equals": true
-        },
-        {
-          "fact": "retry_budget_available",
-          "equals": true
-        }
-      ]
-    },
-    "self_test_failure_invalidates_diagnosis": {
-      "all": [
-        {
-          "fact": "self_test_failed",
-          "equals": true
-        },
-        {
-          "fact": "diagnosis_invalidated",
-          "equals": true
-        }
-      ]
-    },
-    "self_test_fails_and_no_safe_authorized_retry_remains": {
-      "all": [
-        {
-          "fact": "self_test_failed",
-          "equals": true
-        },
-        {
-          "not": {
-            "fact": "safe_authorized_retry_available",
             "equals": true
           }
         }
@@ -678,22 +902,6 @@
         }
       ]
     },
-    "independent_verification_fails_but_diagnosis_remains_valid_and_retry_budget_available": {
-      "all": [
-        {
-          "fact": "independent_verification_failed",
-          "equals": true
-        },
-        {
-          "fact": "diagnosis_valid",
-          "equals": true
-        },
-        {
-          "fact": "retry_budget_available",
-          "equals": true
-        }
-      ]
-    },
     "independent_verification_failure_invalidates_diagnosis": {
       "all": [
         {
@@ -703,20 +911,6 @@
         {
           "fact": "diagnosis_invalidated",
           "equals": true
-        }
-      ]
-    },
-    "independent_verification_fails_and_no_safe_authorized_retry_remains": {
-      "all": [
-        {
-          "fact": "independent_verification_failed",
-          "equals": true
-        },
-        {
-          "not": {
-            "fact": "safe_authorized_retry_available",
-            "equals": true
-          }
         }
       ]
     },
@@ -760,22 +954,6 @@
         }
       ]
     },
-    "adversarial_verification_fails_but_diagnosis_remains_valid_and_retry_budget_available": {
-      "all": [
-        {
-          "fact": "adversarial_verification_failed",
-          "equals": true
-        },
-        {
-          "fact": "diagnosis_valid",
-          "equals": true
-        },
-        {
-          "fact": "retry_budget_available",
-          "equals": true
-        }
-      ]
-    },
     "adversarial_verification_failure_invalidates_diagnosis": {
       "all": [
         {
@@ -788,39 +966,9 @@
         }
       ]
     },
-    "adversarial_verification_fails_and_no_safe_authorized_retry_remains": {
-      "all": [
-        {
-          "fact": "adversarial_verification_failed",
-          "equals": true
-        },
-        {
-          "not": {
-            "fact": "safe_authorized_retry_available",
-            "equals": true
-          }
-        }
-      ]
-    },
     "resilience_verification_passed": {
       "fact": "resilience_verification_passed",
       "equals": true
-    },
-    "resilience_verification_fails_but_diagnosis_remains_valid_and_retry_budget_available": {
-      "all": [
-        {
-          "fact": "resilience_verification_failed",
-          "equals": true
-        },
-        {
-          "fact": "diagnosis_valid",
-          "equals": true
-        },
-        {
-          "fact": "retry_budget_available",
-          "equals": true
-        }
-      ]
     },
     "resilience_verification_failure_invalidates_diagnosis": {
       "all": [
@@ -830,154 +978,6 @@
         },
         {
           "fact": "diagnosis_invalidated",
-          "equals": true
-        }
-      ]
-    },
-    "resilience_verification_fails_and_no_safe_authorized_retry_remains": {
-      "all": [
-        {
-          "fact": "resilience_verification_failed",
-          "equals": true
-        },
-        {
-          "not": {
-            "fact": "safe_authorized_retry_available",
-            "equals": true
-          }
-        }
-      ]
-    },
-    "required_capabilities_preserved_and_no_blocking_regression": {
-      "all": [
-        {
-          "fact": "required_capabilities_preserved",
-          "equals": true
-        },
-        {
-          "not": {
-            "fact": "blocking_regression_present",
-            "equals": true
-          }
-        }
-      ]
-    },
-    "regression_found_but_diagnosis_remains_valid_and_safe_retry_budget_available": {
-      "all": [
-        {
-          "fact": "regression_found",
-          "equals": true
-        },
-        {
-          "fact": "diagnosis_valid",
-          "equals": true
-        },
-        {
-          "fact": "safe_retry_available",
-          "equals": true
-        },
-        {
-          "fact": "retry_budget_available",
-          "equals": true
-        }
-      ]
-    },
-    "regression_or_capability_loss_invalidates_diagnosis": {
-      "all": [
-        {
-          "any": [
-            {
-              "fact": "regression_found",
-              "equals": true
-            },
-            {
-              "fact": "required_capability_loss",
-              "equals": true
-            }
-          ]
-        },
-        {
-          "fact": "diagnosis_invalidated",
-          "equals": true
-        }
-      ]
-    },
-    "material_recovery_with_known_unresolved_noncritical_conditions": {
-      "all": [
-        {
-          "fact": "material_recovery",
-          "equals": true
-        },
-        {
-          "fact": "unresolved_noncritical_conditions",
-          "equals": true
-        }
-      ]
-    },
-    "blocking_regression_or_required_capability_loss_and_no_safe_authorized_retry_remains": {
-      "all": [
-        {
-          "any": [
-            {
-              "fact": "blocking_regression_present",
-              "equals": true
-            },
-            {
-              "fact": "required_capability_loss",
-              "equals": true
-            }
-          ]
-        },
-        {
-          "not": {
-            "fact": "safe_authorized_retry_available",
-            "equals": true
-          }
-        }
-      ]
-    },
-    "all_required_evidence_satisfied_and_no_blocking_residual_risk": {
-      "all": [
-        {
-          "fact": "required_evidence_satisfied",
-          "equals": true
-        },
-        {
-          "not": {
-            "fact": "blocking_residual_risk",
-            "equals": true
-          }
-        }
-      ]
-    },
-    "recovery_satisfied_but_observation_required": {
-      "all": [
-        {
-          "fact": "recovery_requirements_satisfied",
-          "equals": true
-        },
-        {
-          "fact": "observation_required",
-          "equals": true
-        }
-      ]
-    },
-    "some_required_recovery_conditions_remain_unmet": {
-      "fact": "required_recovery_conditions_unmet",
-      "equals": true
-    },
-    "discharge_review_invalidates_root_cause_confidence": {
-      "fact": "root_cause_confidence_invalidated",
-      "equals": true
-    },
-    "residual_risk_exceeds_current_authority_or_competence": {
-      "any": [
-        {
-          "fact": "residual_risk_exceeds_authority",
-          "equals": true
-        },
-        {
-          "fact": "residual_risk_exceeds_competence",
           "equals": true
         }
       ]

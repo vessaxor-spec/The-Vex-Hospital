@@ -1,0 +1,12 @@
+{
+  "conditions": {
+    "authorized_operator_cancels_case": {
+      "fact": "operator_cancelled",
+      "equals": true
+    },
+    "nonwaivable_safety_or_authority_condition_prevents_continuation": {
+      "fact": "nonwaivable_blocker",
+      "equals": true
+    }
+  }
+}

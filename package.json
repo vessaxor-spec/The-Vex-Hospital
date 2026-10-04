@@ -1,0 +1,22 @@
+{
+  "name": "vex-hospital",
+  "version": "2.0.0",
+  "description": "Vex Hospital - AI Clinical Recovery Protocol",
+  "private": true,
+  "scripts": {
+    "lint:commits": "commitlint --from=HEAD~1 --to=HEAD",
+    "release": "semantic-release"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "@semantic-release/changelog": "^6.0.0",
+    "@semantic-release/git": "^10.0.0",
+    "@semantic-release/github": "^10.0.0",
+    "@semantic-release/release-notes-generator": "^6.0.0",
+    "semantic-release": "^24.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

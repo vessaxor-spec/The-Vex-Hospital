@@ -1,0 +1,116 @@
+{
+  "conditions": {
+    "safe_to_observe": {
+      "fact": "safe_to_observe",
+      "equals": true
+    },
+    "cannot_reproduce_and_no_other_sufficient_evidence": {
+      "all": [
+        {
+          "fact": "reproduction_failed",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "other_sufficient_evidence",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "authority_or_objective_is_unsafe_or_out_of_scope": {
+      "any": [
+        {
+          "not": {
+            "fact": "objective_safe",
+            "equals": true
+          }
+        },
+        {
+          "not": {
+            "fact": "objective_in_scope",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "specialist_competence_required": {
+      "not": {
+        "fact": "current_competence_sufficient",
+        "equals": true
+      }
+    },
+    "bounded_treatment_can_be_designed": {
+      "fact": "bounded_treatment_designable",
+      "equals": true
+    },
+    "safe_treatment_cannot_be_designed": {
+      "not": {
+        "fact": "safe_treatment_designable",
+        "equals": true
+      }
+    },
+    "treatment_exceeds_authorized_blast_radius_or_safety_boundary": {
+      "any": [
+        {
+          "fact": "blast_radius_exceeded",
+          "equals": true
+        },
+        {
+          "fact": "safety_boundary_exceeded",
+          "equals": true
+        }
+      ]
+    },
+    "additional_verification_not_required": {
+      "all": [
+        {
+          "not": {
+            "fact": "independent_verification_required",
+            "equals": true
+          }
+        },
+        {
+          "not": {
+            "fact": "adversarial_verification_required",
+            "equals": true
+          }
+        },
+        {
+          "not": {
+            "fact": "resilience_verification_required",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "self_test_failure_invalidates_diagnosis": {
+      "all": [
+        {
+          "fact": "self_test_failed",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_invalidated",
+          "equals": true
+        }
+      ]
+    },
+    "some_required_recovery_conditions_remain_unmet": {
+      "fact": "required_recovery_conditions_unmet",
+      "equals": true
+    },
+    "residual_risk_exceeds_current_authority_or_competence": {
+      "any": [
+        {
+          "fact": "residual_risk_exceeds_authority",
+          "equals": true
+        },
+        {
+          "fact": "residual_risk_exceeds_competence",
+          "equals": true
+        }
+      ]
+    }
+  }
+}

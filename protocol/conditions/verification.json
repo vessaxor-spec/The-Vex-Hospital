@@ -1,0 +1,180 @@
+{
+  "conditions": {
+    "independent_verification_required_or_selected": {
+      "any": [
+        {
+          "fact": "independent_verification_required",
+          "equals": true
+        },
+        {
+          "fact": "independent_verification_selected",
+          "equals": true
+        }
+      ]
+    },
+    "independent_verification_not_required_and_adversarial_required": {
+      "all": [
+        {
+          "not": {
+            "fact": "independent_verification_required",
+            "equals": true
+          }
+        },
+        {
+          "fact": "adversarial_verification_required",
+          "equals": true
+        }
+      ]
+    },
+    "only_resilience_verification_required_next": {
+      "all": [
+        {
+          "fact": "resilience_verification_required",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "independent_verification_required",
+            "equals": true
+          }
+        },
+        {
+          "not": {
+            "fact": "adversarial_verification_required",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "independent_verification_passed_and_adversarial_required": {
+      "all": [
+        {
+          "fact": "independent_verification_passed",
+          "equals": true
+        },
+        {
+          "fact": "adversarial_verification_required",
+          "equals": true
+        }
+      ]
+    },
+    "independent_verification_passed_and_resilience_required_next": {
+      "all": [
+        {
+          "fact": "independent_verification_passed",
+          "equals": true
+        },
+        {
+          "fact": "resilience_verification_required",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "adversarial_verification_required",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "independent_verification_passed_and_no_additional_verification_required": {
+      "all": [
+        {
+          "fact": "independent_verification_passed",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "adversarial_verification_required",
+            "equals": true
+          }
+        },
+        {
+          "not": {
+            "fact": "resilience_verification_required",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "independent_verification_failure_invalidates_diagnosis": {
+      "all": [
+        {
+          "fact": "independent_verification_failed",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_invalidated",
+          "equals": true
+        }
+      ]
+    },
+    "required_independent_verification_unavailable": {
+      "all": [
+        {
+          "fact": "independent_verification_required",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "independent_verification_available",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "adversarial_verification_passed_and_resilience_required": {
+      "all": [
+        {
+          "fact": "adversarial_verification_passed",
+          "equals": true
+        },
+        {
+          "fact": "resilience_verification_required",
+          "equals": true
+        }
+      ]
+    },
+    "adversarial_verification_passed_and_resilience_not_required": {
+      "all": [
+        {
+          "fact": "adversarial_verification_passed",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "resilience_verification_required",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "adversarial_verification_failure_invalidates_diagnosis": {
+      "all": [
+        {
+          "fact": "adversarial_verification_failed",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_invalidated",
+          "equals": true
+        }
+      ]
+    },
+    "resilience_verification_passed": {
+      "fact": "resilience_verification_passed",
+      "equals": true
+    },
+    "resilience_verification_failure_invalidates_diagnosis": {
+      "all": [
+        {
+          "fact": "resilience_verification_failed",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_invalidated",
+          "equals": true
+        }
+      ]
+    }
+  }
+}

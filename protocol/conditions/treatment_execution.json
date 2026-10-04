@@ -1,0 +1,178 @@
+{
+  "conditions": {
+    "authorized_treatment_completed_within_scope": {
+      "all": [
+        {
+          "fact": "treatment_completed",
+          "equals": true
+        },
+        {
+          "fact": "treatment_within_authorized_scope",
+          "equals": true
+        }
+      ]
+    },
+    "self_test_fails_but_diagnosis_remains_valid_and_retry_budget_available": {
+      "all": [
+        {
+          "fact": "self_test_failed",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_valid",
+          "equals": true
+        },
+        {
+          "fact": "retry_budget_available",
+          "equals": true
+        }
+      ]
+    },
+    "self_test_fails_and_no_safe_authorized_retry_remains": {
+      "all": [
+        {
+          "fact": "self_test_failed",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "safe_authorized_retry_available",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "independent_verification_fails_but_diagnosis_remains_valid_and_retry_budget_available": {
+      "all": [
+        {
+          "fact": "independent_verification_failed",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_valid",
+          "equals": true
+        },
+        {
+          "fact": "retry_budget_available",
+          "equals": true
+        }
+      ]
+    },
+    "independent_verification_fails_and_no_safe_authorized_retry_remains": {
+      "all": [
+        {
+          "fact": "independent_verification_failed",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "safe_authorized_retry_available",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "adversarial_verification_fails_but_diagnosis_remains_valid_and_retry_budget_available": {
+      "all": [
+        {
+          "fact": "adversarial_verification_failed",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_valid",
+          "equals": true
+        },
+        {
+          "fact": "retry_budget_available",
+          "equals": true
+        }
+      ]
+    },
+    "adversarial_verification_fails_and_no_safe_authorized_retry_remains": {
+      "all": [
+        {
+          "fact": "adversarial_verification_failed",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "safe_authorized_retry_available",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "resilience_verification_fails_but_diagnosis_remains_valid_and_retry_budget_available": {
+      "all": [
+        {
+          "fact": "resilience_verification_failed",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_valid",
+          "equals": true
+        },
+        {
+          "fact": "retry_budget_available",
+          "equals": true
+        }
+      ]
+    },
+    "resilience_verification_fails_and_no_safe_authorized_retry_remains": {
+      "all": [
+        {
+          "fact": "resilience_verification_failed",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "safe_authorized_retry_available",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "regression_found_but_diagnosis_remains_valid_and_safe_retry_budget_available": {
+      "all": [
+        {
+          "fact": "regression_found",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_valid",
+          "equals": true
+        },
+        {
+          "fact": "safe_retry_available",
+          "equals": true
+        },
+        {
+          "fact": "retry_budget_available",
+          "equals": true
+        }
+      ]
+    },
+    "blocking_regression_or_required_capability_loss_and_no_safe_authorized_retry_remains": {
+      "all": [
+        {
+          "any": [
+            {
+              "fact": "blocking_regression_present",
+              "equals": true
+            },
+            {
+              "fact": "required_capability_loss",
+              "equals": true
+            }
+          ]
+        },
+        {
+          "not": {
+            "fact": "safe_authorized_retry_available",
+            "equals": true
+          }
+        }
+      ]
+    }
+  }
+}

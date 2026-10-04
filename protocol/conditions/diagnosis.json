@@ -1,0 +1,46 @@
+{
+  "conditions": {
+    "root_cause_confidence_and_evidence_threshold_met": {
+      "all": [
+        {
+          "fact": "root_cause_confidence_met",
+          "equals": true
+        },
+        {
+          "fact": "evidence_threshold_met",
+          "equals": true
+        }
+      ]
+    },
+    "hypotheses_exhausted_without_sufficient_support": {
+      "all": [
+        {
+          "fact": "hypotheses_exhausted",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "sufficient_hypothesis_support",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "treatment_evidence_invalidates_diagnosis_and_safe_checkpoint_restored": {
+      "all": [
+        {
+          "fact": "treatment_evidence_invalidates_diagnosis",
+          "equals": true
+        },
+        {
+          "fact": "safe_checkpoint_restored",
+          "equals": true
+        }
+      ]
+    },
+    "discharge_review_invalidates_root_cause_confidence": {
+      "fact": "root_cause_confidence_invalidated",
+      "equals": true
+    }
+  }
+}

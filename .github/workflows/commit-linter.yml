@@ -1,0 +1,38 @@
+name: Commit Linter
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint Commits
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install commitlint
+        run: npm ci --prefer-offline --no-audit 2>/dev/null || npm install -g @commitlint/cli @commitlint/config-conventional
+
+      - name: Lint commits
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            npx commitlint --from=${{ github.base_ref }} --to=${{ github.head_ref }} --verbose
+          else
+            npx commitlint --from=HEAD~1 --to=HEAD --verbose
+          fi

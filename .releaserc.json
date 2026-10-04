@@ -1,0 +1,35 @@
+{
+  "branches": ["main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+    "@semantic-release/github",
+    "@semantic-release/git"
+  ],
+  "commitAnalyzer": {
+    "preset": "conventionalcommits"
+  },
+  "releaseNotesGenerator": {
+    "preset": "conventionalcommits",
+    "presetConfig": {
+      "types": [
+        { "type": "feat", "section": "Features" },
+        { "type": "fix", "section": "Bug Fixes" },
+        { "type": "perf", "section": "Performance Improvements" },
+        { "type": "refactor", "section": "Refactors" },
+        { "type": "docs", "section": "Documentation" },
+        { "type": "test", "section": "Tests" },
+        { "type": "build", "section": "Build System" },
+        { "type": "ci", "section": "Continuous Integration" },
+        { "type": "chore", "section": "Chores" }
+      ]
+    }
+  },
+  "changelog": {
+    "file": "CHANGELOG.md"
+  },
+  "git": {
+    "assets": ["CHANGELOG.md", "protocol/conditions.json", "protocol/protocol.yaml"]
+  }
+}

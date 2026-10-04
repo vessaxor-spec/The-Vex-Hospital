@@ -1,0 +1,128 @@
+# Vex Hospital Protocol State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> ADMITTED
+    
+    ADMITTED --> CONTAINED : containment_needed
+    ADMITTED --> BASELINING : containment_not_needed
+    
+    CONTAINED --> BASELINING : safe_to_observe
+    
+    BASELINING --> AUTHORITY_MAPPED : baseline_sufficient
+    BASELINING --> ROOT_CAUSE_UNRESOLVED : cannot_reproduce_and_no_other_sufficient_evidence
+    BASELINING --> BLOCKED : safe_baseline_impossible
+    
+    AUTHORITY_MAPPED --> DIAGNOSING : authority_envelope_established
+    AUTHORITY_MAPPED --> SPECIALIST_ESCALATION_REQUIRED : authority_or_objective_is_unsafe_or_out_of_scope
+    AUTHORITY_MAPPED --> BLOCKED : required_authority_facts_unavailable
+    
+    DIAGNOSING --> DIAGNOSIS_CONFIRMED : root_cause_confidence_and_evidence_threshold_met
+    DIAGNOSING --> ROOT_CAUSE_UNRESOLVED : hypotheses_exhausted_without_sufficient_support
+    DIAGNOSING --> SPECIALIST_ESCALATION_REQUIRED : specialist_competence_required
+    
+    DIAGNOSIS_CONFIRMED --> TREATMENT_PROPOSED : bounded_treatment_can_be_designed
+    DIAGNOSIS_CONFIRMED --> SPECIALIST_ESCALATION_REQUIRED : safe_treatment_cannot_be_designed
+    
+    TREATMENT_PROPOSED --> AWAITING_AUTHORIZATION : explicit_authorization_required_and_not_already_scoped
+    TREATMENT_PROPOSED --> TREATING : authorization_requirement_satisfied
+    TREATMENT_PROPOSED --> BLOCKED : required_checkpoint_or_rollback_unavailable_for_consequential_treatment
+    
+    AWAITING_AUTHORIZATION --> TREATING : explicit_authorization_received_within_scope
+    AWAITING_AUTHORIZATION --> BLOCKED : authorization_denied_or_unavailable
+    
+    TREATING --> SELF_TESTING : authorized_treatment_completed_within_scope
+    TREATING --> TREATMENT_PROPOSED : treatment_incomplete_but_diagnosis_remains_valid_and_safe_checkpoint_restored_and_retry_budget_available
+    TREATING --> DIAGNOSING : treatment_evidence_invalidates_diagnosis_and_safe_checkpoint_restored
+    TREATING --> BLOCKED : treatment_exceeds_authorized_blast_radius_or_safety_boundary
+    TREATING --> TREATMENT_FAILED : treatment_cannot_be_completed_or_safely_recovered_or_no_authorized_retry_remains
+    
+    SELF_TESTING --> INDEPENDENT_VERIFICATION : independent_verification_required_or_selected
+    SELF_TESTING --> ADVERSARIAL_VERIFICATION : independent_verification_not_required_and_adversarial_required
+    SELF_TESTING --> RESILIENCE_VERIFICATION : only_resilience_verification_required_next
+    SELF_TESTING --> REGRESSION_REVIEW : additional_verification_not_required
+    SELF_TESTING --> TREATMENT_PROPOSED : self_test_fails_but_diagnosis_remains_valid_and_retry_budget_available
+    SELF_TESTING --> DIAGNOSING : self_test_failure_invalidates_diagnosis
+    SELF_TESTING --> TREATMENT_FAILED : self_test_fails_and_no_safe_authorized_retry_remains
+    
+    INDEPENDENT_VERIFICATION --> ADVERSARIAL_VERIFICATION : independent_verification_passed_and_adversarial_required
+    INDEPENDENT_VERIFICATION --> RESILIENCE_VERIFICATION : independent_verification_passed_and_resilience_required_next
+    INDEPENDENT_VERIFICATION --> REGRESSION_REVIEW : independent_verification_passed_and_no_additional_verification_required
+    INDEPENDENT_VERIFICATION --> TREATMENT_PROPOSED : independent_verification_fails_but_diagnosis_remains_valid_and_retry_budget_available
+    INDEPENDENT_VERIFICATION --> DIAGNOSING : independent_verification_failure_invalidates_diagnosis
+    INDEPENDENT_VERIFICATION --> TREATMENT_FAILED : independent_verification_fails_and_no_safe_authorized_retry_remains
+    INDEPENDENT_VERIFICATION --> BLOCKED : required_independent_verification_unavailable
+    
+    ADVERSARIAL_VERIFICATION --> RESILIENCE_VERIFICATION : adversarial_verification_passed_and_resilience_required
+    ADVERSARIAL_VERIFICATION --> REGRESSION_REVIEW : adversarial_verification_passed_and_resilience_not_required
+    ADVERSARIAL_VERIFICATION --> TREATMENT_PROPOSED : adversarial_verification_fails_but_diagnosis_remains_valid_and_retry_budget_available
+    ADVERSARIAL_VERIFICATION --> DIAGNOSING : adversarial_verification_failure_invalidates_diagnosis
+    ADVERSARIAL_VERIFICATION --> TREATMENT_FAILED : adversarial_verification_fails_and_no_safe_authorized_retry_remains
+    
+    RESILIENCE_VERIFICATION --> REGRESSION_REVIEW : resilience_verification_passed
+    RESILIENCE_VERIFICATION --> TREATMENT_PROPOSED : resilience_verification_fails_but_diagnosis_remains_valid_and_retry_budget_available
+    RESILIENCE_VERIFICATION --> DIAGNOSING : resilience_verification_failure_invalidates_diagnosis
+    RESILIENCE_VERIFICATION --> TREATMENT_FAILED : resilience_verification_fails_and_no_safe_authorized_retry_remains
+    
+    REGRESSION_REVIEW --> DISCHARGE_REVIEW : required_capabilities_preserved_and_no_blocking_regression
+    REGRESSION_REVIEW --> TREATMENT_PROPOSED : regression_found_but_diagnosis_remains_valid_and_safe_retry_budget_available
+    REGRESSION_REVIEW --> DIAGNOSING : regression_or_capability_loss_invalidates_diagnosis
+    REGRESSION_REVIEW --> PARTIAL_RECOVERY : material_recovery_with_known_unresolved_noncritical_conditions
+    REGRESSION_REVIEW --> TREATMENT_FAILED : blocking_regression_or_required_capability_loss_and_no_safe_authorized_retry_remains
+    
+    DISCHARGE_REVIEW --> RECOVERED : all_required_evidence_satisfied_and_no_blocking_residual_risk
+    DISCHARGE_REVIEW --> RECOVERED_OBSERVATION_REQUIRED : recovery_satisfied_but_observation_required
+    DISCHARGE_REVIEW --> PARTIAL_RECOVERY : some_required_recovery_conditions_remain_unmet
+    DISCHARGE_REVIEW --> ROOT_CAUSE_UNRESOLVED : discharge_review_invalidates_root_cause_confidence
+    DISCHARGE_REVIEW --> SPECIALIST_ESCALATION_REQUIRED : residual_risk_exceeds_current_authority_or_competence
+    
+    %% Global transitions
+    state "[*]" as CANCELLED
+    state "[*]" as BLOCKED
+    
+    %% Risk classes
+    note right of ADMITTED
+        Risk Classes (R0-R3) determine:
+        • Minimum evidence level (E2-E3)
+        • Root cause confidence (probable→confirmed)
+        • Verification requirements
+        • Authorization requirements
+    end note
+    
+    %% Terminal outcomes
+    RECOVERED --> [*]
+    RECOVERED_OBSERVATION_REQUIRED --> [*]
+    PARTIAL_RECOVERY --> [*]
+    TREATMENT_FAILED --> [*]
+    ROOT_CAUSE_UNRESOLVED --> [*]
+    SPECIALIST_ESCALATION_REQUIRED --> [*]
+    BLOCKED --> [*]
+    CANCELLED --> [*]
+```
+
+## Risk Class Requirements
+
+| Risk Class | Min Evidence | Root Cause Confidence | Recovery Envelope | Independent Verification | Adversarial Verification | Resilience Verification | Explicit Auth |
+|------------|--------------|----------------------|-------------------|-------------------------|-------------------------|------------------------|---------------|
+| R0 (routine) | E2 | probable_cause | No | Optional | Conditional | Conditional | No |
+| R1 (standard) | E3 | observed_cause | Yes | Recommended | Conditional | Conditional | Yes |
+| R2 (high) | E3 | confirmed_root_cause | Yes | Required | Required | Conditional | Yes |
+| R3 (critical) | E3 | confirmed_root_cause | Yes | Required | Required | Required | Yes |
+
+## Evidence Levels
+
+- **E0** (claim): Assertion without corroborating evidence
+- **E1** (static_evidence): Code/config/policy inspection
+- **E2** (reproduced): Observed behavior under controlled conditions
+- **E3** (production_path): Actual affected execution path exercised
+- **E4** (adversarial): Boundary/hostile/forged conditions tested
+- **E5** (independent): Fresh verifier evaluates scoped evidence
+
+## Retry Policy
+
+- Default retry budget: 0
+- Retry budget must be explicit
+- Each retry requires new treatment plan
+- Changed evidence invalidating diagnosis requires re-diagnosis
+- Rollback/safe checkpoint required before retry
+- R3: Each retry requires fresh operator authorization

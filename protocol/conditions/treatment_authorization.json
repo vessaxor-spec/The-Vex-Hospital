@@ -1,0 +1,104 @@
+{
+  "conditions": {
+    "explicit_authorization_required_and_not_already_scoped": {
+      "all": [
+        {
+          "fact": "explicit_authorization_required",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "authorization_scoped",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "authorization_requirement_satisfied": {
+      "any": [
+        {
+          "not": {
+            "fact": "explicit_authorization_required",
+            "equals": true
+          }
+        },
+        {
+          "fact": "authorization_scoped",
+          "equals": true
+        }
+      ]
+    },
+    "required_checkpoint_or_rollback_unavailable_for_consequential_treatment": {
+      "all": [
+        {
+          "fact": "consequential_treatment",
+          "equals": true
+        },
+        {
+          "any": [
+            {
+              "not": {
+                "fact": "checkpoint_available",
+                "equals": true
+              }
+            },
+            {
+              "not": {
+                "fact": "rollback_available",
+                "equals": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "explicit_authorization_received_within_scope": {
+      "fact": "authorization_scoped",
+      "equals": true
+    },
+    "authorization_denied_or_unavailable": {
+      "fact": "authorization_denied_or_unavailable",
+      "equals": true
+    },
+    "treatment_incomplete_but_diagnosis_remains_valid_and_safe_checkpoint_restored_and_retry_budget_available": {
+      "all": [
+        {
+          "fact": "treatment_incomplete",
+          "equals": true
+        },
+        {
+          "fact": "diagnosis_valid",
+          "equals": true
+        },
+        {
+          "fact": "safe_checkpoint_restored",
+          "equals": true
+        },
+        {
+          "fact": "retry_budget_available",
+          "equals": true
+        }
+      ]
+    },
+    "treatment_cannot_be_completed_or_safely_recovered_or_no_authorized_retry_remains": {
+      "any": [
+        {
+          "fact": "treatment_cannot_be_completed",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "safe_recovery_possible",
+            "equals": true
+          }
+        },
+        {
+          "not": {
+            "fact": "authorized_retry_remains",
+            "equals": true
+          }
+        }
+      ]
+    }
+  }
+}

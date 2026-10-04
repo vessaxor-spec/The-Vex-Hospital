@@ -97,6 +97,7 @@
     "privacy/sensitive-patterns.json",
     "scripts/validate_hospital.py",
     "tests/test_validator_mutations.py",
-    "tests/test_privacy_scanner.py"
+    "tests/test_privacy_scanner.py",
+    ".venv/"
   ]
 }

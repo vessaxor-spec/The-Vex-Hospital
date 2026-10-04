@@ -1,0 +1,268 @@
+{
+  "facts": {
+    "adversarial_verification_failed": {
+      "type": "boolean",
+      "description": "adversarial verification failed"
+    },
+    "adversarial_verification_passed": {
+      "type": "boolean",
+      "description": "adversarial verification passed"
+    },
+    "adversarial_verification_required": {
+      "type": "boolean",
+      "description": "adversarial verification required"
+    },
+    "authority_envelope_established": {
+      "type": "boolean",
+      "description": "authority envelope established"
+    },
+    "authority_facts_available": {
+      "type": "boolean",
+      "description": "authority facts available"
+    },
+    "authorization_denied_or_unavailable": {
+      "type": "boolean",
+      "description": "authorization denied or unavailable"
+    },
+    "authorization_scoped": {
+      "type": "boolean",
+      "description": "authorization scoped"
+    },
+    "authorized_retry_remains": {
+      "type": "boolean",
+      "description": "authorized retry remains"
+    },
+    "baseline_sufficient": {
+      "type": "boolean",
+      "description": "baseline sufficient"
+    },
+    "blast_radius_exceeded": {
+      "type": "boolean",
+      "description": "blast radius exceeded"
+    },
+    "blocking_regression_present": {
+      "type": "boolean",
+      "description": "blocking regression present"
+    },
+    "blocking_residual_risk": {
+      "type": "boolean",
+      "description": "blocking residual risk"
+    },
+    "bounded_treatment_designable": {
+      "type": "boolean",
+      "description": "bounded treatment designable"
+    },
+    "checkpoint_available": {
+      "type": "boolean",
+      "description": "checkpoint available"
+    },
+    "consequential_treatment": {
+      "type": "boolean",
+      "description": "consequential treatment"
+    },
+    "containment_required": {
+      "type": "boolean",
+      "description": "containment required"
+    },
+    "current_competence_sufficient": {
+      "type": "boolean",
+      "description": "current competence sufficient"
+    },
+    "diagnosis_invalidated": {
+      "type": "boolean",
+      "description": "diagnosis invalidated"
+    },
+    "diagnosis_valid": {
+      "type": "boolean",
+      "description": "diagnosis valid"
+    },
+    "evidence_threshold_met": {
+      "type": "boolean",
+      "description": "evidence threshold met"
+    },
+    "explicit_authorization_required": {
+      "type": "boolean",
+      "description": "explicit authorization required"
+    },
+    "hypotheses_exhausted": {
+      "type": "boolean",
+      "description": "hypotheses exhausted"
+    },
+    "independent_verification_available": {
+      "type": "boolean",
+      "description": "independent verification available"
+    },
+    "independent_verification_failed": {
+      "type": "boolean",
+      "description": "independent verification failed"
+    },
+    "independent_verification_passed": {
+      "type": "boolean",
+      "description": "independent verification passed"
+    },
+    "independent_verification_required": {
+      "type": "boolean",
+      "description": "independent verification required"
+    },
+    "independent_verification_selected": {
+      "type": "boolean",
+      "description": "independent verification selected"
+    },
+    "material_recovery": {
+      "type": "boolean",
+      "description": "material recovery"
+    },
+    "nonwaivable_blocker": {
+      "type": "boolean",
+      "description": "nonwaivable blocker"
+    },
+    "objective_in_scope": {
+      "type": "boolean",
+      "description": "objective in scope"
+    },
+    "objective_safe": {
+      "type": "boolean",
+      "description": "objective safe"
+    },
+    "observation_required": {
+      "type": "boolean",
+      "description": "observation required"
+    },
+    "operator_cancelled": {
+      "type": "boolean",
+      "description": "operator cancelled"
+    },
+    "other_sufficient_evidence": {
+      "type": "boolean",
+      "description": "other sufficient evidence"
+    },
+    "recovery_requirements_satisfied": {
+      "type": "boolean",
+      "description": "recovery requirements satisfied"
+    },
+    "regression_found": {
+      "type": "boolean",
+      "description": "regression found"
+    },
+    "reproduction_failed": {
+      "type": "boolean",
+      "description": "reproduction failed"
+    },
+    "required_capabilities_preserved": {
+      "type": "boolean",
+      "description": "required capabilities preserved"
+    },
+    "required_capability_loss": {
+      "type": "boolean",
+      "description": "required capability loss"
+    },
+    "required_evidence_satisfied": {
+      "type": "boolean",
+      "description": "required evidence satisfied"
+    },
+    "required_recovery_conditions_unmet": {
+      "type": "boolean",
+      "description": "required recovery conditions unmet"
+    },
+    "residual_risk_exceeds_authority": {
+      "type": "boolean",
+      "description": "residual risk exceeds authority"
+    },
+    "residual_risk_exceeds_competence": {
+      "type": "boolean",
+      "description": "residual risk exceeds competence"
+    },
+    "resilience_verification_failed": {
+      "type": "boolean",
+      "description": "resilience verification failed"
+    },
+    "resilience_verification_passed": {
+      "type": "boolean",
+      "description": "resilience verification passed"
+    },
+    "resilience_verification_required": {
+      "type": "boolean",
+      "description": "resilience verification required"
+    },
+    "retry_budget_available": {
+      "type": "boolean",
+      "description": "retry budget available"
+    },
+    "rollback_available": {
+      "type": "boolean",
+      "description": "rollback available"
+    },
+    "root_cause_confidence_invalidated": {
+      "type": "boolean",
+      "description": "root cause confidence invalidated"
+    },
+    "root_cause_confidence_met": {
+      "type": "boolean",
+      "description": "root cause confidence met"
+    },
+    "safe_authorized_retry_available": {
+      "type": "boolean",
+      "description": "safe authorized retry available"
+    },
+    "safe_baseline_possible": {
+      "type": "boolean",
+      "description": "safe baseline possible"
+    },
+    "safe_checkpoint_restored": {
+      "type": "boolean",
+      "description": "safe checkpoint restored"
+    },
+    "safe_recovery_possible": {
+      "type": "boolean",
+      "description": "safe recovery possible"
+    },
+    "safe_retry_available": {
+      "type": "boolean",
+      "description": "safe retry available"
+    },
+    "safe_to_observe": {
+      "type": "boolean",
+      "description": "safe to observe"
+    },
+    "safe_treatment_designable": {
+      "type": "boolean",
+      "description": "safe treatment designable"
+    },
+    "safety_boundary_exceeded": {
+      "type": "boolean",
+      "description": "safety boundary exceeded"
+    },
+    "self_test_failed": {
+      "type": "boolean",
+      "description": "self test failed"
+    },
+    "sufficient_hypothesis_support": {
+      "type": "boolean",
+      "description": "sufficient hypothesis support"
+    },
+    "treatment_cannot_be_completed": {
+      "type": "boolean",
+      "description": "treatment cannot be completed"
+    },
+    "treatment_completed": {
+      "type": "boolean",
+      "description": "treatment completed"
+    },
+    "treatment_evidence_invalidates_diagnosis": {
+      "type": "boolean",
+      "description": "treatment evidence invalidates diagnosis"
+    },
+    "treatment_incomplete": {
+      "type": "boolean",
+      "description": "treatment incomplete"
+    },
+    "treatment_within_authorized_scope": {
+      "type": "boolean",
+      "description": "treatment within authorized scope"
+    },
+    "unresolved_noncritical_conditions": {
+      "type": "boolean",
+      "description": "unresolved noncritical conditions"
+    }
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "conditions": {
+    "required_capabilities_preserved_and_no_blocking_regression": {
+      "all": [
+        {
+          "fact": "required_capabilities_preserved",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "blocking_regression_present",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "regression_or_capability_loss_invalidates_diagnosis": {
+      "all": [
+        {
+          "any": [
+            {
+              "fact": "regression_found",
+              "equals": true
+            },
+            {
+              "fact": "required_capability_loss",
+              "equals": true
+            }
+          ]
+        },
+        {
+          "fact": "diagnosis_invalidated",
+          "equals": true
+        }
+      ]
+    },
+    "material_recovery_with_known_unresolved_noncritical_conditions": {
+      "all": [
+        {
+          "fact": "material_recovery",
+          "equals": true
+        },
+        {
+          "fact": "unresolved_noncritical_conditions",
+          "equals": true
+        }
+      ]
+    },
+    "all_required_evidence_satisfied_and_no_blocking_residual_risk": {
+      "all": [
+        {
+          "fact": "required_evidence_satisfied",
+          "equals": true
+        },
+        {
+          "not": {
+            "fact": "blocking_residual_risk",
+            "equals": true
+          }
+        }
+      ]
+    },
+    "recovery_satisfied_but_observation_required": {
+      "all": [
+        {
+          "fact": "recovery_requirements_satisfied",
+          "equals": true
+        },
+        {
+          "fact": "observation_required",
+          "equals": true
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "conditions": {
+    "containment_needed": {
+      "fact": "containment_required",
+      "equals": true
+    },
+    "containment_not_needed": {
+      "not": {
+        "fact": "containment_required",
+        "equals": true
+      }
+    }
+  }
+}

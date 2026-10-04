@@ -475,6 +475,12 @@ def validate_public_text():
         relative = path.relative_to(ROOT)
         relative_text = relative.as_posix()
 
+        # Skip excluded paths early
+        if any(
+            str(relative).startswith(str(e).rstrip("/") + "/") or relative == e for e in excluded
+        ):
+            continue
+
         for pattern_id, pattern in filename_patterns:
             if pattern.search(relative_text):
                 failures.append(
@@ -487,7 +493,7 @@ def validate_public_text():
                     f"{relative}: forbidden public path matched: {pattern_id}"
                 )
 
-        if path.suffix.lower() not in TEXT_SUFFIXES or relative in excluded:
+        if path.suffix.lower() not in TEXT_SUFFIXES:
             continue
 
         text = path.read_text(encoding="utf-8")

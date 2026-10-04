@@ -1,0 +1,24 @@
+{
+  "conditions": {
+    "baseline_sufficient": {
+      "fact": "baseline_sufficient",
+      "equals": true
+    },
+    "safe_baseline_impossible": {
+      "not": {
+        "fact": "safe_baseline_possible",
+        "equals": true
+      }
+    },
+    "authority_envelope_established": {
+      "fact": "authority_envelope_established",
+      "equals": true
+    },
+    "required_authority_facts_unavailable": {
+      "not": {
+        "fact": "authority_facts_available",
+        "equals": true
+      }
+    }
+  }
+}
