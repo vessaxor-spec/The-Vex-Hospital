@@ -41,6 +41,8 @@ jobs:
             objects.githubusercontent.com:443
             release-assets.githubusercontent.com:443
             uploads.github.com:443
+            ghcr.io:443
+            pkg-containers.githubusercontent.com:443
 
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -330,6 +332,27 @@ jobs:
 
       - name: Run Semgrep
         run: semgrep scan --config p/ci --config p/python --config p/secrets --config p/security-audit --sarif --output semgrep-results.sarif --error
+
+      - name: Summarize findings without exposing code or secret values
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = Path("semgrep-results.sarif")
+          if not report.exists():
+              print("::error::Semgrep SARIF was not created")
+              raise SystemExit(1)
+          data = json.loads(report.read_text(encoding="utf-8"))
+          results = [item for run in data.get("runs", []) for item in run.get("results", [])]
+          for item in results:
+              locations = item.get("locations", [])
+              physical = locations[0].get("physicalLocation", {}) if locations else {}
+              uri = physical.get("artifactLocation", {}).get("uri", "unknown")
+              line = physical.get("region", {}).get("startLine", 0)
+              print(f"SEMGREP_FINDING {item.get('ruleId', 'unknown')} at {uri}:{line}")
+          print(f"SEMGREP_TOTAL {len(results)}")
+          PY
 
       - name: Upload SARIF
         if: always()
