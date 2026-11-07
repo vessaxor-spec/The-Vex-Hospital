@@ -67,6 +67,14 @@ class GitHubWorkflowSecurityTests(unittest.TestCase):
                     assert re.search(r"\$\{\{\s*inputs\.", shell) is None
                     assert "${{ github.event.pull_request.title }}" not in shell
 
+    def test_dependency_audits_fail_closed(self) -> None:
+        workflow = (WORKFLOWS / "security-scanning.yml").read_text(encoding="utf-8")
+        scan_job = workflow.split("  dependency-scan:", 1)[1].split("  license-check:", 1)[0]
+        assert "name: Enforce dependency audit outcomes" in scan_job
+        for scan_id in ("pip_audit", "safety_audit", "npm_audit"):
+            assert f"id: {scan_id}" in scan_job
+            assert f"steps.{scan_id}.outcome" in scan_job
+
     def test_codecov_action_is_immutable(self) -> None:
         workflow = (WORKFLOWS / "reusable" / "python-tests.yml").read_text(encoding="utf-8")
         assert re.search(r"codecov/codecov-action@[a-f0-9]{40}", workflow) is not None
