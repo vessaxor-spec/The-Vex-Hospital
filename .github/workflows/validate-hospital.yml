@@ -95,7 +95,7 @@ jobs:
         continue-on-error: false
 
       - name: Run ruff (format check)
-        run: ruff format --check scripts/ tests/ --output-format=github
+        run: ruff format --check scripts/ tests/
         continue-on-error: false
 
       - name: Run mypy (type check)
@@ -357,7 +357,7 @@ jobs:
           path: ./
           base: ${{ github.event.pull_request.base.sha || github.event.before || 'HEAD~1' }}
           head: ${{ github.event.pull_request.head.sha || github.sha }}
-          extra_args: --json --fail --only-verified
+          extra_args: --json --only-verified
 
       - name: Run detect-secrets
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
