@@ -114,9 +114,13 @@ jobs:
           fi
 
       - name: Check commit messages in PR
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          npx commitlint --from="${{ github.base_ref }}" --to="${{ github.head_ref }}" --verbose
-        continue-on-error: false
+          git cat-file -e "$BASE_SHA^{commit}"
+          git cat-file -e "$HEAD_SHA^{commit}"
+          npx commitlint --from="$BASE_SHA" --to="$HEAD_SHA" --verbose
 
       - name: Add PR label if conventional
         if: success()
@@ -141,5 +145,7 @@ jobs:
               repo: context.repo.repo,
               issue_number: context.payload.pull_request.number,
               name: 'conventional-commits'
+            }).catch(error => {
+              if (error.status !== 404) throw error;
             });
         continue-on-error: true
