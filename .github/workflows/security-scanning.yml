@@ -66,13 +66,6 @@ jobs:
           format: sarif-latest
           temp-dir: ${{ runner.temp }}/codeql
 
-      - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@8c78abb9b62512e3c45dea6559ffd924ed8549c8
-        with:
-          sarif_file: results.sarif
-          category: codeql/${{ matrix.language }}
-          wait-for-processing: true
-
   trufflehog:
     name: TruffleHog Secret Scan
     runs-on: ubuntu-latest

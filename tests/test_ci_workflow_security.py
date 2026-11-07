@@ -36,16 +36,24 @@ def shell_commands(text: str) -> list[str]:
 class GitHubWorkflowSecurityTests(unittest.TestCase):
     def test_dependabot_uses_explicit_stability_cooldown(self) -> None:
         config = (ROOT / ".github" / "dependabot.yml").read_text(encoding="utf-8")
-        self.assertEqual(config.count("package-ecosystem:"), 3)
-        self.assertEqual(config.count("default-days: 3"), 3)
+        assert config.count("package-ecosystem:") == 3
+        assert config.count("default-days: 7") == 3
 
     def test_codeql_uses_valid_suite_from_config_only(self) -> None:
         workflow = (WORKFLOWS / "security-scanning.yml").read_text(encoding="utf-8")
         config = (ROOT / ".github" / "codeql" / "codeql-config.yml").read_text(encoding="utf-8")
-        self.assertNotIn("queries: +security-and-quality,+security-extended", workflow)
-        self.assertIn("config-file: ./.github/codeql/codeql-config.yml", workflow)
-        self.assertIn("uses: security-extended", config)
-        self.assertIn("uses: security-and-quality", config)
+        assert "queries: +security-and-quality,+security-extended" not in workflow
+        assert "config-file: ./.github/codeql/codeql-config.yml" in workflow
+        assert "uses: security-extended" in config
+        assert "uses: security-and-quality" in config
+
+    def test_codeql_analysis_uploads_once_and_includes_javascript(self) -> None:
+        workflow = (WORKFLOWS / "security-scanning.yml").read_text(encoding="utf-8")
+        codeql_job = workflow.split("  codeql:", 1)[1].split("  trufflehog:", 1)[0]
+        config = (ROOT / ".github" / "codeql" / "codeql-config.yml").read_text(encoding="utf-8")
+        assert "upload: true" in codeql_job
+        assert "name: Upload SARIF" not in codeql_job
+        assert '"commitlint.config.js"' in config
 
     def test_untrusted_expressions_are_not_interpolated_in_shell(self) -> None:
         for path in [
@@ -56,13 +64,13 @@ class GitHubWorkflowSecurityTests(unittest.TestCase):
         ]:
             with self.subTest(path=path.relative_to(ROOT)):
                 for shell in shell_commands(path.read_text(encoding="utf-8")):
-                    self.assertNotRegex(shell, r"\$\{\{\s*inputs\.")
-                    self.assertNotIn("${{ github.event.pull_request.title }}", shell)
+                    assert re.search(r"\$\{\{\s*inputs\.", shell) is None
+                    assert "${{ github.event.pull_request.title }}" not in shell
 
     def test_codecov_action_is_immutable(self) -> None:
         workflow = (WORKFLOWS / "reusable" / "python-tests.yml").read_text(encoding="utf-8")
-        self.assertRegex(workflow, r"codecov/codecov-action@[a-f0-9]{40}")
-        self.assertNotRegex(workflow, r"codecov/codecov-action@v\d")
+        assert re.search(r"codecov/codecov-action@[a-f0-9]{40}", workflow) is not None
+        assert re.search(r"codecov/codecov-action@v\d", workflow) is None
 
 
 if __name__ == "__main__":
