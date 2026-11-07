@@ -107,7 +107,7 @@ jobs:
         run: |
           TITLE="${{ github.event.pull_request.title }}"
           echo "PR Title: $TITLE"
-          if ! echo "$TITLE" | grep -qE '^(feat|fix|perf|refactor|docs|test|build|ci|chore|revert)(\(.+\))?: .+'; then
+          if ! echo "$TITLE" | grep -qE '^(feat|fix|perf|refactor|docs|test|build|ci|chore|style|revert)(\(.+\))?: .+'; then
             echo "::error::PR title must follow conventional commits format: <type>(<scope>): <description>"
             echo "Example: feat(auth): add login endpoint"
             exit 1
