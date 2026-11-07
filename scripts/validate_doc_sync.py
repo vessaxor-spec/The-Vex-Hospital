@@ -84,10 +84,6 @@ def main():
     return 0
 
 
-def load_markdown(path: Path):
-    return path.read_text(encoding="utf-8")
-
-
 if __name__ == "__main__":
     import sys
     raise SystemExit(main())
