@@ -3,6 +3,7 @@ jsonschema==4.23.0
 ruff==0.16.10
 mypy==1.11.2
 hypothesis==6.100.0
+pytest==8.3.5
 ollama==0.4.2
 sigstore==3.6.7
 # cache-bust
