@@ -291,9 +291,14 @@ jobs:
           import unittest
           loader = unittest.TestLoader()
           suite = loader.loadTestsFromName('tests.test_validator_mutations')
-          test_names = [test._testMethodName for test in suite]
+          def iter_cases(node):
+              for item in node:
+                  if isinstance(item, unittest.TestSuite):
+                      yield from iter_cases(item)
+                  else:
+                      yield item
           expected = 12
-          actual = len(test_names)
+          actual = sum(1 for _ in iter_cases(suite))
           assert actual >= expected, f'Expected at least {expected} mutation tests, got {actual}'
           print(f'Mutation tests: {actual} (expected >= {expected})')
           "
@@ -330,8 +335,13 @@ jobs:
 
       - name: Run with increased examples
         run: |
-          python -m pytest tests/test_transition_property.py::test_transition_policy_no_crash -v --hypothesis-max-examples=200
-        continue-on-error: true
+          python - <<'PY'
+          from hypothesis import settings
+          import pytest
+          settings.register_profile("ci_deep", max_examples=200)
+          settings.load_profile("ci_deep")
+          raise SystemExit(pytest.main(["tests/test_transition_property.py::test_transition_policy_no_crash", "-v"]))
+          PY
         env:
           PYTHONPATH: ${{ github.workspace }}
           PYTHONHASHSEED: random
