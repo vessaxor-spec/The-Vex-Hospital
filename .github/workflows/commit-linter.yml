@@ -51,32 +51,21 @@ jobs:
       - name: Validate commitlint config
         run: npx commitlint --help > /dev/null
 
-      - name: Lint commits
+      # Check only incoming commits. Legacy history predates the conventional-commit policy.
+      - name: Lint incoming commits
         id: lint
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            if [ -n "${{ github.base_ref }}" ]; then
-              npx commitlint --from="${{ github.base_ref }}" --to="${{ github.head_ref }}" --verbose
-            else
-              echo "::warning::Base ref not available, skipping PR commit lint"
-            fi
-          else
-            npx commitlint --from=HEAD~1 --to=HEAD --verbose
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "::error::Cannot establish a trusted commit range"
+            exit 1
           fi
-        continue-on-error: false
-
-      - name: Lint all commits on main (push)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          COMMIT_COUNT=$(git rev-list --count HEAD)
-          if [ "$COMMIT_COUNT" -gt 50 ]; then
-            FROM_COMMIT=$(git rev-list --max-count=50 HEAD | tail -1)
-            npx commitlint --from="${FROM_COMMIT}" --to=HEAD --verbose
-          else
-            ROOT_COMMIT=$(git rev-list --max-parents=0 HEAD)
-            npx commitlint --from="${ROOT_COMMIT}" --to=HEAD --verbose
-          fi
-        continue-on-error: false
+          git cat-file -e "$BASE_SHA^{commit}"
+          git cat-file -e "$HEAD_SHA^{commit}"
+          npx commitlint --from="$BASE_SHA" --to="$HEAD_SHA" --verbose
 
       - name: Report lint results
         if: always()
@@ -115,19 +104,24 @@ jobs:
         run: npm ci --prefer-offline --no-audit --ignore-scripts 2>/dev/null || npm install -g @commitlint/cli@19.3.0 @commitlint/config-conventional@19.2.2 --ignore-scripts
 
       - name: Check PR title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
         run: |
-          TITLE="${{ github.event.pull_request.title }}"
-          echo "PR Title: $TITLE"
-          if ! echo "$TITLE" | grep -qE '^(feat|fix|perf|refactor|docs|test|build|ci|chore|revert)(\(.+\))?: .+'; then
+          printf '%s\n' "PR Title: $TITLE"
+          if ! echo "$TITLE" | grep -qE '^(feat|fix|perf|refactor|docs|test|build|ci|chore|style|revert)(\(.+\))?: .+'; then
             echo "::error::PR title must follow conventional commits format: <type>(<scope>): <description>"
             echo "Example: feat(auth): add login endpoint"
             exit 1
           fi
 
       - name: Check commit messages in PR
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          npx commitlint --from="${{ github.base_ref }}" --to="${{ github.head_ref }}" --verbose
-        continue-on-error: false
+          git cat-file -e "$BASE_SHA^{commit}"
+          git cat-file -e "$HEAD_SHA^{commit}"
+          npx commitlint --from="$BASE_SHA" --to="$HEAD_SHA" --verbose
 
       - name: Add PR label if conventional
         if: success()
@@ -152,5 +146,7 @@ jobs:
               repo: context.repo.repo,
               issue_number: context.payload.pull_request.number,
               name: 'conventional-commits'
+            }).catch(error => {
+              if (error.status !== 404) throw error;
             });
         continue-on-error: true

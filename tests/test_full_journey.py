@@ -22,7 +22,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from evaluate_transition_policy import evaluate_transition
+from evaluate_transition_policy import evaluate_transition  # noqa: E402 - sys.path setup above
 
 
 def identity(identity_id: str, role: str, kind: str, session_ref: str = "SYN-TEST-SESSION") -> dict:
@@ -77,9 +77,12 @@ def declared_transition(protocol, source: str, target: str) -> bool:
             return True
 
     for transition in protocol["global_transitions"]:
-        if transition["from"] == "*" and transition.get("excluding_terminal", False):
-            if transition["to"] == target:
-                return True
+        if (
+            transition["from"] == "*"
+            and transition.get("excluding_terminal", False)
+            and transition["to"] == target
+        ):
+            return True
 
     return False
 
@@ -99,60 +102,211 @@ class FullJourneyTest(unittest.TestCase):
     def test_r0_routine_journey(self):
         """Test complete R0 (routine) patient journey."""
         evidence_records = [
-            evidence("EV-ADMIT", "repository_inspection", "case_orchestrator", "observed", "ID-ORCHESTRATOR"),
-            evidence("EV-CONTAIN", "runtime_observation", "treating_agent", "observed", "ID-PATIENT"),
+            evidence(
+                "EV-ADMIT",
+                "repository_inspection",
+                "case_orchestrator",
+                "observed",
+                "ID-ORCHESTRATOR",
+            ),
+            evidence(
+                "EV-CONTAIN", "runtime_observation", "treating_agent", "observed", "ID-PATIENT"
+            ),
             evidence("EV-BASELINE", "diagnosis", "treating_agent", "observed", "ID-PATIENT"),
-            evidence("EV-AUTH-MAP", "authorization", "authorized_operator", "granted", "ID-OPERATOR"),
+            evidence(
+                "EV-AUTH-MAP", "authorization", "authorized_operator", "granted", "ID-OPERATOR"
+            ),
             evidence("EV-DIAGNOSE", "diagnosis", "treating_agent", "pass", "ID-PATIENT"),
             evidence("EV-ROOT-CAUSE", "diagnosis", "case_orchestrator", "pass", "ID-ORCHESTRATOR"),
-            evidence("EV-TREATMENT-PLAN", "treatment_result", "treating_agent", "pass", "ID-PATIENT"),
-            evidence("EV-TREAT-AUTH", "authorization", "authorized_operator", "granted", "ID-OPERATOR"),
+            evidence(
+                "EV-TREATMENT-PLAN", "treatment_result", "treating_agent", "pass", "ID-PATIENT"
+            ),
+            evidence(
+                "EV-TREAT-AUTH", "authorization", "authorized_operator", "granted", "ID-OPERATOR"
+            ),
             evidence("EV-TREAT", "treatment_result", "treating_agent", "pass", "ID-PATIENT"),
             evidence("EV-SELF-TEST", "self_test", "treating_agent", "pass", "ID-PATIENT"),
-            evidence("EV-INDEP", "independent_verification", "independent_verifier", "pass", "ID-VERIFIER", fresh_context=True),
-            evidence("EV-ADV", "adversarial_verification", "adversarial_verifier", "pass", "ID-ADVERSARIAL"),
-            evidence("EV-RESIL", "resilience_verification", "resilience_verifier", "pass", "ID-RESILIENCE"),
-            evidence("EV-REGRESSION", "regression_review", "independent_verifier", "pass", "ID-VERIFIER"),
-            evidence("EV-DISCHARGE", "discharge_review", "independent_verifier", "pass", "ID-VERIFIER"),
+            evidence(
+                "EV-INDEP",
+                "independent_verification",
+                "independent_verifier",
+                "pass",
+                "ID-VERIFIER",
+                fresh_context=True,
+            ),
+            evidence(
+                "EV-ADV",
+                "adversarial_verification",
+                "adversarial_verifier",
+                "pass",
+                "ID-ADVERSARIAL",
+            ),
+            evidence(
+                "EV-RESIL",
+                "resilience_verification",
+                "resilience_verifier",
+                "pass",
+                "ID-RESILIENCE",
+            ),
+            evidence(
+                "EV-REGRESSION", "regression_review", "independent_verifier", "pass", "ID-VERIFIER"
+            ),
+            evidence(
+                "EV-DISCHARGE", "discharge_review", "independent_verifier", "pass", "ID-VERIFIER"
+            ),
         ]
 
         events = [
-            {"seq": 1, "type": "state_transition", "from": "ADMITTED", "to": "CONTAINED", "executed": True,
-             "condition_facts": {"containment_required": True}},
-            {"seq": 2, "type": "state_transition", "from": "CONTAINED", "to": "BASELINING", "executed": True,
-             "condition_facts": {"safe_to_observe": True}},
-            {"seq": 3, "type": "state_transition", "from": "BASELINING", "to": "AUTHORITY_MAPPED", "executed": True,
-             "condition_facts": {"baseline_sufficient": True}},
-            {"seq": 4, "type": "state_transition", "from": "AUTHORITY_MAPPED", "to": "DIAGNOSING", "executed": True,
-             "condition_facts": {"authority_envelope_established": True}},
-            {"seq": 5, "type": "state_transition", "from": "DIAGNOSING", "to": "DIAGNOSIS_CONFIRMED", "executed": True,
-             "condition_facts": {"root_cause_confidence_met": True, "evidence_threshold_met": True}},
-            {"seq": 6, "type": "state_transition", "from": "DIAGNOSIS_CONFIRMED", "to": "TREATMENT_PROPOSED", "executed": True,
-             "condition_facts": {"bounded_treatment_designable": True}},
-            {"seq": 7, "type": "state_transition", "from": "TREATMENT_PROPOSED", "to": "AWAITING_AUTHORIZATION", "executed": True,
-             "condition_facts": {"explicit_authorization_required": True, "authorization_scoped": False}},
-            {"seq": 8, "type": "state_transition", "from": "AWAITING_AUTHORIZATION", "to": "TREATING", "executed": True,
-             "condition_facts": {"authorization_scoped": True}},
-            {"seq": 9, "type": "state_transition", "from": "TREATING", "to": "SELF_TESTING", "executed": True,
-             "condition_facts": {"treatment_completed": True, "treatment_within_authorized_scope": True}},
-            {"seq": 10, "type": "state_transition", "from": "SELF_TESTING", "to": "INDEPENDENT_VERIFICATION", "executed": True,
-             "condition_facts": {"independent_verification_required": True, "independent_verification_selected": True}},
-            {"seq": 11, "type": "state_transition", "from": "INDEPENDENT_VERIFICATION", "to": "ADVERSARIAL_VERIFICATION", "executed": True,
-             "condition_facts": {"independent_verification_passed": True, "adversarial_verification_required": True}},
-            {"seq": 12, "type": "state_transition", "from": "ADVERSARIAL_VERIFICATION", "to": "RESILIENCE_VERIFICATION", "executed": True,
-             "condition_facts": {"adversarial_verification_passed": True, "resilience_verification_required": True}},
-            {"seq": 13, "type": "state_transition", "from": "RESILIENCE_VERIFICATION", "to": "REGRESSION_REVIEW", "executed": True,
-             "condition_facts": {"resilience_verification_passed": True}},
-            {"seq": 14, "type": "state_transition", "from": "REGRESSION_REVIEW", "to": "DISCHARGE_REVIEW", "executed": True,
-             "condition_facts": {"required_capabilities_preserved": True, "blocking_regression_present": False}},
-            {"seq": 15, "type": "state_transition", "from": "DISCHARGE_REVIEW", "to": "RECOVERED", "executed": True,
-             "condition_facts": {"required_evidence_satisfied": True, "blocking_residual_risk": False}},
+            {
+                "seq": 1,
+                "type": "state_transition",
+                "from": "ADMITTED",
+                "to": "CONTAINED",
+                "executed": True,
+                "condition_facts": {"containment_required": True},
+            },
+            {
+                "seq": 2,
+                "type": "state_transition",
+                "from": "CONTAINED",
+                "to": "BASELINING",
+                "executed": True,
+                "condition_facts": {"safe_to_observe": True},
+            },
+            {
+                "seq": 3,
+                "type": "state_transition",
+                "from": "BASELINING",
+                "to": "AUTHORITY_MAPPED",
+                "executed": True,
+                "condition_facts": {"baseline_sufficient": True},
+            },
+            {
+                "seq": 4,
+                "type": "state_transition",
+                "from": "AUTHORITY_MAPPED",
+                "to": "DIAGNOSING",
+                "executed": True,
+                "condition_facts": {"authority_envelope_established": True},
+            },
+            {
+                "seq": 5,
+                "type": "state_transition",
+                "from": "DIAGNOSING",
+                "to": "DIAGNOSIS_CONFIRMED",
+                "executed": True,
+                "condition_facts": {
+                    "root_cause_confidence_met": True,
+                    "evidence_threshold_met": True,
+                },
+            },
+            {
+                "seq": 6,
+                "type": "state_transition",
+                "from": "DIAGNOSIS_CONFIRMED",
+                "to": "TREATMENT_PROPOSED",
+                "executed": True,
+                "condition_facts": {"bounded_treatment_designable": True},
+            },
+            {
+                "seq": 7,
+                "type": "state_transition",
+                "from": "TREATMENT_PROPOSED",
+                "to": "AWAITING_AUTHORIZATION",
+                "executed": True,
+                "condition_facts": {
+                    "explicit_authorization_required": True,
+                    "authorization_scoped": False,
+                },
+            },
+            {
+                "seq": 8,
+                "type": "state_transition",
+                "from": "AWAITING_AUTHORIZATION",
+                "to": "TREATING",
+                "executed": True,
+                "condition_facts": {"authorization_scoped": True},
+            },
+            {
+                "seq": 9,
+                "type": "state_transition",
+                "from": "TREATING",
+                "to": "SELF_TESTING",
+                "executed": True,
+                "condition_facts": {
+                    "treatment_completed": True,
+                    "treatment_within_authorized_scope": True,
+                },
+            },
+            {
+                "seq": 10,
+                "type": "state_transition",
+                "from": "SELF_TESTING",
+                "to": "INDEPENDENT_VERIFICATION",
+                "executed": True,
+                "condition_facts": {
+                    "independent_verification_required": True,
+                    "independent_verification_selected": True,
+                },
+            },
+            {
+                "seq": 11,
+                "type": "state_transition",
+                "from": "INDEPENDENT_VERIFICATION",
+                "to": "ADVERSARIAL_VERIFICATION",
+                "executed": True,
+                "condition_facts": {
+                    "independent_verification_passed": True,
+                    "adversarial_verification_required": True,
+                },
+            },
+            {
+                "seq": 12,
+                "type": "state_transition",
+                "from": "ADVERSARIAL_VERIFICATION",
+                "to": "RESILIENCE_VERIFICATION",
+                "executed": True,
+                "condition_facts": {
+                    "adversarial_verification_passed": True,
+                    "resilience_verification_required": True,
+                },
+            },
+            {
+                "seq": 13,
+                "type": "state_transition",
+                "from": "RESILIENCE_VERIFICATION",
+                "to": "REGRESSION_REVIEW",
+                "executed": True,
+                "condition_facts": {"resilience_verification_passed": True},
+            },
+            {
+                "seq": 14,
+                "type": "state_transition",
+                "from": "REGRESSION_REVIEW",
+                "to": "DISCHARGE_REVIEW",
+                "executed": True,
+                "condition_facts": {
+                    "required_capabilities_preserved": True,
+                    "blocking_regression_present": False,
+                },
+            },
+            {
+                "seq": 15,
+                "type": "state_transition",
+                "from": "DISCHARGE_REVIEW",
+                "to": "RECOVERED",
+                "executed": True,
+                "condition_facts": {
+                    "required_evidence_satisfied": True,
+                    "blocking_residual_risk": False,
+                },
+            },
         ]
 
         for event in events:
             self.assertTrue(
                 declared_transition(self.protocol, event["from"], event["to"]),
-                f"Illegal transition: {event['from']} -> {event['to']}"
+                f"Illegal transition: {event['from']} -> {event['to']}",
             )
 
         declared_facts = set(self.conditions["facts"])
@@ -162,6 +316,7 @@ class FullJourneyTest(unittest.TestCase):
                     self.assertIn(fact, declared_facts, f"Undeclared fact: {fact}")
 
         from scripts.validate_hospital import load_json
+
         evidence_schema = load_json(ROOT / "evidence" / "evidence-record.schema.json")
         valid_kinds = set(evidence_schema["properties"]["kind"]["enum"])
         for ev in evidence_records:
@@ -169,68 +324,241 @@ class FullJourneyTest(unittest.TestCase):
 
         valid_roles = set(evidence_schema["properties"]["producer_role"]["enum"])
         for ev in evidence_records:
-            self.assertIn(ev["producer_role"], valid_roles, f"Invalid producer role: {ev['producer_role']}")
+            self.assertIn(
+                ev["producer_role"], valid_roles, f"Invalid producer role: {ev['producer_role']}"
+            )
 
         print("✓ R0 routine journey validation passed")
 
     def test_r3_critical_journey(self):
         """Test complete R3 (critical) patient journey with human discharge authorization."""
         evidence_records = [
-            evidence("EV-ADMIT", "repository_inspection", "case_orchestrator", "observed", "ID-ORCHESTRATOR"),
-            evidence("EV-CONTAIN", "runtime_observation", "treating_agent", "observed", "ID-PATIENT"),
+            evidence(
+                "EV-ADMIT",
+                "repository_inspection",
+                "case_orchestrator",
+                "observed",
+                "ID-ORCHESTRATOR",
+            ),
+            evidence(
+                "EV-CONTAIN", "runtime_observation", "treating_agent", "observed", "ID-PATIENT"
+            ),
             evidence("EV-BASELINE", "diagnosis", "treating_agent", "observed", "ID-PATIENT"),
-            evidence("EV-AUTH-MAP", "authorization", "authorized_operator", "granted", "ID-OPERATOR"),
+            evidence(
+                "EV-AUTH-MAP", "authorization", "authorized_operator", "granted", "ID-OPERATOR"
+            ),
             evidence("EV-DIAGNOSE", "diagnosis", "treating_agent", "pass", "ID-PATIENT"),
             evidence("EV-ROOT-CAUSE", "diagnosis", "case_orchestrator", "pass", "ID-ORCHESTRATOR"),
-            evidence("EV-TREATMENT-PLAN", "treatment_result", "treating_agent", "pass", "ID-PATIENT"),
-            evidence("EV-TREAT-AUTH", "authorization", "authorized_operator", "granted", "ID-OPERATOR"),
-            evidence("EV-DISCHARGE-AUTH", "authorization", "authorized_operator", "granted", "ID-OPERATOR"),
+            evidence(
+                "EV-TREATMENT-PLAN", "treatment_result", "treating_agent", "pass", "ID-PATIENT"
+            ),
+            evidence(
+                "EV-TREAT-AUTH", "authorization", "authorized_operator", "granted", "ID-OPERATOR"
+            ),
+            evidence(
+                "EV-DISCHARGE-AUTH",
+                "authorization",
+                "authorized_operator",
+                "granted",
+                "ID-OPERATOR",
+            ),
             evidence("EV-TREAT", "treatment_result", "treating_agent", "pass", "ID-PATIENT"),
             evidence("EV-SELF-TEST", "self_test", "treating_agent", "pass", "ID-PATIENT"),
-            evidence("EV-INDEP", "independent_verification", "independent_verifier", "pass", "ID-VERIFIER", fresh_context=True),
-            evidence("EV-ADV", "adversarial_verification", "adversarial_verifier", "pass", "ID-ADVERSARIAL"),
-            evidence("EV-RESIL", "resilience_verification", "resilience_verifier", "pass", "ID-RESILIENCE"),
-            evidence("EV-REGRESSION", "regression_review", "independent_verifier", "pass", "ID-VERIFIER"),
-            evidence("EV-DISCHARGE", "discharge_review", "independent_verifier", "pass", "ID-VERIFIER"),
+            evidence(
+                "EV-INDEP",
+                "independent_verification",
+                "independent_verifier",
+                "pass",
+                "ID-VERIFIER",
+                fresh_context=True,
+            ),
+            evidence(
+                "EV-ADV",
+                "adversarial_verification",
+                "adversarial_verifier",
+                "pass",
+                "ID-ADVERSARIAL",
+            ),
+            evidence(
+                "EV-RESIL",
+                "resilience_verification",
+                "resilience_verifier",
+                "pass",
+                "ID-RESILIENCE",
+            ),
+            evidence(
+                "EV-REGRESSION", "regression_review", "independent_verifier", "pass", "ID-VERIFIER"
+            ),
+            evidence(
+                "EV-DISCHARGE", "discharge_review", "independent_verifier", "pass", "ID-VERIFIER"
+            ),
         ]
 
+        # Verify required critical-case evidence, rather than leaving fixtures unused.
+        evidence_ids = {item["evidence_id"] for item in evidence_records}
+        self.assertEqual(len(evidence_records), len(evidence_ids))
+        self.assertTrue(all(item["synthetic"] for item in evidence_records))
+        for required in ("EV-TREAT-AUTH", "EV-DISCHARGE-AUTH", "EV-INDEP", "EV-ADV", "EV-RESIL"):
+            self.assertIn(required, evidence_ids)
+        self.assertTrue(
+            all(
+                item["result"] == "granted"
+                for item in evidence_records
+                if item["evidence_id"] in {"EV-TREAT-AUTH", "EV-DISCHARGE-AUTH"}
+            )
+        )
+
         events = [
-            {"seq": 1, "type": "state_transition", "from": "ADMITTED", "to": "CONTAINED", "executed": True,
-             "condition_facts": {"containment_required": True}},
-            {"seq": 2, "type": "state_transition", "from": "CONTAINED", "to": "BASELINING", "executed": True,
-             "condition_facts": {"safe_to_observe": True}},
-            {"seq": 3, "type": "state_transition", "from": "BASELINING", "to": "AUTHORITY_MAPPED", "executed": True,
-             "condition_facts": {"baseline_sufficient": True}},
-            {"seq": 4, "type": "state_transition", "from": "AUTHORITY_MAPPED", "to": "DIAGNOSING", "executed": True,
-             "condition_facts": {"authority_envelope_established": True}},
-            {"seq": 5, "type": "state_transition", "from": "DIAGNOSING", "to": "DIAGNOSIS_CONFIRMED", "executed": True,
-             "condition_facts": {"root_cause_confidence_met": True, "evidence_threshold_met": True}},
-            {"seq": 6, "type": "state_transition", "from": "DIAGNOSIS_CONFIRMED", "to": "TREATMENT_PROPOSED", "executed": True,
-             "condition_facts": {"bounded_treatment_designable": True}},
-            {"seq": 7, "type": "state_transition", "from": "TREATMENT_PROPOSED", "to": "AWAITING_AUTHORIZATION", "executed": True,
-             "condition_facts": {"explicit_authorization_required": True, "authorization_scoped": False}},
-            {"seq": 8, "type": "state_transition", "from": "AWAITING_AUTHORIZATION", "to": "TREATING", "executed": True,
-             "condition_facts": {"authorization_scoped": True}},
-            {"seq": 9, "type": "state_transition", "from": "TREATING", "to": "SELF_TESTING", "executed": True,
-             "condition_facts": {"treatment_completed": True, "treatment_within_authorized_scope": True}},
-            {"seq": 10, "type": "state_transition", "from": "SELF_TESTING", "to": "INDEPENDENT_VERIFICATION", "executed": True,
-             "condition_facts": {"independent_verification_required": True, "independent_verification_selected": True}},
-            {"seq": 11, "type": "state_transition", "from": "INDEPENDENT_VERIFICATION", "to": "ADVERSARIAL_VERIFICATION", "executed": True,
-             "condition_facts": {"independent_verification_passed": True, "adversarial_verification_required": True}},
-            {"seq": 12, "type": "state_transition", "from": "ADVERSARIAL_VERIFICATION", "to": "RESILIENCE_VERIFICATION", "executed": True,
-             "condition_facts": {"adversarial_verification_passed": True, "resilience_verification_required": True}},
-            {"seq": 13, "type": "state_transition", "from": "RESILIENCE_VERIFICATION", "to": "REGRESSION_REVIEW", "executed": True,
-             "condition_facts": {"resilience_verification_passed": True}},
-            {"seq": 14, "type": "state_transition", "from": "REGRESSION_REVIEW", "to": "DISCHARGE_REVIEW", "executed": True,
-             "condition_facts": {"required_capabilities_preserved": True, "blocking_regression_present": False}},
-            {"seq": 15, "type": "state_transition", "from": "DISCHARGE_REVIEW", "to": "RECOVERED", "executed": True,
-             "condition_facts": {"required_evidence_satisfied": True, "blocking_residual_risk": False}},
+            {
+                "seq": 1,
+                "type": "state_transition",
+                "from": "ADMITTED",
+                "to": "CONTAINED",
+                "executed": True,
+                "condition_facts": {"containment_required": True},
+            },
+            {
+                "seq": 2,
+                "type": "state_transition",
+                "from": "CONTAINED",
+                "to": "BASELINING",
+                "executed": True,
+                "condition_facts": {"safe_to_observe": True},
+            },
+            {
+                "seq": 3,
+                "type": "state_transition",
+                "from": "BASELINING",
+                "to": "AUTHORITY_MAPPED",
+                "executed": True,
+                "condition_facts": {"baseline_sufficient": True},
+            },
+            {
+                "seq": 4,
+                "type": "state_transition",
+                "from": "AUTHORITY_MAPPED",
+                "to": "DIAGNOSING",
+                "executed": True,
+                "condition_facts": {"authority_envelope_established": True},
+            },
+            {
+                "seq": 5,
+                "type": "state_transition",
+                "from": "DIAGNOSING",
+                "to": "DIAGNOSIS_CONFIRMED",
+                "executed": True,
+                "condition_facts": {
+                    "root_cause_confidence_met": True,
+                    "evidence_threshold_met": True,
+                },
+            },
+            {
+                "seq": 6,
+                "type": "state_transition",
+                "from": "DIAGNOSIS_CONFIRMED",
+                "to": "TREATMENT_PROPOSED",
+                "executed": True,
+                "condition_facts": {"bounded_treatment_designable": True},
+            },
+            {
+                "seq": 7,
+                "type": "state_transition",
+                "from": "TREATMENT_PROPOSED",
+                "to": "AWAITING_AUTHORIZATION",
+                "executed": True,
+                "condition_facts": {
+                    "explicit_authorization_required": True,
+                    "authorization_scoped": False,
+                },
+            },
+            {
+                "seq": 8,
+                "type": "state_transition",
+                "from": "AWAITING_AUTHORIZATION",
+                "to": "TREATING",
+                "executed": True,
+                "condition_facts": {"authorization_scoped": True},
+            },
+            {
+                "seq": 9,
+                "type": "state_transition",
+                "from": "TREATING",
+                "to": "SELF_TESTING",
+                "executed": True,
+                "condition_facts": {
+                    "treatment_completed": True,
+                    "treatment_within_authorized_scope": True,
+                },
+            },
+            {
+                "seq": 10,
+                "type": "state_transition",
+                "from": "SELF_TESTING",
+                "to": "INDEPENDENT_VERIFICATION",
+                "executed": True,
+                "condition_facts": {
+                    "independent_verification_required": True,
+                    "independent_verification_selected": True,
+                },
+            },
+            {
+                "seq": 11,
+                "type": "state_transition",
+                "from": "INDEPENDENT_VERIFICATION",
+                "to": "ADVERSARIAL_VERIFICATION",
+                "executed": True,
+                "condition_facts": {
+                    "independent_verification_passed": True,
+                    "adversarial_verification_required": True,
+                },
+            },
+            {
+                "seq": 12,
+                "type": "state_transition",
+                "from": "ADVERSARIAL_VERIFICATION",
+                "to": "RESILIENCE_VERIFICATION",
+                "executed": True,
+                "condition_facts": {
+                    "adversarial_verification_passed": True,
+                    "resilience_verification_required": True,
+                },
+            },
+            {
+                "seq": 13,
+                "type": "state_transition",
+                "from": "RESILIENCE_VERIFICATION",
+                "to": "REGRESSION_REVIEW",
+                "executed": True,
+                "condition_facts": {"resilience_verification_passed": True},
+            },
+            {
+                "seq": 14,
+                "type": "state_transition",
+                "from": "REGRESSION_REVIEW",
+                "to": "DISCHARGE_REVIEW",
+                "executed": True,
+                "condition_facts": {
+                    "required_capabilities_preserved": True,
+                    "blocking_regression_present": False,
+                },
+            },
+            {
+                "seq": 15,
+                "type": "state_transition",
+                "from": "DISCHARGE_REVIEW",
+                "to": "RECOVERED",
+                "executed": True,
+                "condition_facts": {
+                    "required_evidence_satisfied": True,
+                    "blocking_residual_risk": False,
+                },
+            },
         ]
 
         for event in events:
             self.assertTrue(
                 declared_transition(self.protocol, event["from"], event["to"]),
-                f"Illegal transition: {event['from']} -> {event['to']}"
+                f"Illegal transition: {event['from']} -> {event['to']}",
             )
 
         risk_class = self.protocol["risk_classes"]["R3"]
@@ -251,23 +579,82 @@ class FullJourneyTest(unittest.TestCase):
             ("CONTAINED", "BASELINING", {"safe_to_observe": True}, True),
             ("BASELINING", "AUTHORITY_MAPPED", {"baseline_sufficient": True}, True),
             ("AUTHORITY_MAPPED", "DIAGNOSING", {"authority_envelope_established": True}, True),
-            ("DIAGNOSING", "DIAGNOSIS_CONFIRMED", {"root_cause_confidence_met": True, "evidence_threshold_met": True}, True),
-            ("DIAGNOSIS_CONFIRMED", "TREATMENT_PROPOSED", {"bounded_treatment_designable": True}, True),
-            ("TREATMENT_PROPOSED", "AWAITING_AUTHORIZATION", {"explicit_authorization_required": True, "authorization_scoped": False}, True),
+            (
+                "DIAGNOSING",
+                "DIAGNOSIS_CONFIRMED",
+                {"root_cause_confidence_met": True, "evidence_threshold_met": True},
+                True,
+            ),
+            (
+                "DIAGNOSIS_CONFIRMED",
+                "TREATMENT_PROPOSED",
+                {"bounded_treatment_designable": True},
+                True,
+            ),
+            (
+                "TREATMENT_PROPOSED",
+                "AWAITING_AUTHORIZATION",
+                {"explicit_authorization_required": True, "authorization_scoped": False},
+                True,
+            ),
             ("AWAITING_AUTHORIZATION", "TREATING", {"authorization_scoped": True}, True),
-            ("TREATING", "SELF_TESTING", {"treatment_completed": True, "treatment_within_authorized_scope": True}, True),
-            ("SELF_TESTING", "INDEPENDENT_VERIFICATION", {"independent_verification_required": True, "independent_verification_selected": True}, True),
-            ("INDEPENDENT_VERIFICATION", "ADVERSARIAL_VERIFICATION", {"independent_verification_passed": True, "adversarial_verification_required": True}, True),
-            ("ADVERSARIAL_VERIFICATION", "RESILIENCE_VERIFICATION", {"adversarial_verification_passed": True, "resilience_verification_required": True}, True),
-            ("RESILIENCE_VERIFICATION", "REGRESSION_REVIEW", {"resilience_verification_passed": True}, True),
-            ("REGRESSION_REVIEW", "DISCHARGE_REVIEW", {"required_capabilities_preserved": True, "blocking_regression_present": False}, True),
-            ("DISCHARGE_REVIEW", "RECOVERED", {"required_evidence_satisfied": True, "blocking_residual_risk": False}, True),
+            (
+                "TREATING",
+                "SELF_TESTING",
+                {"treatment_completed": True, "treatment_within_authorized_scope": True},
+                True,
+            ),
+            (
+                "SELF_TESTING",
+                "INDEPENDENT_VERIFICATION",
+                {
+                    "independent_verification_required": True,
+                    "independent_verification_selected": True,
+                },
+                True,
+            ),
+            (
+                "INDEPENDENT_VERIFICATION",
+                "ADVERSARIAL_VERIFICATION",
+                {
+                    "independent_verification_passed": True,
+                    "adversarial_verification_required": True,
+                },
+                True,
+            ),
+            (
+                "ADVERSARIAL_VERIFICATION",
+                "RESILIENCE_VERIFICATION",
+                {"adversarial_verification_passed": True, "resilience_verification_required": True},
+                True,
+            ),
+            (
+                "RESILIENCE_VERIFICATION",
+                "REGRESSION_REVIEW",
+                {"resilience_verification_passed": True},
+                True,
+            ),
+            (
+                "REGRESSION_REVIEW",
+                "DISCHARGE_REVIEW",
+                {"required_capabilities_preserved": True, "blocking_regression_present": False},
+                True,
+            ),
+            (
+                "DISCHARGE_REVIEW",
+                "RECOVERED",
+                {"required_evidence_satisfied": True, "blocking_residual_risk": False},
+                True,
+            ),
         ]
 
         for source, target, facts, expected in test_cases:
             allowed, matched = evaluate_transition(source, target, facts)
-            self.assertEqual(allowed, expected,
-                f"Transition {source} -> {target} with facts {facts}: expected {expected}, got {allowed}, matched {matched}")
+            self.assertEqual(
+                allowed,
+                expected,
+                f"Transition {source} -> {target} with facts {facts}: expected {expected}, got {allowed}, matched {matched}",
+            )
 
         print("✓ All transition policy evaluations passed")
 

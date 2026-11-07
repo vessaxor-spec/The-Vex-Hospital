@@ -9,14 +9,13 @@ from pathlib import Path
 
 import jsonschema
 import yaml
-
-from evaluate_behavioral_run import BehavioralFailure, evaluate as evaluate_behavioral_run
-from evaluate_evidence_provenance import ProvenanceFailure
+from evaluate_behavioral_run import evaluate as evaluate_behavioral_run
 
 ROOT = Path(__file__).resolve().parents[1]
 
 TEXT_SUFFIXES = {".md", ".yaml", ".yml", ".json", ".py", ".txt"}
 EM_DASH = "\u2014"
+
 
 class ValidationFailure(Exception):
     pass
@@ -60,16 +59,24 @@ def validate_protocol():
 
     require(states, "Protocol has no nonterminal states.")
     require(outcomes, "Protocol has no terminal outcomes.")
-    require(set(protocol["transitions"]) == states, "Protocol transition sources must exactly match nonterminal states.")
+    require(
+        set(protocol["transitions"]) == states,
+        "Protocol transition sources must exactly match nonterminal states.",
+    )
 
     known_targets = states | outcomes
     for source, transitions in protocol["transitions"].items():
         require(source in states, f"Unknown transition source: {source}")
         for transition in transitions:
-            require(transition["to"] in known_targets, f"Unknown transition target: {transition['to']}")
+            require(
+                transition["to"] in known_targets, f"Unknown transition target: {transition['to']}"
+            )
 
     for transition in protocol["global_transitions"]:
-        require(transition["to"] in outcomes, f"Global transition target is not terminal: {transition['to']}")
+        require(
+            transition["to"] in outcomes,
+            f"Global transition target is not terminal: {transition['to']}",
+        )
 
     return protocol
 
@@ -101,9 +108,7 @@ def validate_transition_conditions(protocol):
         for transitions in protocol["transitions"].values()
         for transition in transitions
     }
-    predicates.update(
-        transition["when"] for transition in protocol["global_transitions"]
-    )
+    predicates.update(transition["when"] for transition in protocol["global_transitions"])
 
     registered = set(registry["conditions"])
     require(
@@ -182,9 +187,7 @@ def validate_privacy_registry():
             try:
                 re.compile(entry["regex"])
             except re.error as exc:
-                raise ValidationFailure(
-                    f"Invalid privacy regex {entry['id']}: {exc}"
-                ) from exc
+                raise ValidationFailure(f"Invalid privacy regex {entry['id']}: {exc}") from exc
 
     return registry
 
@@ -208,13 +211,8 @@ def validate_live_trial_harness():
     validate_json_schema(registry_path, registry_schema_path)
     registry = load_json(registry_path)
 
-    known_playbooks = set(
-        load_yaml(ROOT / "playbooks" / "registry.yaml")["playbooks"]
-    )
-    known_cases = {
-        load_json(path)["case_id"]
-        for path in (ROOT / "evals" / "cases").glob("*.json")
-    }
+    known_playbooks = set(load_yaml(ROOT / "playbooks" / "registry.yaml")["playbooks"])
+    known_cases = {load_json(path)["case_id"] for path in (ROOT / "evals" / "cases").glob("*.json")}
 
     adapters_root = (ROOT / "live_trials" / "adapters").resolve()
 
@@ -228,9 +226,7 @@ def validate_live_trial_harness():
             f"Test-only trial adapter cannot support live execution: {adapter_id}",
         )
 
-        module_path = (
-            ROOT / (adapter["module"].replace(".", "/") + ".py")
-        ).resolve()
+        module_path = (ROOT / (adapter["module"].replace(".", "/") + ".py")).resolve()
         require(
             module_path.is_relative_to(adapters_root),
             f"Trial adapter module escapes adapter directory: {adapter_id}",
@@ -240,9 +236,7 @@ def validate_live_trial_harness():
             f"Trial adapter module is missing: {adapter_id}",
         )
 
-    manifests = sorted(
-        (ROOT / "live_trials" / "manifests").glob("*.json")
-    )
+    manifests = sorted((ROOT / "live_trials" / "manifests").glob("*.json"))
     require(manifests, "No trial harness manifests found.")
 
     trial_schema = load_json(trial_schema_path)
@@ -358,9 +352,12 @@ def declared_transition(protocol, source: str, target: str) -> bool:
             return True
 
     for transition in protocol["global_transitions"]:
-        if transition["from"] == "*" and transition.get("excluding_terminal", False):
-            if transition["to"] == target:
-                return True
+        if (
+            transition["from"] == "*"
+            and transition.get("excluding_terminal", False)
+            and transition["to"] == target
+        ):
+            return True
 
     return False
 
@@ -386,14 +383,26 @@ def validate_evals(protocol, specialists):
         case_ids.add(case["case_id"])
 
         unknown_departments = set(case["required_departments"]) - departments
-        require(not unknown_departments, f"{case['case_id']} references unknown departments: {sorted(unknown_departments)}")
+        require(
+            not unknown_departments,
+            f"{case['case_id']} references unknown departments: {sorted(unknown_departments)}",
+        )
 
         unknown_outcomes = set(case["acceptable_terminal_outcomes"]) - outcomes
-        require(not unknown_outcomes, f"{case['case_id']} references unknown outcomes: {sorted(unknown_outcomes)}")
+        require(
+            not unknown_outcomes,
+            f"{case['case_id']} references unknown outcomes: {sorted(unknown_outcomes)}",
+        )
 
         for probe in case["transition_probes"]:
-            require(probe["from"] in known_states, f"{case['case_id']} has unknown probe source: {probe['from']}")
-            require(probe["to"] in known_states, f"{case['case_id']} has unknown probe target: {probe['to']}")
+            require(
+                probe["from"] in known_states,
+                f"{case['case_id']} has unknown probe source: {probe['from']}",
+            )
+            require(
+                probe["to"] in known_states,
+                f"{case['case_id']} has unknown probe target: {probe['to']}",
+            )
             actual = declared_transition(protocol, probe["from"], probe["to"])
             require(
                 actual == probe["expected_legal"],
@@ -429,12 +438,9 @@ def validate_behavioral_runs():
         evaluate_behavioral_run(path)
 
     assurance_cases = {
-        load_json(path)["case_id"]
-        for path in (ROOT / "evals" / "cases").glob("*.json")
+        load_json(path)["case_id"] for path in (ROOT / "evals" / "cases").glob("*.json")
     }
-    registered_playbooks = set(
-        load_yaml(ROOT / "playbooks" / "registry.yaml")["playbooks"]
-    )
+    registered_playbooks = set(load_yaml(ROOT / "playbooks" / "registry.yaml")["playbooks"])
 
     require(
         assurance_cases.issubset(covered_cases),
@@ -453,16 +459,14 @@ def validate_public_text():
     excluded = {Path(path) for path in registry["excluded_paths"]}
 
     content_patterns = [
-        (entry["id"], re.compile(entry["regex"]))
-        for entry in registry["content_patterns"]
+        (entry["id"], re.compile(entry["regex"])) for entry in registry["content_patterns"]
     ]
     filename_patterns = [
         (entry["id"], re.compile(entry["regex"]))
         for entry in registry["sensitive_filename_patterns"]
     ]
     forbidden_path_patterns = [
-        (entry["id"], re.compile(entry["regex"]))
-        for entry in registry["forbidden_path_patterns"]
+        (entry["id"], re.compile(entry["regex"])) for entry in registry["forbidden_path_patterns"]
     ]
 
     for path in ROOT.rglob("*"):
@@ -483,15 +487,11 @@ def validate_public_text():
 
         for pattern_id, pattern in filename_patterns:
             if pattern.search(relative_text):
-                failures.append(
-                    f"{relative}: sensitive filename pattern matched: {pattern_id}"
-                )
+                failures.append(f"{relative}: sensitive filename pattern matched: {pattern_id}")
 
         for pattern_id, pattern in forbidden_path_patterns:
             if pattern.search(relative_text):
-                failures.append(
-                    f"{relative}: forbidden public path matched: {pattern_id}"
-                )
+                failures.append(f"{relative}: forbidden public path matched: {pattern_id}")
 
         if path.suffix.lower() not in TEXT_SUFFIXES:
             continue
@@ -509,14 +509,11 @@ def validate_public_text():
 
         for pattern_id, pattern in content_patterns:
             if pattern.search(text):
-                failures.append(
-                    f"{relative}: sensitive content pattern matched: {pattern_id}"
-                )
+                failures.append(f"{relative}: sensitive content pattern matched: {pattern_id}")
 
     require(
         not failures,
-        "Public text validation failed:\n"
-        + "\n".join(f"  - {item}" for item in failures),
+        "Public text validation failed:\n" + "\n".join(f"  - {item}" for item in failures),
     )
 
 
@@ -561,7 +558,13 @@ def main():
         validate_public_text()
         checks.append("public-text")
 
-    except (ValidationFailure, json.JSONDecodeError, yaml.YAMLError, jsonschema.ValidationError, jsonschema.SchemaError) as exc:
+    except (
+        ValidationFailure,
+        json.JSONDecodeError,
+        yaml.YAMLError,
+        jsonschema.ValidationError,
+        jsonschema.SchemaError,
+    ) as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
         return 1
 

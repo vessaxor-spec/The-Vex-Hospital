@@ -1,6 +1,6 @@
-[tool.ruff]
 target-version = "py313"
 line-length = 100
+[lint]
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
@@ -20,13 +20,22 @@ ignore = [
     "TRY003", # avoid specifying long messages outside the exception class
 ]
 
-[tool.ruff.format]
+[format]
 quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 
-[tool.ruff.lint.isort]
+[lint.isort]
 known-first-party = ["scripts", "tests"]
 
-[tool.ruff.lint.per-file-ignores]
+[lint.per-file-ignores]
 "tests/*" = ["S101", "S106"]
+# Pytest assertion-style rules do not apply to unittest.TestCase methods.
+"tests/test_behavioral_evaluator.py" = ["PT009", "PT027", "PT017"]
+"tests/test_evidence_provenance.py" = ["PT009", "PT027", "PT017"]
+"tests/test_full_journey.py" = ["PT009", "PT027", "PT017"]
+"tests/test_live_trial_harness.py" = ["PT009", "PT027", "PT017"]
+"tests/test_privacy_scanner.py" = ["PT009", "PT027", "PT017"]
+"tests/test_schema_evolution.py" = ["PT009", "PT027", "PT017"]
+"tests/test_transition_policy.py" = ["PT009", "PT027", "PT017"]
+"tests/test_validator_mutations.py" = ["PT009", "PT027", "PT017"]

@@ -10,7 +10,6 @@ from pathlib import Path
 
 import yaml
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -59,7 +58,9 @@ class HospitalMutationTests(unittest.TestCase):
             {"to": "TREATING", "when": "mutation_test_bypass"}
         )
         path.write_text(yaml.safe_dump(protocol, sort_keys=False), encoding="utf-8")
-        self.assert_validator_fails("Transition condition registry must exactly match protocol predicates")
+        self.assert_validator_fails(
+            "Transition condition registry must exactly match protocol predicates"
+        )
 
     def test_undeclared_specialist_department_fails(self):
         path = self.work / "specialists" / "registry.yaml"
@@ -100,21 +101,14 @@ class HospitalMutationTests(unittest.TestCase):
         self.assert_validator_fails("Behavioral coverage missing playbooks")
 
     def test_checked_in_live_trial_manifest_fails(self):
-        path = (
-            self.work
-            / "live_trials"
-            / "manifests"
-            / "TRIAL-EVAL-001-MOCK.json"
-        )
+        path = self.work / "live_trials" / "manifests" / "TRIAL-EVAL-001-MOCK.json"
         manifest = json.loads(path.read_text(encoding="utf-8"))
         manifest["execution_mode"] = "live"
         path.write_text(
             json.dumps(manifest, indent=2) + "\n",
             encoding="utf-8",
         )
-        self.assert_validator_fails(
-            "Checked-in trial manifests must remain mock-only"
-        )
+        self.assert_validator_fails("Checked-in trial manifests must remain mock-only")
 
     def test_unknown_playbook_fails(self):
         path = self.work / "playbooks" / "registry.yaml"

@@ -4,7 +4,6 @@ import importlib.util
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 MODULE_PATH = ROOT / "scripts" / "evaluate_transition_policy.py"
 
@@ -91,7 +90,9 @@ class TransitionPolicyTests(unittest.TestCase):
             },
         )
         self.assertTrue(allowed)
-        self.assertEqual(matched, ["nonwaivable_safety_or_authority_condition_prevents_continuation"])
+        self.assertEqual(
+            matched, ["nonwaivable_safety_or_authority_condition_prevents_continuation"]
+        )
 
     def test_retry_requires_all_compound_facts(self):
         allowed, _ = transition_policy.evaluate_transition(

@@ -55,7 +55,9 @@ def main():
 
     # Write output
     OUTPUT_PATH.write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")
-    print(f"Built {OUTPUT_PATH} with {len(all_conditions)} conditions from {len(module_files)-1} modules")
+    print(
+        f"Built {OUTPUT_PATH} with {len(all_conditions)} conditions from {len(module_files) - 1} modules"
+    )
 
     return 0
 

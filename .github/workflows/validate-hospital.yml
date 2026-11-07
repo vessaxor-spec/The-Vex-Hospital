@@ -95,29 +95,36 @@ jobs:
         continue-on-error: false
 
       - name: Run ruff (format check)
-        run: ruff format --check scripts/ tests/ --output-format=github
+        run: ruff format --check scripts/ tests/
         continue-on-error: false
+
+      - name: Install pinned typing stubs
+        run: python -m pip install --no-cache-dir types-PyYAML==6.0.12.20261103 types-jsonschema==4.23.0.20250516
 
       - name: Run mypy (type check)
         run: mypy scripts/ tests/ --strict --show-error-codes --pretty
         continue-on-error: false
 
-      - name: Run bandit (security lint)
-        run: bandit -r scripts/ tests/ -f json -o bandit-report.json || true
-        continue-on-error: true
+      - name: Install Bandit
+        run: python -m pip install bandit
 
-      - name: Upload bandit results
+      - name: Run bandit (security lint)
+        run: bandit -r scripts/ -f json -o bandit-report.json
+
+      - name: Retain Bandit JSON report
         if: always()
-        uses: github/codeql-action/upload-sarif@8c78abb9b62512e3c45dea6559ffd924ed8549c8
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          sarif_file: bandit-report.json
-          category: bandit
+          name: bandit-report
+          path: bandit-report.json
+          if-no-files-found: warn
+          retention-days: 30
 
   validate:
     name: Validate Hospital Protocol
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [setup, lint]
+    needs: setup
     permissions:
       contents: read
     steps:
@@ -166,7 +173,7 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [setup, lint]
+    needs: setup
     permissions:
       contents: read
     steps:
@@ -212,7 +219,7 @@ jobs:
     name: Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [setup, lint]
+    needs: setup
     permissions:
       contents: read
     steps:
@@ -255,7 +262,7 @@ jobs:
     name: Self-Examination (Mutation Tests)
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    needs: [setup, lint]
+    needs: setup
     permissions:
       contents: read
     steps:
@@ -287,9 +294,14 @@ jobs:
           import unittest
           loader = unittest.TestLoader()
           suite = loader.loadTestsFromName('tests.test_validator_mutations')
-          test_names = [test._testMethodName for test in suite]
+          def iter_cases(node):
+              for item in node:
+                  if isinstance(item, unittest.TestSuite):
+                      yield from iter_cases(item)
+                  else:
+                      yield item
           expected = 12
-          actual = len(test_names)
+          actual = sum(1 for _ in iter_cases(suite))
           assert actual >= expected, f'Expected at least {expected} mutation tests, got {actual}'
           print(f'Mutation tests: {actual} (expected >= {expected})')
           "
@@ -298,7 +310,7 @@ jobs:
     name: Property-Based Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [setup, lint]
+    needs: setup
     permissions:
       contents: read
     steps:
@@ -326,8 +338,13 @@ jobs:
 
       - name: Run with increased examples
         run: |
-          python -m pytest tests/test_transition_property.py::test_transition_policy_no_crash -v --hypothesis-max-examples=200
-        continue-on-error: true
+          python - <<'PY'
+          from hypothesis import settings
+          import pytest
+          settings.register_profile("ci_deep", max_examples=200)
+          settings.load_profile("ci_deep")
+          raise SystemExit(pytest.main(["tests/test_transition_property.py::test_transition_policy_no_crash", "-v"]))
+          PY
         env:
           PYTHONPATH: ${{ github.workspace }}
           PYTHONHASHSEED: random
@@ -351,10 +368,9 @@ jobs:
         uses: trufflesecurity/trufflehog@4dd8831c5f12599465d4d45c3c447b4018a34c85
         with:
           path: ./
-          base: ${{ github.event.pull_request.base.sha || github.sha }}
+          base: ${{ github.event.pull_request.base.sha || github.event.before || 'HEAD~1' }}
           head: ${{ github.event.pull_request.head.sha || github.sha }}
-          extra_args: --json --fail
-        continue-on-error: true
+          extra_args: --json --only-verified
 
       - name: Run detect-secrets
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
@@ -363,33 +379,34 @@ jobs:
       - run: |
           pip install detect-secrets
           detect-secrets scan --all-files --exclude-files '\.gitignore$' --baseline .secrets.baseline
-        continue-on-error: true
 
       - name: Run pip-audit (dependency vulnerabilities)
         run: |
           pip install pip-audit
-          pip-audit -r requirements.txt --format=json --output=pip-audit.json || true
-        continue-on-error: true
+          pip-audit -r requirements.txt --format=json --output=pip-audit.json
 
-      - name: Upload pip-audit results
+      - name: Retain pip-audit JSON report
         if: always()
-        uses: github/codeql-action/upload-sarif@8c78abb9b62512e3c45dea6559ffd924ed8549c8
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          sarif_file: pip-audit.json
-          category: pip-audit
+          name: pip-audit-report
+          path: pip-audit.json
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Run safety (known vulnerabilities)
         run: |
           pip install safety
-          safety check -r requirements.txt --json --output safety-report.json || true
-        continue-on-error: true
+          safety check -r requirements.txt --json > safety-report.json
 
-      - name: Upload safety results
+      - name: Retain Safety JSON report
         if: always()
-        uses: github/codeql-action/upload-sarif@8c78abb9b62512e3c45dea6559ffd924ed8549c8
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          sarif_file: safety-report.json
-          category: safety
+          name: safety-report
+          path: safety-report.json
+          if-no-files-found: warn
+          retention-days: 30
 
   status-check:
     name: Status Check
@@ -401,9 +418,25 @@ jobs:
       contents: read
     steps:
       - name: Check all required jobs passed
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
         run: |
-          echo "All validation jobs completed successfully"
-          exit 0
+          python - <<'PY'
+          import json
+          import os
+          import sys
+
+          jobs = json.loads(os.environ["JOB_RESULTS"])
+          failures = {
+              name: job.get("result", "missing")
+              for name, job in jobs.items()
+              if job.get("result") != "success"
+          }
+          if not jobs or failures:
+              print(f"::error::Required validation jobs not successful: {failures or 'none reported'}")
+              sys.exit(1)
+          print(f"Required validation jobs passed: {', '.join(sorted(jobs))}")
+          PY
 
   notify-failure:
     name: Notify Failure

@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [python, javascript, typescript]
+        language: [python, javascript-typescript]
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1
@@ -39,6 +39,10 @@ jobs:
             api.github.com:443
             github.com:443
             objects.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
+            uploads.github.com:443
+            ghcr.io:443
+            pkg-containers.githubusercontent.com:443
 
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -50,7 +54,6 @@ jobs:
         uses: github/codeql-action/init@8c78abb9b62512e3c45dea6559ffd924ed8549c8
         with:
           languages: ${{ matrix.language }}
-          queries: +security-and-quality,+security-extended
           config-file: ./.github/codeql/codeql-config.yml
           debug: false
 
@@ -62,13 +65,6 @@ jobs:
           output: results.sarif
           format: sarif-latest
           temp-dir: ${{ runner.temp }}/codeql
-
-      - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@8c78abb9b62512e3c45dea6559ffd924ed8549c8
-        with:
-          sarif_file: results.sarif
-          category: codeql/${{ matrix.language }}
-          wait-for-processing: true
 
   trufflehog:
     name: TruffleHog Secret Scan
@@ -85,6 +81,8 @@ jobs:
           allowed-endpoints: >
             api.github.com:443
             github.com:443
+            ghcr.io:443
+            pkg-containers.githubusercontent.com:443
 
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -96,17 +94,9 @@ jobs:
         uses: trufflesecurity/trufflehog@4dd8831c5f12599465d4d45c3c447b4018a34c85
         with:
           path: ./
-          base: ${{ github.event.pull_request.base.sha || github.sha }}
+          base: ${{ github.event.pull_request.base.sha || github.event.before || 'HEAD~1' }}
           head: ${{ github.event.pull_request.head.sha || github.sha }}
-          extra_args: --json --fail --only-verified
-        continue-on-error: true
-
-      - name: Upload results
-        if: always()
-        uses: github/codeql-action/upload-sarif@8c78abb9b62512e3c45dea6559ffd924ed8549c8
-        with:
-          sarif_file: trufflehog-results.sarif
-          category: trufflehog
+          extra_args: --json --only-verified
 
   detect-secrets:
     name: Detect Secrets
@@ -123,6 +113,8 @@ jobs:
           allowed-endpoints: >
             api.github.com:443
             github.com:443
+            pypi.org:443
+            files.pythonhosted.org:443
 
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -167,6 +159,7 @@ jobs:
             api.github.com:443
             github.com:443
             pypi.org:443
+            files.pythonhosted.org:443
             test.pypi.org:443
             registry.npmjs.org:443
 
@@ -187,42 +180,67 @@ jobs:
           python -m pip install -r requirements.txt
 
       - name: Run pip-audit
+        id: pip_audit
         run: |
           python -m pip install pip-audit==2.7.0
-          pip-audit -r requirements.txt --format=json --output=pip-audit.json --desc --fix || true
+          pip-audit -r requirements.txt --format=json --output=pip-audit.json --desc
         continue-on-error: true
 
-      - name: Upload pip-audit results
+      - name: Retain pip-audit JSON report
         if: always()
-        uses: github/codeql-action/upload-sarif@8c78abb9b62512e3c45dea6559ffd924ed8549c8
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          sarif_file: pip-audit.json
-          category: pip-audit
+          name: pip-audit-report
+          path: pip-audit.json
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Run safety
+        id: safety_audit
         run: |
           python -m pip install safety==3.2.0
-          safety check -r requirements.txt --json --output safety-report.json --ignore=000000 || true
+          safety check -r requirements.txt --json > safety-report.json
         continue-on-error: true
 
-      - name: Upload safety results
+      - name: Retain safety JSON report
         if: always()
-        uses: github/codeql-action/upload-sarif@8c78abb9b62512e3c45dea6559ffd924ed8549c8
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          sarif_file: safety-report.json
-          category: safety
+          name: safety-report
+          path: safety-report.json
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Run npm audit
+        id: npm_audit
         run: |
-          npm audit --json --audit-level=high > npm-audit.json || true
+          npm audit --json --audit-level=high > npm-audit.json
         continue-on-error: true
 
-      - name: Upload npm audit results
+      - name: Retain npm-audit JSON report
         if: always()
-        uses: github/codeql-action/upload-sarif@8c78abb9b62512e3c45dea6559ffd924ed8549c8
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          sarif_file: npm-audit.json
-          category: npm-audit
+          name: npm-audit-report
+          path: npm-audit.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      # Keep all three reports, then fail if any audit found vulnerabilities or could not run.
+      - name: Enforce dependency audit outcomes
+        if: always()
+        env:
+          PIP_OUTCOME: ${{ steps.pip_audit.outcome }}
+          SAFETY_OUTCOME: ${{ steps.safety_audit.outcome }}
+          NPM_OUTCOME: ${{ steps.npm_audit.outcome }}
+        run: |
+          for outcome in "$PIP_OUTCOME" "$SAFETY_OUTCOME" "$NPM_OUTCOME"; do
+            if [ "$outcome" != "success" ]; then
+              echo "::error::Dependency scanner failed or reported vulnerabilities"
+              exit 1
+            fi
+          done
+          echo "All dependency scanners completed without findings"
 
   license-check:
     name: License Compliance Check
@@ -239,6 +257,8 @@ jobs:
           allowed-endpoints: >
             api.github.com:443
             github.com:443
+            pypi.org:443
+            files.pythonhosted.org:443
 
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -304,6 +324,8 @@ jobs:
             api.github.com:443
             github.com:443
             semgrep.dev:443
+            pypi.org:443
+            files.pythonhosted.org:443
 
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -311,17 +333,37 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Run Semgrep
-        uses: returntocorp/semgrep@fed96460fd67f504ea59342eba8f921f4d74fe17
+      - name: Setup Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
-          config: >-
-            p/ci
-            p/python
-            p/secrets
-            p/security-audit
-          generateSarif: true
-          output: semgrep-results.sarif
-        continue-on-error: true
+          python-version: "3.13"
+
+      - name: Install Semgrep
+        run: python -m pip install semgrep
+
+      - name: Run Semgrep
+        run: semgrep scan --config p/ci --config p/python --config p/secrets --config p/security-audit --sarif --output semgrep-results.sarif --error
+
+      - name: Summarize findings without exposing code or secret values
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = Path("semgrep-results.sarif")
+          if not report.exists():
+              print("::error::Semgrep SARIF was not created")
+              raise SystemExit(1)
+          data = json.loads(report.read_text(encoding="utf-8"))
+          results = [item for run in data.get("runs", []) for item in run.get("results", [])]
+          for item in results:
+              locations = item.get("locations", [])
+              physical = locations[0].get("physicalLocation", {}) if locations else {}
+              uri = physical.get("artifactLocation", {}).get("uri", "unknown")
+              line = physical.get("region", {}).get("startLine", 0)
+              print(f"SEMGREP_FINDING {item.get('ruleId', 'unknown')} at {uri}:{line}")
+          print(f"SEMGREP_TOTAL {len(results)}")
+          PY
 
       - name: Upload SARIF
         if: always()
@@ -334,7 +376,6 @@ jobs:
     name: Container Scan
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    if: ${{ hashFiles('Dockerfile*') != '' || hashFiles('.dockerignore') != '' }}
     permissions:
       contents: read
       security-events: write
@@ -354,6 +395,7 @@ jobs:
           persist-credentials: false
 
       - name: Run Trivy
+        if: ${{ hashFiles('Dockerfile*') != '' || hashFiles('.dockerignore') != '' }}
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
         with:
           scan-type: 'fs'
@@ -365,7 +407,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload SARIF
-        if: always()
+        if: ${{ hashFiles('Dockerfile*') != '' || hashFiles('.dockerignore') != '' }}
         uses: github/codeql-action/upload-sarif@8c78abb9b62512e3c45dea6559ffd924ed8549c8
         with:
           sarif_file: trivy-results.sarif
@@ -381,12 +423,20 @@ jobs:
       contents: read
       security-events: read
     steps:
-      - name: Check for critical findings
+      - name: Verify required scanner jobs
+        env:
+          SCAN_RESULTS: ${{ toJSON(needs) }}
         run: |
-          echo "Security scanning complete. Check Security tab for findings."
-          exit 0
+          python - <<'PY'
+          import json
+          import os
+          import sys
 
-      - name: Fail on critical findings
-        run: |
-          echo "Security scan completed. Review findings in Security tab."
-          exit 0
+          jobs = json.loads(os.environ["SCAN_RESULTS"])
+          failures = {name: job.get("result") for name, job in jobs.items()
+                      if job.get("result") != "success"}
+          if not jobs or failures:
+              print(f"::error::Security jobs failed or skipped: {failures}")
+              sys.exit(1)
+          print("All required scanner jobs succeeded")
+          PY

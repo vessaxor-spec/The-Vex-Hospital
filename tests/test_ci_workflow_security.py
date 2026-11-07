@@ -1,0 +1,85 @@
+"""Regression checks for GitHub Actions trust boundaries and scanner configuration."""
+
+from __future__ import annotations
+
+import re
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+WORKFLOWS = ROOT / ".github" / "workflows"
+
+
+def shell_commands(text: str) -> list[str]:
+    """Extract multiline shell run bodies without interpreting user input."""
+    lines = text.splitlines()
+    out: list[str] = []
+    index = 0
+    while index < len(lines):
+        match = re.match(r"^(?P<indent> *)run:\s*[|>]\-?\s*$", lines[index])
+        if not match:
+            index += 1
+            continue
+        depth = len(match.group("indent"))
+        index += 1
+        content = []
+        while index < len(lines):
+            line = lines[index]
+            if line.strip() and len(line) - len(line.lstrip(" ")) <= depth:
+                break
+            content.append(line)
+            index += 1
+        out.append("\n".join(content))
+    return out
+
+
+class GitHubWorkflowSecurityTests(unittest.TestCase):
+    def test_dependabot_uses_explicit_stability_cooldown(self) -> None:
+        config = (ROOT / ".github" / "dependabot.yml").read_text(encoding="utf-8")
+        assert config.count("package-ecosystem:") == 3
+        assert config.count("default-days: 7") == 3
+
+    def test_codeql_uses_valid_suite_from_config_only(self) -> None:
+        workflow = (WORKFLOWS / "security-scanning.yml").read_text(encoding="utf-8")
+        config = (ROOT / ".github" / "codeql" / "codeql-config.yml").read_text(encoding="utf-8")
+        assert "queries: +security-and-quality,+security-extended" not in workflow
+        assert "config-file: ./.github/codeql/codeql-config.yml" in workflow
+        assert "uses: security-extended" in config
+        assert "uses: security-and-quality" in config
+
+    def test_codeql_analysis_uploads_once_and_includes_javascript(self) -> None:
+        workflow = (WORKFLOWS / "security-scanning.yml").read_text(encoding="utf-8")
+        codeql_job = workflow.split("  codeql:", 1)[1].split("  trufflehog:", 1)[0]
+        config = (ROOT / ".github" / "codeql" / "codeql-config.yml").read_text(encoding="utf-8")
+        assert "upload: true" in codeql_job
+        assert "name: Upload SARIF" not in codeql_job
+        assert '"commitlint.config.js"' in config
+
+    def test_untrusted_expressions_are_not_interpolated_in_shell(self) -> None:
+        for path in [
+            WORKFLOWS / "commit-linter.yml",
+            WORKFLOWS / "reusable" / "python-setup.yml",
+            WORKFLOWS / "reusable" / "python-tests.yml",
+            WORKFLOWS / "reusable" / "security-scan.yml",
+        ]:
+            with self.subTest(path=path.relative_to(ROOT)):
+                for shell in shell_commands(path.read_text(encoding="utf-8")):
+                    assert re.search(r"\$\{\{\s*inputs\.", shell) is None
+                    assert "${{ github.event.pull_request.title }}" not in shell
+
+    def test_dependency_audits_fail_closed(self) -> None:
+        workflow = (WORKFLOWS / "security-scanning.yml").read_text(encoding="utf-8")
+        scan_job = workflow.split("  dependency-scan:", 1)[1].split("  license-check:", 1)[0]
+        assert "name: Enforce dependency audit outcomes" in scan_job
+        for scan_id in ("pip_audit", "safety_audit", "npm_audit"):
+            assert f"id: {scan_id}" in scan_job
+            assert f"steps.{scan_id}.outcome" in scan_job
+
+    def test_codecov_action_is_immutable(self) -> None:
+        workflow = (WORKFLOWS / "reusable" / "python-tests.yml").read_text(encoding="utf-8")
+        assert re.search(r"codecov/codecov-action@[a-f0-9]{40}", workflow) is not None
+        assert re.search(r"codecov/codecov-action@v\d", workflow) is None
+
+
+if __name__ == "__main__":
+    unittest.main()

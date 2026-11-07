@@ -5,15 +5,17 @@
 
 ## Canonical baseline
 
-The current canonical implementation stops at:
+**Last independently qualified clinical baseline:** V1.2A: Provider-Neutral Live Behavioral Trial Harness
 
-**V1.2A: Provider-Neutral Live Behavioral Trial Harness**
-
-Canonical main commit:
+Qualified baseline commit:
 
 `9d8a6687aed787b8910a4b09db2e013bc3ab3a46`
 
-This baseline has passed the Hospital validator and self-examination after repository lineage repair.
+**Current deployed main head at the 2026-11-07 audit:** `d0ba0010ff20b31f4aecad49271865c6902bce69`
+
+The branch later received the 2026-10-04 v2.0 migration and CI/security/release changes.
+These are present on `main` but **not qualified** by an end-to-end passing CI run.
+Do not confuse the latest deployed source with the last qualified baseline.
 
 ## Completed sequence
 
@@ -28,6 +30,8 @@ This baseline has passed the Hospital validator and self-examination after repos
 - V1.1D: Assurance Coverage Expansion
 - V1.1E: Evidence Integrity and Runtime Identity
 - V1.2A: Provider-Neutral Live Behavioral Trial Harness
+
+The 2026-10-04 v2.0 migration is implemented on `main` but awaits qualification.
 
 ## Canonical capabilities at V1.1E
 
@@ -173,9 +177,39 @@ Implemented:
 
 No real provider adapter is registered. V1.2A does not constitute live-provider validation.
 
+## Post-V1.2A deployed changes and recovery gate (2026-11-07 audit)
+
+**Status:** CI RECOVERY IN PROGRESS; v2.0 deployment NOT QUALIFIED.
+
+The 2026-10-04 history contains a v2.0 migration (commit `94e32b3a9f529bd548cf5f2b0723e1a38d4db8fd`) with:
+- modular condition definitions and build logic;
+- property-based and schema evolution tests;
+- document synchronization and full-journey tests;
+- versioned evidence-envelope and expanded privacy-scanner material;
+- GitHub release, dependency/security, and SBOM/provenance workflow definitions.
+
+The latest main commit in the audit is `d0ba0010ff20b31f4aecad49271865c6902bce69`.
+The `package.json` version is `2.0.0`, but `CHANGELOG.md` contains a release headed `1.0.0`.
+Version naming and release claims are not substitutes for successful verification.
+
+Observed failures in the scheduled 2026-11-02 validation run:
+- `ruff.toml` used `[tool.ruff]` in a standalone file, which Ruff rejects;
+- JSON security reports were uploaded to a SARIF-only action, and some reports were missing;
+- the status-check job printed success without examining its upstream jobs;
+- the new commit linter re-checked legacy history against a later-adopted policy;
+- separate security/release/SBOM workflow reliability has not been established.
+
+A bounded CI remediation branch is being prepared. Do **not** mark CI recovered until:
+1. pull-request and scheduled validation execute real tests and report all required job results accurately;
+2. no scan failure is disguised by an artifact-upload error or unconditional success;
+3. outstanding security, release and provenance workflow failures are separately triaged;
+4. the exact verified candidate head is recorded.
+
+No external live provider adapter is registered. A green mock harness is not live-provider proof.
+
 ## Exact next move
 
-Run a **live adapter selection gate**.
+**First:** restore trustworthy CI and qualify or reject the deployed v2.0 implementation using actual passing tests and recorded evidence. Do not merely disable failing jobs. After that gate passes, run a **live adapter selection gate**.
 
 The gate must choose at most one initial external runtime for the first real provider adapter and must evaluate:
 

@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import copy
 import os
 import sys
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -18,7 +16,6 @@ from run_live_trial import (  # noqa: E402
     filtered_environment,
     load_json,
 )
-
 
 MANIFEST = ROOT / "live_trials" / "manifests" / "TRIAL-EVAL-001-MOCK.json"
 
@@ -137,9 +134,11 @@ class LiveTrialHarnessTests(unittest.TestCase):
             "credential_env": ["VEX_REQUIRED_SECRET"],
         }
 
-        with patch.dict(os.environ, {}, clear=True):
-            with self.assertRaisesRegex(TrialFailure, "Missing live adapter credential"):
-                filtered_environment(adapter, "live")
+        with (
+            patch.dict(os.environ, {}, clear=True),
+            self.assertRaisesRegex(TrialFailure, "Missing live adapter credential"),
+        ):
+            filtered_environment(adapter, "live")
 
 
 if __name__ == "__main__":

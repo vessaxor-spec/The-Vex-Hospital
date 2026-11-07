@@ -12,10 +12,9 @@ from pathlib import Path
 
 import jsonschema
 import yaml
-
-from evaluate_behavioral_run import BehavioralFailure, evaluate as evaluate_behavioral_run
+from evaluate_behavioral_run import BehavioralFailure
+from evaluate_behavioral_run import evaluate as evaluate_behavioral_run
 from evaluate_evidence_provenance import ProvenanceFailure
-
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_ADAPTER_OUTPUT_BYTES = 2_000_000
