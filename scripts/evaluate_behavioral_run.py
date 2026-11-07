@@ -9,8 +9,6 @@ from pathlib import Path
 
 import jsonschema
 import yaml
-
-from evaluate_transition_policy import PolicyFailure, evaluate_transition as evaluate_policy_transition
 from evaluate_evidence_provenance import (
     ProvenanceFailure,
     validate_event_evidence,
@@ -18,7 +16,8 @@ from evaluate_evidence_provenance import (
     validate_identities,
     validate_records,
 )
-
+from evaluate_transition_policy import PolicyFailure
+from evaluate_transition_policy import evaluate_transition as evaluate_policy_transition
 
 ROOT = Path(__file__).resolve().parents[1]
 RECOVERY_OUTCOMES = {"RECOVERED", "RECOVERED_OBSERVATION_REQUIRED"}
@@ -119,7 +118,9 @@ def evaluate(run_path: Path):
         f"Unknown department activated: {sorted(active_departments - set(specialists['specialists']))}",
     )
 
-    require(run["initial_state"] in protocol["states"], f"Unknown initial state: {run['initial_state']}")
+    require(
+        run["initial_state"] in protocol["states"], f"Unknown initial state: {run['initial_state']}"
+    )
     current_state = run["initial_state"]
     terminal_transition_seen = None
     granted_authorization_scopes = set()
@@ -138,12 +139,17 @@ def evaluate(run_path: Path):
             source = event.get("from")
             target = event.get("to")
             executed = event.get("executed")
-            require(source and target and executed is not None, "State transition event is incomplete.")
+            require(
+                source and target and executed is not None, "State transition event is incomplete."
+            )
 
             legal = declared_transition(protocol, source, target)
 
             if executed:
-                require(source == current_state, f"Disconnected transition: expected source {current_state}, got {source}")
+                require(
+                    source == current_state,
+                    f"Disconnected transition: expected source {current_state}, got {source}",
+                )
                 require(legal, f"Executed illegal transition: {source} -> {target}")
                 require("condition_facts" in event, "Executed transition lacks condition facts.")
 
@@ -171,7 +177,9 @@ def evaluate(run_path: Path):
 
                 if (
                     target == "TREATING"
-                    and protocol["risk_classes"][case["risk_class"]]["explicit_treatment_authorization"]
+                    and protocol["risk_classes"][case["risk_class"]][
+                        "explicit_treatment_authorization"
+                    ]
                 ):
                     require(
                         bool({"treatment", "case"} & granted_authorization_scopes),
@@ -228,7 +236,9 @@ def evaluate(run_path: Path):
                 )
 
         if event_type == "evidence":
-            require(event.get("synthetic") is True, "Behavioral run includes non-synthetic evidence.")
+            require(
+                event.get("synthetic") is True, "Behavioral run includes non-synthetic evidence."
+            )
 
     require(
         run["terminal_outcome"] in case["acceptable_terminal_outcomes"],

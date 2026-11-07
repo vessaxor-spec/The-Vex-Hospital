@@ -7,7 +7,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -51,10 +50,7 @@ class PrivacyScannerTests(unittest.TestCase):
         value = "super" + "secret" + "value123456789"
         path = self.work / "README.md"
         path.write_text(
-            path.read_text(encoding="utf-8")
-            + "\napi_key="
-            + value
-            + "\n",
+            path.read_text(encoding="utf-8") + "\napi_key=" + value + "\n",
             encoding="utf-8",
         )
         self.assert_fails("generic_secret_assignment")

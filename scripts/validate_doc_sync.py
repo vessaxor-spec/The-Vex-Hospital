@@ -31,9 +31,7 @@ def check_doc_references(doc_text: str, doc_name: str):
         issues.append(f"{doc_name}: must reference protocol.yaml")
 
     # Must reference key clinical phases
-    clinical_phases = [
-        "admission", "diagnosis", "treatment", "verification", "discharge"
-    ]
+    clinical_phases = ["admission", "diagnosis", "treatment", "verification", "discharge"]
     for phase in clinical_phases:
         if phase.lower() not in doc_text.lower():
             issues.append(f"{doc_name}: missing clinical phase '{phase}'")
@@ -51,15 +49,21 @@ def check_invariants_consistency(doc_text: str, doc_name: str):
     issues = []
 
     # Check for absolute safety claims (violates "no_absolute_safety_claims")
-    if re.search(r"\b(guarantee|ensure|prove).*(safe|secure|correct|reliable)\b", doc_text, re.IGNORECASE):
-        issues.append(f"{doc_name}: may contain absolute safety claims (violates 'no_absolute_safety_claims' invariant)")
+    if re.search(
+        r"\b(guarantee|ensure|prove).*(safe|secure|correct|reliable)\b", doc_text, re.IGNORECASE
+    ):
+        issues.append(
+            f"{doc_name}: may contain absolute safety claims (violates 'no_absolute_safety_claims' invariant)"
+        )
 
     # Check for capability-as-authority (violates "capability_does_not_create_authority")
     # But allow the exact invariant statement "Capability never creates authority"
     if re.search(r"\b(can|able to).*(authorize|permit|grant)\b", doc_text, re.IGNORECASE):
         # Check if it's just stating the invariant
         if "Capability never creates authority" not in doc_text:
-            issues.append(f"{doc_name}: may imply capability creates authority (violates 'capability_does_not_create_authority')")
+            issues.append(
+                f"{doc_name}: may imply capability creates authority (violates 'capability_does_not_create_authority')"
+            )
 
     return issues
 
@@ -86,4 +90,5 @@ def main():
 
 if __name__ == "__main__":
     import sys
+
     raise SystemExit(main())

@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import copy
 import os
 import sys
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -18,7 +16,6 @@ from run_live_trial import (  # noqa: E402
     filtered_environment,
     load_json,
 )
-
 
 MANIFEST = ROOT / "live_trials" / "manifests" / "TRIAL-EVAL-001-MOCK.json"
 

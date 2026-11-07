@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-import copy
 import json
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
-
 
 ROOT = Path(__file__).resolve().parents[1]
 EVALUATOR = ROOT / "scripts" / "evaluate_behavioral_run.py"
@@ -63,10 +61,7 @@ class BehavioralEvaluatorTests(unittest.TestCase):
             data["events"] = [
                 event
                 for event in data["events"]
-                if not (
-                    event["type"] == "authorization"
-                    and event.get("scope") == "treatment"
-                )
+                if not (event["type"] == "authorization" and event.get("scope") == "treatment")
             ]
 
         path = self.temporary_run(RUN_R2, mutate)
@@ -112,10 +107,7 @@ class BehavioralEvaluatorTests(unittest.TestCase):
             data["events"] = [
                 event
                 for event in data["events"]
-                if not (
-                    event["type"] == "authorization"
-                    and event.get("scope") == "discharge"
-                )
+                if not (event["type"] == "authorization" and event.get("scope") == "discharge")
             ]
 
         path = self.temporary_run(RUN_R3, mutate)
@@ -133,10 +125,7 @@ class BehavioralEvaluatorTests(unittest.TestCase):
     def test_missing_authorization_evidence_ref_fails(self):
         def mutate(data):
             for event in data["events"]:
-                if (
-                    event["type"] == "authorization"
-                    and event.get("scope") == "treatment"
-                ):
+                if event["type"] == "authorization" and event.get("scope") == "treatment":
                     event.pop("evidence_ref", None)
 
         path = self.temporary_run(RUN_R2, mutate)
