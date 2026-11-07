@@ -30,16 +30,15 @@ class BehavioralEvaluatorTests(unittest.TestCase):
         for index, event in enumerate(data["events"], start=1):
             event["seq"] = index
 
-        temp = tempfile.NamedTemporaryFile(
+        with tempfile.NamedTemporaryFile(
             mode="w",
             suffix=".json",
             encoding="utf-8",
             delete=False,
-        )
-        json.dump(data, temp, indent=2)
-        temp.write("\n")
-        temp.close()
-        return Path(temp.name)
+        ) as temp:
+            json.dump(data, temp, indent=2)
+            temp.write("\n")
+            return Path(temp.name)
 
     def assert_fails(self, path: Path, fragment: str):
         result = self.run_evaluator(path)

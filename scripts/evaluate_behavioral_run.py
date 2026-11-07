@@ -49,9 +49,12 @@ def declared_transition(protocol, source: str, target: str) -> bool:
             return True
 
     for transition in protocol["global_transitions"]:
-        if transition["from"] == "*" and transition.get("excluding_terminal", False):
-            if transition["to"] == target:
-                return True
+        if (
+            transition["from"] == "*"
+            and transition.get("excluding_terminal", False)
+            and transition["to"] == target
+        ):
+            return True
 
     return False
 

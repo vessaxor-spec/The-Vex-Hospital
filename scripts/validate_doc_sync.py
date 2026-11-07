@@ -58,12 +58,13 @@ def check_invariants_consistency(doc_text: str, doc_name: str):
 
     # Check for capability-as-authority (violates "capability_does_not_create_authority")
     # But allow the exact invariant statement "Capability never creates authority"
-    if re.search(r"\b(can|able to).*(authorize|permit|grant)\b", doc_text, re.IGNORECASE):
-        # Check if it's just stating the invariant
-        if "Capability never creates authority" not in doc_text:
-            issues.append(
-                f"{doc_name}: may imply capability creates authority (violates 'capability_does_not_create_authority')"
-            )
+    if (
+        re.search(r"\b(can|able to).*(authorize|permit|grant)\b", doc_text, re.IGNORECASE)
+        and "Capability never creates authority" not in doc_text
+    ):
+        issues.append(
+            f"{doc_name}: may imply capability creates authority (violates 'capability_does_not_create_authority')"
+        )
 
     return issues
 

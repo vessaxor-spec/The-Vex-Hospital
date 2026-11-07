@@ -20,7 +20,7 @@ def main() -> int:
 
     run_trial = getattr(module, "run_trial", None)
     if not callable(run_trial):
-        raise RuntimeError("Adapter does not expose callable run_trial(context).")
+        raise TypeError("Adapter does not expose callable run_trial(context).")
 
     result = run_trial(context)
     args.output.write_text(

@@ -18,7 +18,11 @@ from hypothesis import strategies as st
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from evaluate_transition_policy import evaluate_transition
+from evaluate_transition_policy import (  # noqa: E402 - sys.path setup above
+    MissingFact,
+    PolicyFailure,
+    evaluate_transition,
+)
 
 
 @settings(max_examples=50, deadline=None)
@@ -115,7 +119,7 @@ def test_transition_policy_no_crash(source, target, facts):
         if allowed:
             import yaml
 
-            PROTOCOL = yaml.safe_load(
+            protocol = yaml.safe_load(
                 (Path(__file__).resolve().parents[1] / "protocol" / "protocol.yaml").read_text()
             )
 
@@ -126,25 +130,22 @@ def test_transition_policy_no_crash(source, target, facts):
                     if transition["to"] == target:
                         return True
                 for transition in protocol["global_transitions"]:
-                    if transition["from"] == "*" and transition.get("excluding_terminal", False):
-                        if transition["to"] == target:
-                            return True
+                    if (
+                        transition["from"] == "*"
+                        and transition.get("excluding_terminal", False)
+                        and transition["to"] == target
+                    ):
+                        return True
                 return False
 
             assert declared_transition(
-                yaml.safe_load(
-                    (Path(__file__).resolve().parents[1] / "protocol" / "protocol.yaml").read_text()
-                ),
+                protocol,
                 source,
                 target,
             ), f"Allowed undeclared transition: {source} -> {target}"
             assert len(matched) > 0, "Allowed transition must have matched condition"
-    except Exception as e:
-        from evaluate_transition_policy import MissingFact, PolicyFailure
-
-        assert isinstance(e, (PolicyFailure, MissingFact)), (
-            f"Unexpected exception: {type(e).__name__}: {e}"
-        )
+    except (PolicyFailure, MissingFact):
+        pass
 
 
 @settings(max_examples=20, deadline=None)
@@ -158,9 +159,9 @@ def test_admitted_transitions(facts):
     allowed_baseline, _ = evaluate_transition("ADMITTED", "BASELINING", test_facts)
 
     if test_facts.get("containment_required") is True:
-        assert evaluate_transition("ADMITTED", "CONTAINED", test_facts)[0] == True
+        assert evaluate_transition("ADMITTED", "CONTAINED", test_facts)[0] is True
     else:
-        assert evaluate_transition("ADMITTED", "BASELINING", test_facts)[0] == True
+        assert evaluate_transition("ADMITTED", "BASELINING", test_facts)[0] is True
 
 
 @settings(max_examples=20, deadline=None)
@@ -247,12 +248,8 @@ def test_deterministic_evaluation(source, target, facts):
 
         assert allowed1 == allowed2, "Evaluation must be deterministic"
         assert matched1 == matched2, "Matched conditions must be deterministic"
-    except Exception as e:
-        from evaluate_transition_policy import MissingFact, PolicyFailure
-
-        assert isinstance(e, (PolicyFailure, MissingFact)), (
-            f"Unexpected exception: {type(e).__name__}: {e}"
-        )
+    except (PolicyFailure, MissingFact):
+        pass
 
 
 if __name__ == "__main__":

@@ -134,9 +134,11 @@ class LiveTrialHarnessTests(unittest.TestCase):
             "credential_env": ["VEX_REQUIRED_SECRET"],
         }
 
-        with patch.dict(os.environ, {}, clear=True):
-            with self.assertRaisesRegex(TrialFailure, "Missing live adapter credential"):
-                filtered_environment(adapter, "live")
+        with (
+            patch.dict(os.environ, {}, clear=True),
+            self.assertRaisesRegex(TrialFailure, "Missing live adapter credential"),
+        ):
+            filtered_environment(adapter, "live")
 
 
 if __name__ == "__main__":

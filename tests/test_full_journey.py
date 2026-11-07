@@ -22,7 +22,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from evaluate_transition_policy import evaluate_transition
+from evaluate_transition_policy import evaluate_transition  # noqa: E402 - sys.path setup above
 
 
 def identity(identity_id: str, role: str, kind: str, session_ref: str = "SYN-TEST-SESSION") -> dict:
@@ -77,9 +77,12 @@ def declared_transition(protocol, source: str, target: str) -> bool:
             return True
 
     for transition in protocol["global_transitions"]:
-        if transition["from"] == "*" and transition.get("excluding_terminal", False):
-            if transition["to"] == target:
-                return True
+        if (
+            transition["from"] == "*"
+            and transition.get("excluding_terminal", False)
+            and transition["to"] == target
+        ):
+            return True
 
     return False
 
@@ -390,6 +393,20 @@ class FullJourneyTest(unittest.TestCase):
                 "EV-DISCHARGE", "discharge_review", "independent_verifier", "pass", "ID-VERIFIER"
             ),
         ]
+
+        # Verify required critical-case evidence, rather than leaving fixtures unused.
+        evidence_ids = {item["evidence_id"] for item in evidence_records}
+        self.assertEqual(len(evidence_records), len(evidence_ids))
+        self.assertTrue(all(item["synthetic"] for item in evidence_records))
+        for required in ("EV-TREAT-AUTH", "EV-DISCHARGE-AUTH", "EV-INDEP", "EV-ADV", "EV-RESIL"):
+            self.assertIn(required, evidence_ids)
+        self.assertTrue(
+            all(
+                item["result"] == "granted"
+                for item in evidence_records
+                if item["evidence_id"] in {"EV-TREAT-AUTH", "EV-DISCHARGE-AUTH"}
+            )
+        )
 
         events = [
             {

@@ -41,10 +41,7 @@ def evaluate_expression(expression, facts):
         return value is expression["equals"]
 
     if "all" in expression:
-        for item in expression["all"]:
-            if not evaluate_expression(item, facts):
-                return False
-        return True
+        return all(evaluate_expression(item, facts) for item in expression["all"])
 
     if "any" in expression:
         missing = []
@@ -125,6 +122,12 @@ def evaluate_transition(source: str, target: str, facts: dict):
     return False, [condition_id for condition_id, _ in evaluated]
 
 
+def validate_fact_payload(facts):
+    if not isinstance(facts, dict):
+        raise PolicyFailure("Facts payload must be a JSON object.")
+    return facts
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--from", dest="source", required=True)
@@ -133,9 +136,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        facts = load_json(args.facts)
-        if not isinstance(facts, dict):
-            raise PolicyFailure("Facts payload must be a JSON object.")
+        facts = validate_fact_payload(load_json(args.facts))
 
         allowed, matched = evaluate_transition(args.source, args.target, facts)
     except (PolicyFailure, json.JSONDecodeError, yaml.YAMLError) as exc:
