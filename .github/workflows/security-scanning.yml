@@ -39,6 +39,8 @@ jobs:
             api.github.com:443
             github.com:443
             objects.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
+            uploads.github.com:443
 
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -85,6 +87,8 @@ jobs:
           allowed-endpoints: >
             api.github.com:443
             github.com:443
+            ghcr.io:443
+            pkg-containers.githubusercontent.com:443
 
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -99,13 +103,6 @@ jobs:
           base: ${{ github.event.pull_request.base.sha || github.event.before || 'HEAD~1' }}
           head: ${{ github.event.pull_request.head.sha || github.sha }}
           extra_args: --json --only-verified
-
-      - name: Upload results
-        if: always()
-        uses: github/codeql-action/upload-sarif@8c78abb9b62512e3c45dea6559ffd924ed8549c8
-        with:
-          sarif_file: trufflehog-results.sarif
-          category: trufflehog
 
   detect-secrets:
     name: Detect Secrets
@@ -122,6 +119,8 @@ jobs:
           allowed-endpoints: >
             api.github.com:443
             github.com:443
+            pypi.org:443
+            files.pythonhosted.org:443
 
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -166,6 +165,7 @@ jobs:
             api.github.com:443
             github.com:443
             pypi.org:443
+            files.pythonhosted.org:443
             test.pypi.org:443
             registry.npmjs.org:443
 
@@ -244,6 +244,8 @@ jobs:
           allowed-endpoints: >
             api.github.com:443
             github.com:443
+            pypi.org:443
+            files.pythonhosted.org:443
 
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -309,6 +311,8 @@ jobs:
             api.github.com:443
             github.com:443
             semgrep.dev:443
+            pypi.org:443
+            files.pythonhosted.org:443
 
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -316,17 +320,16 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Run Semgrep
-        uses: returntocorp/semgrep@fed96460fd67f504ea59342eba8f921f4d74fe17
+      - name: Setup Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
-          config: >-
-            p/ci
-            p/python
-            p/secrets
-            p/security-audit
-          generateSarif: true
-          output: semgrep-results.sarif
-        continue-on-error: true
+          python-version: "3.13"
+
+      - name: Install Semgrep
+        run: python -m pip install semgrep
+
+      - name: Run Semgrep
+        run: semgrep scan --config p/ci --config p/python --config p/secrets --config p/security-audit --sarif --output semgrep-results.sarif --error
 
       - name: Upload SARIF
         if: always()
