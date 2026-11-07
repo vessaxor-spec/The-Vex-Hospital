@@ -180,6 +180,7 @@ jobs:
           python -m pip install -r requirements.txt
 
       - name: Run pip-audit
+        id: pip_audit
         run: |
           python -m pip install pip-audit==2.7.0
           pip-audit -r requirements.txt --format=json --output=pip-audit.json --desc
@@ -195,6 +196,7 @@ jobs:
           retention-days: 30
 
       - name: Run safety
+        id: safety_audit
         run: |
           python -m pip install safety==3.2.0
           safety check -r requirements.txt --json > safety-report.json
@@ -210,6 +212,7 @@ jobs:
           retention-days: 30
 
       - name: Run npm audit
+        id: npm_audit
         run: |
           npm audit --json --audit-level=high > npm-audit.json
         continue-on-error: true
@@ -222,6 +225,22 @@ jobs:
           path: npm-audit.json
           if-no-files-found: warn
           retention-days: 30
+
+      # Keep all three reports, then fail if any audit found vulnerabilities or could not run.
+      - name: Enforce dependency audit outcomes
+        if: always()
+        env:
+          PIP_OUTCOME: ${{ steps.pip_audit.outcome }}
+          SAFETY_OUTCOME: ${{ steps.safety_audit.outcome }}
+          NPM_OUTCOME: ${{ steps.npm_audit.outcome }}
+        run: |
+          for outcome in "$PIP_OUTCOME" "$SAFETY_OUTCOME" "$NPM_OUTCOME"; do
+            if [ "$outcome" != "success" ]; then
+              echo "::error::Dependency scanner failed or reported vulnerabilities"
+              exit 1
+            fi
+          done
+          echo "All dependency scanners completed without findings"
 
   license-check:
     name: License Compliance Check
