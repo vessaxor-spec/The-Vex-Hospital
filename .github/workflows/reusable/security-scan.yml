@@ -136,8 +136,14 @@ jobs:
       - name: Run npm audit
         if: ${{ inputs.scan-type == 'full' || inputs.scan-type == 'node' }}
         id: npm-audit
+        env:
+          AUDIT_LEVEL: ${{ inputs.severity-threshold }}
         run: |
-          npm audit --json --audit-level=${{ inputs.severity-threshold }} > npm-audit.json || true
+          case "$AUDIT_LEVEL" in
+            low|moderate|high|critical) ;;
+            *) echo "::error::Invalid npm audit severity threshold"; exit 2 ;;
+          esac
+          npm audit --json --audit-level="$AUDIT_LEVEL" > npm-audit.json || true
           FINDINGS=$(jq '.metadata.vulnerabilities.total' npm-audit.json)
           echo "findings-count=$FINDINGS" >> $GITHUB_OUTPUT
         continue-on-error: true
@@ -195,6 +201,8 @@ jobs:
 
       - name: Fail on findings
         if: ${{ inputs.fail-on-findings && (steps.bandit.outputs.findings-count > 0 || steps.pip-audit.outputs.findings-count > 0 || steps.safety.outputs.findings-count > 0 || steps.detect-secrets.outputs.findings-count > 0 || steps.npm-audit.outputs.findings-count > 0) }}
+        env:
+          SEVERITY_THRESHOLD: ${{ inputs.severity-threshold }}
         run: |
-          echo "::error::Security findings detected above threshold (${{ inputs.severity-threshold }})"
+          printf '%s\n' "::error::Security findings detected above threshold ($SEVERITY_THRESHOLD)"
           exit 1

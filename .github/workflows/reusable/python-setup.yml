@@ -64,15 +64,17 @@ jobs:
           allow-prereleases: false
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip setuptools wheel
-          python -m pip install --no-cache-dir -r ${{ inputs.cache-dependency-path }}
-          if [ "${{ inputs.install-dev-deps }}" = "true" ]; then
-            python -m pip install --no-cache-dir -r requirements-dev.txt 2>/dev/null || true
-          fi
         env:
           PIP_DISABLE_PIP_VERSION_CHECK: 1
           PIP_NO_CACHE_DIR: 0
+          CACHE_DEPENDENCY_PATH: ${{ inputs.cache-dependency-path }}
+          INSTALL_DEV_DEPS: ${{ inputs.install-dev-deps }}
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --no-cache-dir -r "$CACHE_DEPENDENCY_PATH"
+          if [ "$INSTALL_DEV_DEPS" = "true" ]; then
+            python -m pip install --no-cache-dir -r requirements-dev.txt 2>/dev/null || true
+          fi
 
       - name: Verify environment
         run: |
